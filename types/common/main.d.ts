@@ -1,6 +1,13 @@
+// Inputs from configuration options
+type inputsReturned = {
+    repo: string;
+    org: string;
+    features:  ghasFeatures[]; 
+  };
+
+type ghasFeatures = "secret-scanning" | "dependabot" | "code-scanning"; 
 
 // Dependabot alerts
-
 export interface DependancyAlert {
     number: number
     state: string

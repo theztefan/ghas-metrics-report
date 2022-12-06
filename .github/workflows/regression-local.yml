@@ -19,11 +19,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ steps.token-collection.outputs.token }}
           RUN_USING_ACT: "true"
+        with: 
           repo: "srdemo-demo"
           org: "advanced-security-demo"
-        # with: 
-        #   repo: X
-        #   org: "X"
-        
+          features: "dependabot, code-scanning, secret-scanning"
 
 

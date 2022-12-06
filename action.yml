@@ -10,6 +10,10 @@ inputs:
     description: 'The organisation to generate the report for'
     required: false
     default: advanced-security-demo
+  features:
+    description: 'The GHAS features enabled on the repo to generate the report for'
+    required: false
+    default: dependabot, code-scanning, secret-scanning
 outputs:
   reportOutput:
     description: 'GHAS Metrics Report'

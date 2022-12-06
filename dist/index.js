@@ -10958,18 +10958,28 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const utils_1 = __nccwpck_require__(6252);
 const run = async () => {
+    // get inputs
+    const inputs = await (0, utils_1.inputs)();
+    core.debug(`[🔎] inputs: ` + inputs.features);
+    core.debug(`[✅] Inputs parsed]`);
     // get dependabot alerts
-    let dependabotRes = await ((0, utils_1.DependabotAlerts)("advanced-security-demo", "srdemo-demo"));
-    core.debug(`[🔎] Dependabot alerts:` + dependabotRes.length);
-    core.debug(`[✅] Dependabot alerts fetched`);
+    if (inputs.features.includes("dependabot")) {
+        let dependabotRes = await ((0, utils_1.DependabotAlerts)("advanced-security-demo", "srdemo-demo"));
+        core.debug(`[🔎] Dependabot alerts: ` + dependabotRes.length);
+        core.debug(`[✅] Dependabot alerts fetched`);
+    }
     // get code scanning alerts
-    let codeScanningRes = await ((0, utils_1.CodeScanningAlerts)("advanced-security-demo", "srdemo-demo"));
-    core.debug(`[🔎] Code Scanning alerts:` + codeScanningRes.length);
-    core.debug(`[✅] Code Scanning alerts fetched`);
+    if (inputs.features.includes("code-scanning")) {
+        let codeScanningRes = await ((0, utils_1.CodeScanningAlerts)("advanced-security-demo", "srdemo-demo"));
+        core.debug(`[🔎] Code Scanning alerts: ` + codeScanningRes.length);
+        core.debug(`[✅] Code Scanning alerts fetched`);
+    }
     // get secret scanning alerts
-    let secretScanningRes = await ((0, utils_1.SecretScanningAlerts)("advanced-security-demo", "srdemo-demo"));
-    core.debug(`[🔎] Secret Scanning alerts:` + secretScanningRes.length);
-    core.debug(`[✅] Secret Scanning alerts fetched`);
+    if (inputs.features.includes("secret-scanning")) {
+        let secretScanningRes = await ((0, utils_1.SecretScanningAlerts)("advanced-security-demo", "srdemo-demo"));
+        core.debug(`[🔎] Secret Scanning alerts ` + secretScanningRes.length);
+        core.debug(`[✅] Secret Scanning alerts fetched`);
+    }
     // do our metrics, calculations, etc
     // prepare output
     return;
@@ -11179,17 +11189,57 @@ Object.defineProperty(exports, "SecretScanningAlerts", ({ enumerable: true, get:
 /***/ }),
 
 /***/ 9378:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.inputs = void 0;
-function updatePath(cardPath, path) {
-    const [, prefix] = path.split("/");
-    return (cardPath = `./${prefix}` + cardPath.replace(".", ""));
-}
+const core = __importStar(__nccwpck_require__(2186));
 const inputs = async () => {
+    try {
+        // get the inputs
+        const repo = core.getInput("repo", { required: true });
+        const org = core.getInput("org", { required: true });
+        const features_string = core.getInput("features", { required: true });
+        const features = features_string.replace(/\s/g, "").toLowerCase().split(",", 3);
+        core.debug(`The following repo was inputted: ${repo}`);
+        core.debug(`The following org was inputted: ${org}`);
+        core.debug(`The following features was inputted: ${features}`);
+        return {
+            repo,
+            org,
+            features,
+        };
+    }
+    catch (e) {
+        core.debug(`${e}`);
+        core.setFailed("Error: There was an error getting the inputs. Please check the logs.");
+        throw new Error(e.message);
+    }
 };
 exports.inputs = inputs;
 
