@@ -16,20 +16,20 @@ export interface DependancyAlert {
     dismissed_reason: any
     dismissed_comment: any
     fixed_at: any
-  }
-  
-  export interface Dependency {
+}
+
+export interface Dependency {
     package: Package
     manifest_path: string
     scope: string
-  }
-  
-  export interface Package {
+}
+
+export interface Package {
     ecosystem: string
     name: string
-  }
-  
-  export interface SecurityAdvisory {
+}
+
+export interface SecurityAdvisory {
     ghsa_id: string
     cve_id: string
     summary: string
@@ -43,62 +43,62 @@ export interface DependancyAlert {
     vulnerabilities: Vulnerability[]
     cvss: Cvss
     cwes: Cwe[]
-  }
-  
-  export interface Identifier {
+}
+
+export interface Identifier {
     value: string
     type: string
-  }
-  
-  export interface Reference {
+}
+
+export interface Reference {
     url: string
-  }
-  
-  export interface Vulnerability {
+}
+
+export interface Vulnerability {
     package: Package2
     severity: string
     vulnerable_version_range: string
     first_patched_version: FirstPatchedVersion
-  }
-  
-  export interface Package2 {
+}
+
+export interface Package2 {
     ecosystem: string
     name: string
-  }
-  
-  export interface FirstPatchedVersion {
+}
+
+export interface FirstPatchedVersion {
     identifier: string
-  }
-  
-  export interface Cvss {
+}
+
+export interface Cvss {
     vector_string: any
     score: number
-  }
-  
-  export interface Cwe {
+}
+
+export interface Cwe {
     cwe_id: string
     name: string
-  }
-  
-  export interface SecurityVulnerability {
+}
+
+export interface SecurityVulnerability {
     package: Package3
     severity: string
     vulnerable_version_range: string
     first_patched_version: FirstPatchedVersion2
-  }
-  
-  export interface Package3 {
+}
+
+export interface Package3 {
     ecosystem: string
     name: string
-  }
-  
-  export interface FirstPatchedVersion2 {
-    identifier: string
-  }
-  
+}
 
-  // Code scanning alerts
-  export interface CodeScanningAlert {
+export interface FirstPatchedVersion2 {
+    identifier: string
+}
+
+
+// Code scanning alerts
+export interface CodeScanningAlert {
     number: number
     created_at: string
     updated_at: string
@@ -114,9 +114,9 @@ export interface DependancyAlert {
     tool: Tool
     most_recent_instance: MostRecentInstance
     instances_url: string
-  }
-  
-  export interface DismissedBy {
+}
+
+export interface DismissedBy {
     login: string
     id: number
     node_id: string
@@ -135,24 +135,24 @@ export interface DependancyAlert {
     received_events_url: string
     type: string
     site_admin: boolean
-  }
-  
-  export interface Rule {
+}
+
+export interface Rule {
     id: string
     severity: string
     description: string
     name: string
     tags: string[]
     security_severity_level: string
-  }
-  
-  export interface Tool {
+}
+
+export interface Tool {
     name: string
     guid: any
     version: string
-  }
-  
-  export interface MostRecentInstance {
+}
+
+export interface MostRecentInstance {
     ref: string
     analysis_key: string
     environment: string
@@ -162,17 +162,38 @@ export interface DependancyAlert {
     message: Message
     location: Location
     classifications: any[]
-  }
-  
-  export interface Message {
+}
+
+export interface Message {
     text: string
-  }
-  
-  export interface Location {
+}
+
+export interface Location {
     path: string
     start_line: number
     end_line: number
     start_column: number
     end_column: number
-  }
-  
+}
+
+
+// Secret Scaning
+export interface SecretScanningAlert {
+    number: number
+    created_at: string
+    updated_at: string
+    url: string
+    html_url: string
+    locations_url: string
+    state: string
+    secret_type: string
+    secret_type_display_name: string
+    secret: string
+    resolution: any
+    resolved_by: any
+    resolved_at: any
+    resolution_comment: any
+    push_protection_bypassed: boolean
+    push_protection_bypassed_by: any
+    push_protection_bypassed_at: any
+}

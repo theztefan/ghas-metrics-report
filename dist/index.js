@@ -10967,7 +10967,9 @@ const run = async () => {
     core.debug(`[🔎] Code Scanning alerts:` + codeScanningRes.length);
     core.debug(`[✅] Code Scanning alerts fetched`);
     // get secret scanning alerts
-    //let secretScanningRes = await (SecretScanningAlerts("advanced-security-demo", "srdemo-demo"));
+    let secretScanningRes = await ((0, utils_1.SecretScanningAlerts)("advanced-security-demo", "srdemo-demo"));
+    core.debug(`[🔎] Secret Scanning alerts:` + secretScanningRes.length);
+    core.debug(`[✅] Secret Scanning alerts fetched`);
     // do our metrics, calculations, etc
     // prepare output
     return;
@@ -11016,11 +11018,10 @@ const CodeScanningAlerts = async (owner, repository) => {
         const iterator = await octokit.paginate('GET /repos/{owner}/{repo}/code-scanning/alerts', {
             owner: owner,
             repo: repository,
-            per_page: 5,
+            per_page: 100,
         }, (response) => {
             return response.data;
         });
-        core.debug("Code Scanning" + JSON.stringify(iterator[0]));
         res = iterator;
     }
     catch (error) {
@@ -11072,7 +11073,7 @@ const DependabotAlerts = async (owner, repository) => {
         const iterator = await octokit.paginate('GET /repos/{owner}/{repo}/dependabot/alerts', {
             owner: owner,
             repo: repository,
-            per_page: 5,
+            per_page: 100,
         }, (response) => {
             return response.data;
         });
@@ -11117,22 +11118,41 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SecretScanningAlerts = void 0;
+exports.SecretScanningAlerts = exports.xSecretScanningAlerts = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const action_1 = __nccwpck_require__(1231);
-const SecretScanningAlerts = async (owner, repository) => {
+const xSecretScanningAlerts = async (owner, repository) => {
     try {
         const octokit = new action_1.Octokit();
         let response = await octokit.request('GET /repos/{owner}/{repo}/secret-scanning/alerts', {
             owner: owner,
             repo: repository
         });
-        console.log(`Alerts` + JSON.stringify(response));
+        console.log(`Alerts` + JSON.stringify(response.data[0]));
     }
     catch (error) {
         console.log(error);
         core.setFailed("There was an erron. Please check the logs");
     }
+};
+exports.xSecretScanningAlerts = xSecretScanningAlerts;
+const SecretScanningAlerts = async (owner, repository) => {
+    let res = [];
+    try {
+        const octokit = new action_1.Octokit();
+        const iterator = await octokit.paginate('GET /repos/{owner}/{repo}/secret-scanning/alerts', {
+            owner: owner,
+            repo: repository,
+            per_page: 100,
+        }, (response) => {
+            return response.data;
+        });
+        res = iterator;
+    }
+    catch (error) {
+        core.setFailed("There was an error. Please check the logs" + error);
+    }
+    return res;
 };
 exports.SecretScanningAlerts = SecretScanningAlerts;
 
