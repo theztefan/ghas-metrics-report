@@ -1,7 +1,7 @@
 {
-  "name": "actions-name",
+  "name": "ghas-metrics-report",
   "version": "1.0.0",
-  "description": "actions-description",
+  "description": "A GitHub Action to generate GHAS metrics report",
   "main": "main.ts",
   "scripts": {
     "build": "tsc && ncc build ./src/main.ts -o dist",
@@ -12,7 +12,7 @@
     "test": "jest --coverage",
     "prepare": "husky install",
     "start": "yarn run build && node ./dist/index.js",
-    "local": "yarn run build && act --job regression --env-file ./.env --eventpath .github/workflows/regression/payload.json --secret-file my.secrets"
+    "local": "yarn run build && act --job regression-local-pat --env-file ./.env --secret-file my.secrets"
   },
   "keywords": [],
   "author": "",

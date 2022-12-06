@@ -1,13 +1,18 @@
-name: 'Action Name'
-author: 'NickLiffen'
-description: 'Action Description'
+name: 'Github Advanced Sceurity Metrics Report'
+author: 'theztefan'
+description: 'A GithuB Action to generate a report of the Advanced Security Metrics for a given repository'
 inputs:
-  inputName:
-    description: 'Input Description'
+  repo:
+    description: 'The repository to generate the report for'
     required: true
+    default: srdemo-demo
+  org:
+    description: 'The organisation to generate the report for'
+    required: false
+    default: advanced-security-demo
 outputs:
-  outputName:
-    description: 'Output Description'
+  reportOutput:
+    description: 'GHAS Metrics Report'
 runs:
   using: 'node16'
   main: 'dist/index.js'

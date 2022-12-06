@@ -32,8 +32,8 @@ name: "Regression Testing"
 ? "on"
 : 
   workflow_dispatch: 
-    inputs: 
-      exampleInput: 
-        default: xys
-        description: "xyz"
-        required: true
+    # inputs: 
+    #   exampleInput: 
+    #     default: xys
+    #     description: "xyz"
+    #     required: true
