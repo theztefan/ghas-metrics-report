@@ -11045,7 +11045,8 @@ const AlertsMetrics = (alerts, dateField, state) => {
     const fixedAlertsLastWeek = fixedAlerts.filter(a => FilterBetweenDates(a[dateField], lastWeek, today));
     const result = {
         fixedYesterday: fixedAlertsYesterday.length,
-        fixedLastWeek: fixedAlertsLastWeek.length
+        fixedLastWeek: fixedAlertsLastWeek.length,
+        openVulnerabilities: alerts.filter(a => a.state === "open").length
     };
     return result;
 };

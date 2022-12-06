@@ -4,6 +4,7 @@ import { DependancyAlert, CodeScanningAlert, SecretScanningAlert } from "../../t
 interface AlertsMetrics {
     fixedYesterday: number,
     fixedLastWeek: number
+    openVulnerabilities: number,
 }
 
 interface MTTRMetrics {
@@ -31,7 +32,8 @@ export const AlertsMetrics = (alerts: any[], dateField: string, state: string): 
 
     const result:AlertsMetrics = {
         fixedYesterday: fixedAlertsYesterday.length, 
-        fixedLastWeek: fixedAlertsLastWeek.length
+        fixedLastWeek: fixedAlertsLastWeek.length,
+        openVulnerabilities: alerts.filter(a => a.state === "open").length
     };
 
     return result;
