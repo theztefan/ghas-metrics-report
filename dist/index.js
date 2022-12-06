@@ -10960,31 +10960,123 @@ const utils_1 = __nccwpck_require__(6252);
 const run = async () => {
     // get inputs
     const inputs = await (0, utils_1.inputs)();
-    core.debug(`[🔎] inputs: ` + inputs.features);
     core.debug(`[✅] Inputs parsed]`);
     // get dependabot alerts
     if (inputs.features.includes("dependabot")) {
         let dependabotRes = await ((0, utils_1.DependabotAlerts)("advanced-security-demo", "srdemo-demo"));
         core.debug(`[🔎] Dependabot alerts: ` + dependabotRes.length);
         core.debug(`[✅] Dependabot alerts fetched`);
+        const dependabotAlertsMetrics = (0, utils_1.AlertsMetrics)(dependabotRes, "fixed_at", "fixed");
+        const dependabotMttr = (0, utils_1.CalculateMTTR)(dependabotRes, "fixed_at", "fixed");
+        (0, utils_1.PrintAlertsMetrics)("Dependabot", dependabotAlertsMetrics);
+        core.debug(`[🔎] Dependabot - MTTR: ` + dependabotMttr.mttr);
     }
     // get code scanning alerts
     if (inputs.features.includes("code-scanning")) {
         let codeScanningRes = await ((0, utils_1.CodeScanningAlerts)("advanced-security-demo", "srdemo-demo"));
         core.debug(`[🔎] Code Scanning alerts: ` + codeScanningRes.length);
         core.debug(`[✅] Code Scanning alerts fetched`);
+        const codeScanningAlertsMetrics = (0, utils_1.AlertsMetrics)(codeScanningRes, "fixed_at", "fixed");
+        const codeScanningMttr = (0, utils_1.CalculateMTTR)(codeScanningRes, "fixed_at", "fixed");
+        (0, utils_1.PrintAlertsMetrics)("Code Scanning", codeScanningAlertsMetrics);
+        core.debug(`[🔎] Code Scanning - MTTR: ` + codeScanningMttr.mttr);
     }
     // get secret scanning alerts
     if (inputs.features.includes("secret-scanning")) {
         let secretScanningRes = await ((0, utils_1.SecretScanningAlerts)("advanced-security-demo", "srdemo-demo"));
         core.debug(`[🔎] Secret Scanning alerts ` + secretScanningRes.length);
         core.debug(`[✅] Secret Scanning alerts fetched`);
+        const secretScanningAlertsMetrics = (0, utils_1.AlertsMetrics)(secretScanningRes, "resolved_at", "resolved");
+        const secretScanningMttr = (0, utils_1.CalculateMTTR)(secretScanningRes, "resolved_at", "resolved");
+        (0, utils_1.PrintAlertsMetrics)("Secret Scanning", secretScanningAlertsMetrics);
+        core.debug(`[🔎] Secret Scanning - MTTR: ` + secretScanningMttr.mttr);
     }
-    // do our metrics, calculations, etc
     // prepare output
     return;
 };
 run();
+
+
+/***/ }),
+
+/***/ 2344:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CalculateMTTR = exports.PrintAlertsMetrics = exports.AlertsMetrics = void 0;
+const core = __importStar(__nccwpck_require__(2186));
+const AlertsMetrics = (alerts, dateField, state) => {
+    const todayDate = new Date();
+    todayDate.setHours(0, 0, 0, 0);
+    const today = todayDate.getDate();
+    const yesterdayDate = new Date();
+    yesterdayDate.setHours(0, 0, 0, 0);
+    const yesterday = yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+    const lastWeekDate = new Date();
+    lastWeekDate.setHours(0, 0, 0, 0);
+    const lastWeek = lastWeekDate.setDate(lastWeekDate.getDate() - 7);
+    const fixedAlerts = alerts.filter(a => a.state === state);
+    const fixedAlertsYesterday = fixedAlerts.filter(a => FilterBetweenDates(a[dateField], yesterday, today));
+    const fixedAlertsLastWeek = fixedAlerts.filter(a => FilterBetweenDates(a[dateField], lastWeek, today));
+    const result = {
+        fixedYesterday: fixedAlertsYesterday.length,
+        fixedLastWeek: fixedAlertsLastWeek.length
+    };
+    return result;
+};
+exports.AlertsMetrics = AlertsMetrics;
+const PrintAlertsMetrics = (category, alertsMetrics) => {
+    for (const metric in alertsMetrics) {
+        core.debug(`[🔎] ${category} - ${metric}: ` + alertsMetrics[metric]);
+    }
+};
+exports.PrintAlertsMetrics = PrintAlertsMetrics;
+const CalculateMTTR = (alerts, dateField, state) => {
+    let alert_count = 0;
+    let total_time_to_remediate_seconds = 0;
+    for (const alert of alerts.filter(a => a.state === state)) {
+        const fixedDate = Date.parse(alert[dateField]);
+        const openDate = Date.parse(alert.created_at);
+        const time_to_remediate = fixedDate - openDate;
+        total_time_to_remediate_seconds += (time_to_remediate / 1000);
+        alert_count += 1;
+    }
+    const result = {
+        mttr: alert_count === 0 ? 0 : (total_time_to_remediate_seconds / alert_count),
+        count: alert_count
+    };
+    return result;
+};
+exports.CalculateMTTR = CalculateMTTR;
+const FilterBetweenDates = (stringDate, minDate, maxDate) => {
+    const date = Date.parse(stringDate);
+    return date >= minDate; //&& date < maxDate
+};
 
 
 /***/ }),
@@ -11175,7 +11267,7 @@ exports.SecretScanningAlerts = SecretScanningAlerts;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SecretScanningAlerts = exports.CodeScanningAlerts = exports.DependabotAlerts = exports.inputs = void 0;
+exports.CalculateMTTR = exports.PrintAlertsMetrics = exports.AlertsMetrics = exports.SecretScanningAlerts = exports.CodeScanningAlerts = exports.DependabotAlerts = exports.inputs = void 0;
 const inputs_1 = __nccwpck_require__(9378);
 Object.defineProperty(exports, "inputs", ({ enumerable: true, get: function () { return inputs_1.inputs; } }));
 const DependabotAlerts_1 = __nccwpck_require__(1514);
@@ -11184,6 +11276,10 @@ const CodeScanningAlerts_1 = __nccwpck_require__(798);
 Object.defineProperty(exports, "CodeScanningAlerts", ({ enumerable: true, get: function () { return CodeScanningAlerts_1.CodeScanningAlerts; } }));
 const SecretScanningAlerts_1 = __nccwpck_require__(5667);
 Object.defineProperty(exports, "SecretScanningAlerts", ({ enumerable: true, get: function () { return SecretScanningAlerts_1.SecretScanningAlerts; } }));
+const AlertMetrics_1 = __nccwpck_require__(2344);
+Object.defineProperty(exports, "AlertsMetrics", ({ enumerable: true, get: function () { return AlertMetrics_1.AlertsMetrics; } }));
+Object.defineProperty(exports, "PrintAlertsMetrics", ({ enumerable: true, get: function () { return AlertMetrics_1.PrintAlertsMetrics; } }));
+Object.defineProperty(exports, "CalculateMTTR", ({ enumerable: true, get: function () { return AlertMetrics_1.CalculateMTTR; } }));
 
 
 /***/ }),
@@ -11226,6 +11322,7 @@ const inputs = async () => {
         const org = core.getInput("org", { required: true });
         const features_string = core.getInput("features", { required: true });
         const features = features_string.replace(/\s/g, "").toLowerCase().split(",", 3);
+        //TODO: Stricter validation. Why are values not in ghasFeatures type union still accepted?
         core.debug(`The following repo was inputted: ${repo}`);
         core.debug(`The following org was inputted: ${org}`);
         core.debug(`The following features was inputted: ${features}`);
