@@ -11043,10 +11043,14 @@ const AlertsMetrics = (alerts, dateField, state) => {
     const fixedAlerts = alerts.filter(a => a.state === state);
     const fixedAlertsYesterday = fixedAlerts.filter(a => FilterBetweenDates(a[dateField], yesterday, today));
     const fixedAlertsLastWeek = fixedAlerts.filter(a => FilterBetweenDates(a[dateField], lastWeek, today));
+    //get Top 10 by criticality
+    const openAlerts = alerts.filter(a => a.state === "open");
+    const top10Alerts = openAlerts.sort(compareAlertSeverity).slice(0, 10);
     const result = {
         fixedYesterday: fixedAlertsYesterday.length,
         fixedLastWeek: fixedAlertsLastWeek.length,
-        openVulnerabilities: alerts.filter(a => a.state === "open").length
+        openVulnerabilities: alerts.filter(a => a.state === "open").length,
+        top10: top10Alerts,
     };
     return result;
 };
@@ -11078,6 +11082,44 @@ const FilterBetweenDates = (stringDate, minDate, maxDate) => {
     const date = Date.parse(stringDate);
     return date >= minDate; //&& date < maxDate
 };
+function compareAlertSeverity(a, b) {
+    //critical, high, medium, low, warning, note, error
+    const weight = {
+        "critical": 7,
+        "high": 6,
+        "medium": 5,
+        "low": 4,
+        "warning": 3,
+        "note": 2,
+        "error": 1,
+        "none": 0,
+    };
+    let comparison = 0;
+    let severity1 = "none";
+    let severity2 = "none";
+    // different comparisons depending on alert type alerts
+    if (isDependancyAlert(a) && isDependancyAlert(b)) {
+        severity1 = a.security_advisory.severity.toLowerCase();
+        severity2 = b.security_advisory.severity.toLowerCase();
+    }
+    else if (isCodeScanningAlert(a) && isCodeScanningAlert(b)) {
+        severity1 = a.rule.severity.toLowerCase();
+        severity2 = b.rule.severity.toLowerCase();
+    }
+    if (weight[severity1] < weight[severity2]) {
+        comparison = 1;
+    }
+    else if (weight[severity1] > weight[severity2]) {
+        comparison = -1;
+    }
+    return comparison;
+}
+function isDependancyAlert(alert) {
+    return 'security_advisory' in alert;
+}
+function isCodeScanningAlert(alert) {
+    return 'rule' in alert && 'severity' in alert.rule;
+}
 
 
 /***/ }),
