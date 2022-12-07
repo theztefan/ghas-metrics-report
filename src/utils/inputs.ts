@@ -1,15 +1,16 @@
 import * as core from "@actions/core";
 import { inputsReturned, ghasFeatures } from "../types/common/main";
 
-
-
 export const inputs = async (): Promise<inputsReturned> => {
   try {
     // get the inputs
     const repo = core.getInput("repo", { required: true });
     const org = core.getInput("org", { required: true });
     const features_string = core.getInput("features", { required: true });
-    const features: ghasFeatures[] = features_string.replace(/\s/g, "").toLowerCase().split(",", 3) as ghasFeatures[]; 
+    const features: ghasFeatures[] = features_string
+      .replace(/\s/g, "")
+      .toLowerCase()
+      .split(",", 3) as ghasFeatures[];
     //TODO: Stricter validation. Why are values not in ghasFeatures type union still accepted?
 
     core.debug(`The following repo was inputted: ${repo}`);

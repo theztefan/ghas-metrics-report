@@ -1,25 +1,25 @@
-name: 'Github Advanced Sceurity Metrics Report'
-author: 'theztefan'
-description: 'A GithuB Action to generate a report of the Advanced Security Metrics for a given repository'
+name: "Github Advanced Sceurity Metrics Report"
+author: "theztefan"
+description: "A GithuB Action to generate a report of the Advanced Security Metrics for a given repository"
 inputs:
   repo:
-    description: 'The repository to generate the report for'
+    description: "The repository to generate the report for"
     required: true
     default: srdemo-demo
   org:
-    description: 'The organisation to generate the report for'
+    description: "The organisation to generate the report for"
     required: false
     default: advanced-security-demo
   features:
-    description: 'The GHAS features enabled on the repo to generate the report for'
+    description: "The GHAS features enabled on the repo to generate the report for"
     required: false
     default: dependabot, code-scanning, secret-scanning
 outputs:
   report-json:
-    description: 'GHAS Metrics Report'
+    description: "GHAS Metrics Report"
 runs:
-  using: 'node16'
-  main: 'dist/index.js'
+  using: "node16"
+  main: "dist/index.js"
 branding:
-  icon: 'target'  
-  color: 'blue'
+  icon: "target"
+  color: "blue"

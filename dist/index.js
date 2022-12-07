@@ -10968,11 +10968,11 @@ const run = async () => {
         inputs: inputs,
         dependabot_metrics: null,
         code_scanning_metrics: null,
-        secret_scanning_metrics: null
+        secret_scanning_metrics: null,
     };
     // get dependabot alerts
     if (inputs.features.includes("dependabot")) {
-        const dependabotRes = await ((0, utils_1.DependabotAlerts)("advanced-security-demo", "srdemo-demo"));
+        const dependabotRes = await (0, utils_1.DependabotAlerts)("advanced-security-demo", "srdemo-demo");
         core.debug(`[🔎] Dependabot alerts: ` + dependabotRes.length);
         core.info(`[✅] Dependabot alerts fetched`);
         const dependabotAlertsMetrics = (0, utils_1.AlertsMetrics)(dependabotRes, "fixed_at", "fixed");
@@ -10983,7 +10983,7 @@ const run = async () => {
     }
     // get code scanning alerts
     if (inputs.features.includes("code-scanning")) {
-        const codeScanningRes = await ((0, utils_1.CodeScanningAlerts)("advanced-security-demo", "srdemo-demo"));
+        const codeScanningRes = await (0, utils_1.CodeScanningAlerts)("advanced-security-demo", "srdemo-demo");
         core.debug(`[🔎] Code Scanning alerts: ` + codeScanningRes.length);
         core.info(`[✅] Code Scanning alerts fetched`);
         const codeScanningAlertsMetrics = (0, utils_1.AlertsMetrics)(codeScanningRes, "fixed_at", "fixed");
@@ -10994,7 +10994,7 @@ const run = async () => {
     }
     // get secret scanning alerts
     if (inputs.features.includes("secret-scanning")) {
-        const secretScanningRes = await ((0, utils_1.SecretScanningAlerts)("advanced-security-demo", "srdemo-demo"));
+        const secretScanningRes = await (0, utils_1.SecretScanningAlerts)("advanced-security-demo", "srdemo-demo");
         core.debug(`[🔎] Secret Scanning alerts ` + secretScanningRes.length);
         core.debug(`[✅] Secret Scanning alerts fetched`);
         const secretScanningAlertsMetrics = (0, utils_1.AlertsMetrics)(secretScanningRes, "resolved_at", "resolved");
@@ -11055,62 +11055,63 @@ const AlertsMetrics = (alerts, dateField, state) => {
     const lastWeekDate = new Date();
     lastWeekDate.setHours(0, 0, 0, 0);
     const lastWeek = lastWeekDate.setDate(lastWeekDate.getDate() - 7);
-    const fixedAlerts = alerts.filter(a => a.state === state);
-    const fixedAlertsYesterday = fixedAlerts.filter(a => FilterBetweenDates(a[dateField], yesterday, today));
-    const fixedAlertsLastWeek = fixedAlerts.filter(a => FilterBetweenDates(a[dateField], lastWeek, today));
+    const fixedAlerts = alerts.filter((a) => a.state === state);
+    const fixedAlertsYesterday = fixedAlerts.filter((a) => FilterBetweenDates(a[dateField], yesterday, today));
+    const fixedAlertsLastWeek = fixedAlerts.filter((a) => FilterBetweenDates(a[dateField], lastWeek, today));
     //get Top 10 by criticality
-    const openAlerts = alerts.filter(a => a.state === "open");
+    const openAlerts = alerts.filter((a) => a.state === "open");
     const top10Alerts = openAlerts.sort(compareAlertSeverity).slice(0, 10);
     //get MTTR
     const mttr = (0, exports.CalculateMTTR)(alerts, dateField, state);
     const result = {
         fixedYesterday: fixedAlertsYesterday.length,
         fixedLastWeek: fixedAlertsLastWeek.length,
-        openVulnerabilities: alerts.filter(a => a.state === "open").length,
+        openVulnerabilities: alerts.filter((a) => a.state === "open").length,
         top10: top10Alerts,
-        mttr: mttr
+        mttr: mttr,
     };
     return result;
 };
 exports.AlertsMetrics = AlertsMetrics;
 const PrintAlertsMetrics = (category, alertsMetrics) => {
     for (const metric in alertsMetrics) {
-        core.debug(`[🔎] ${category} - ${metric}: ` + alertsMetrics[metric]);
+        core.debug(`[🔎] ${category} - ${metric}: ` +
+            alertsMetrics[metric]);
     }
 };
 exports.PrintAlertsMetrics = PrintAlertsMetrics;
 const CalculateMTTR = (alerts, dateField, state) => {
     let alert_count = 0;
     let total_time_to_remediate_seconds = 0;
-    for (const alert of alerts.filter(a => a.state === state)) {
+    for (const alert of alerts.filter((a) => a.state === state)) {
         const fixedDate = Date.parse(alert[dateField]);
         const openDate = Date.parse(alert.created_at);
         const time_to_remediate = fixedDate - openDate;
-        total_time_to_remediate_seconds += (time_to_remediate / 1000);
+        total_time_to_remediate_seconds += time_to_remediate / 1000;
         alert_count += 1;
     }
     const result = {
-        mttr: alert_count === 0 ? 0 : (total_time_to_remediate_seconds / alert_count),
-        count: alert_count
+        mttr: alert_count === 0 ? 0 : total_time_to_remediate_seconds / alert_count,
+        count: alert_count,
     };
     return result;
 };
 exports.CalculateMTTR = CalculateMTTR;
 const FilterBetweenDates = (stringDate, minDate, maxDate) => {
     const date = Date.parse(stringDate);
-    return date >= minDate; //&& date < maxDate
+    return date >= minDate && date < maxDate;
 };
 function compareAlertSeverity(a, b) {
     //critical, high, medium, low, warning, note, error
     const weight = {
-        "critical": 7,
-        "high": 6,
-        "medium": 5,
-        "low": 4,
-        "warning": 3,
-        "note": 2,
-        "error": 1,
-        "none": 0,
+        critical: 7,
+        high: 6,
+        medium: 5,
+        low: 4,
+        warning: 3,
+        note: 2,
+        error: 1,
+        none: 0,
     };
     let comparison = 0;
     let severity1 = "none";
@@ -11133,10 +11134,10 @@ function compareAlertSeverity(a, b) {
     return comparison;
 }
 function isDependancyAlert(alert) {
-    return 'security_advisory' in alert;
+    return "security_advisory" in alert;
 }
 function isCodeScanningAlert(alert) {
-    return 'rule' in alert && 'severity' in alert.rule;
+    return "rule" in alert && "severity" in alert.rule;
 }
 
 
@@ -11178,7 +11179,7 @@ const CodeScanningAlerts = async (owner, repository) => {
     let res = [];
     try {
         const octokit = new action_1.Octokit();
-        const iterator = await octokit.paginate('GET /repos/{owner}/{repo}/code-scanning/alerts', {
+        const iterator = await octokit.paginate("GET /repos/{owner}/{repo}/code-scanning/alerts", {
             owner: owner,
             repo: repository,
             per_page: 100,
@@ -11233,7 +11234,7 @@ const DependabotAlerts = async (owner, repository) => {
     let res = [];
     try {
         const octokit = new action_1.Octokit();
-        const iterator = await octokit.paginate('GET /repos/{owner}/{repo}/dependabot/alerts', {
+        const iterator = await octokit.paginate("GET /repos/{owner}/{repo}/dependabot/alerts", {
             owner: owner,
             repo: repository,
             per_page: 100,
@@ -11288,7 +11289,7 @@ const SecretScanningAlerts = async (owner, repository) => {
     let res = [];
     try {
         const octokit = new action_1.Octokit();
-        const iterator = await octokit.paginate('GET /repos/{owner}/{repo}/secret-scanning/alerts', {
+        const iterator = await octokit.paginate("GET /repos/{owner}/{repo}/secret-scanning/alerts", {
             owner: owner,
             repo: repository,
             per_page: 100,
@@ -11343,7 +11344,7 @@ const path_1 = __nccwpck_require__(1017);
 const syncWriteFile = (filename, data) => {
     const outputFilename = (0, path_1.join)(__dirname, filename);
     (0, fs_1.writeFileSync)(outputFilename, data, {
-        flag: 'w',
+        flag: "w",
     });
     core.debug(`[📝] File ${outputFilename} written`);
     return;
@@ -11415,7 +11416,10 @@ const inputs = async () => {
         const repo = core.getInput("repo", { required: true });
         const org = core.getInput("org", { required: true });
         const features_string = core.getInput("features", { required: true });
-        const features = features_string.replace(/\s/g, "").toLowerCase().split(",", 3);
+        const features = features_string
+            .replace(/\s/g, "")
+            .toLowerCase()
+            .split(",", 3);
         //TODO: Stricter validation. Why are values not in ghasFeatures type union still accepted?
         core.debug(`The following repo was inputted: ${repo}`);
         core.debug(`The following org was inputted: ${org}`);

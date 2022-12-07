@@ -1,1 +1,752 @@
-[{"number":64,"state":"open","dependency":{"package":{"ecosystem":"npm","name":"loader-utils"},"manifest_path":"frontend/package-lock.json","scope":"runtime"},"security_advisory":{"ghsa_id":"GHSA-76p3-8jx3-jpfq","cve_id":"CVE-2022-37601","summary":"Prototype pollution in webpack loader-utils","description":"Prototype pollution vulnerability in function parseQuery in parseQuery.js in webpack loader-utils prior to version 2.0.3 via the name variable in parseQuery.js.","severity":"critical","identifiers":[{"value":"GHSA-76p3-8jx3-jpfq","type":"GHSA"},{"value":"CVE-2022-37601","type":"CVE"}],"references":[{"url":"https://nvd.nist.gov/vuln/detail/CVE-2022-37601"},{"url":"https://github.com/webpack/loader-utils/issues/212"},{"url":"https://github.com/webpack/loader-utils/blob/d9f4e23cf411d8556f8bac2d3bf05a6e0103b568/lib/parseQuery.js#L11"},{"url":"https://github.com/webpack/loader-utils/blob/d9f4e23cf411d8556f8bac2d3bf05a6e0103b568/lib/parseQuery.js#L47"},{"url":"https://github.com/webpack/loader-utils/releases/tag/v2.0.3"},{"url":"https://github.com/webpack/loader-utils/pull/217"},{"url":"https://github.com/webpack/loader-utils/pull/220"},{"url":"https://github.com/webpack/loader-utils/releases/tag/v1.4.1"},{"url":"https://github.com/advisories/GHSA-76p3-8jx3-jpfq"}],"published_at":"2022-10-13T12:00:28Z","updated_at":"2022-11-07T22:14:16Z","withdrawn_at":null,"vulnerabilities":[{"package":{"ecosystem":"npm","name":"loader-utils"},"severity":"critical","vulnerable_version_range":">= 2.0.0, < 2.0.3","first_patched_version":{"identifier":"2.0.3"}},{"package":{"ecosystem":"npm","name":"loader-utils"},"severity":"critical","vulnerable_version_range":"< 1.4.1","first_patched_version":{"identifier":"1.4.1"}}],"cvss":{"vector_string":"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H","score":9.8},"cwes":[{"cwe_id":"CWE-1321","name":"Improperly Controlled Modification of Object Prototype Attributes ('Prototype Pollution')"}]},"security_vulnerability":{"package":{"ecosystem":"npm","name":"loader-utils"},"severity":"critical","vulnerable_version_range":">= 2.0.0, < 2.0.3","first_patched_version":{"identifier":"2.0.3"}},"url":"https://api.github.com/repos/advanced-security-demo/bb-demo/dependabot/alerts/64","html_url":"https://github.com/advanced-security-demo/bb-demo/security/dependabot/64","created_at":"2022-11-08T18:49:31Z","updated_at":"2022-11-08T18:49:31Z","dismissed_at":null,"dismissed_by":null,"dismissed_reason":null,"dismissed_comment":null,"fixed_at":null},{"number":63,"state":"open","dependency":{"package":{"ecosystem":"npm","name":"loader-utils"},"manifest_path":"frontend/package-lock.json","scope":"development"},"security_advisory":{"ghsa_id":"GHSA-76p3-8jx3-jpfq","cve_id":"CVE-2022-37601","summary":"Prototype pollution in webpack loader-utils","description":"Prototype pollution vulnerability in function parseQuery in parseQuery.js in webpack loader-utils prior to version 2.0.3 via the name variable in parseQuery.js.","severity":"critical","identifiers":[{"value":"GHSA-76p3-8jx3-jpfq","type":"GHSA"},{"value":"CVE-2022-37601","type":"CVE"}],"references":[{"url":"https://nvd.nist.gov/vuln/detail/CVE-2022-37601"},{"url":"https://github.com/webpack/loader-utils/issues/212"},{"url":"https://github.com/webpack/loader-utils/blob/d9f4e23cf411d8556f8bac2d3bf05a6e0103b568/lib/parseQuery.js#L11"},{"url":"https://github.com/webpack/loader-utils/blob/d9f4e23cf411d8556f8bac2d3bf05a6e0103b568/lib/parseQuery.js#L47"},{"url":"https://github.com/webpack/loader-utils/releases/tag/v2.0.3"},{"url":"https://github.com/webpack/loader-utils/pull/217"},{"url":"https://github.com/webpack/loader-utils/pull/220"},{"url":"https://github.com/webpack/loader-utils/releases/tag/v1.4.1"},{"url":"https://github.com/advisories/GHSA-76p3-8jx3-jpfq"}],"published_at":"2022-10-13T12:00:28Z","updated_at":"2022-11-07T22:14:16Z","withdrawn_at":null,"vulnerabilities":[{"package":{"ecosystem":"npm","name":"loader-utils"},"severity":"critical","vulnerable_version_range":">= 2.0.0, < 2.0.3","first_patched_version":{"identifier":"2.0.3"}},{"package":{"ecosystem":"npm","name":"loader-utils"},"severity":"critical","vulnerable_version_range":"< 1.4.1","first_patched_version":{"identifier":"1.4.1"}}],"cvss":{"vector_string":"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H","score":9.8},"cwes":[{"cwe_id":"CWE-1321","name":"Improperly Controlled Modification of Object Prototype Attributes ('Prototype Pollution')"}]},"security_vulnerability":{"package":{"ecosystem":"npm","name":"loader-utils"},"severity":"critical","vulnerable_version_range":"< 1.4.1","first_patched_version":{"identifier":"1.4.1"}},"url":"https://api.github.com/repos/advanced-security-demo/bb-demo/dependabot/alerts/63","html_url":"https://github.com/advanced-security-demo/bb-demo/security/dependabot/63","created_at":"2022-11-08T09:45:27Z","updated_at":"2022-11-08T09:45:27Z","dismissed_at":null,"dismissed_by":null,"dismissed_reason":null,"dismissed_comment":null,"fixed_at":null},{"number":59,"state":"open","dependency":{"package":{"ecosystem":"npm","name":"shell-quote"},"manifest_path":"frontend/package-lock.json","scope":"development"},"security_advisory":{"ghsa_id":"GHSA-g4rg-993r-mgx7","cve_id":"CVE-2021-42740","summary":"Improper Neutralization of Special Elements used in a Command in Shell-quote","description":"The shell-quote package before 1.7.3 for Node.js allows command injection. An attacker can inject unescaped shell metacharacters through a regex designed to support Windows drive letters. If the output of this package is passed to a real shell as a quoted argument to a command with exec(), an attacker can inject arbitrary commands. This is because the Windows drive letter regex character class is {A-z] instead of the correct {A-Za-z]. Several shell metacharacters exist in the space between capital letter Z and lower case letter a, such as the backtick character.","severity":"critical","identifiers":[{"value":"GHSA-g4rg-993r-mgx7","type":"GHSA"},{"value":"CVE-2021-42740","type":"CVE"}],"references":[{"url":"https://nvd.nist.gov/vuln/detail/CVE-2021-42740"},{"url":"https://www.npmjs.com/package/shell-quote"},{"url":"https://github.com/ljharb/shell-quote/commit/5799416ed454aa4ec9afafc895b4e31760ea1abe"},{"url":"https://github.com/ljharb/shell-quote/blob/master/CHANGELOG.md#173"},{"url":"https://github.com/advisories/GHSA-g4rg-993r-mgx7"}],"published_at":"2022-05-24T19:18:27Z","updated_at":"2022-10-21T23:00:14Z","withdrawn_at":null,"vulnerabilities":[{"package":{"ecosystem":"npm","name":"shell-quote"},"severity":"critical","vulnerable_version_range":"<= 1.7.2","first_patched_version":{"identifier":"1.7.3"}}],"cvss":{"vector_string":"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H","score":9.8},"cwes":[{"cwe_id":"CWE-77","name":"Improper Neutralization of Special Elements used in a Command ('Command Injection')"}]},"security_vulnerability":{"package":{"ecosystem":"npm","name":"shell-quote"},"severity":"critical","vulnerable_version_range":"<= 1.7.2","first_patched_version":{"identifier":"1.7.3"}},"url":"https://api.github.com/repos/advanced-security-demo/bb-demo/dependabot/alerts/59","html_url":"https://github.com/advanced-security-demo/bb-demo/security/dependabot/59","created_at":"2022-10-18T11:38:45Z","updated_at":"2022-10-18T11:38:45Z","dismissed_at":null,"dismissed_by":null,"dismissed_reason":null,"dismissed_comment":null,"fixed_at":null},{"number":57,"state":"open","dependency":{"package":{"ecosystem":"npm","name":"eventsource"},"manifest_path":"frontend/package-lock.json","scope":"development"},"security_advisory":{"ghsa_id":"GHSA-6h5x-7c5m-7cr7","cve_id":"CVE-2022-1650","summary":"Exposure of Sensitive Information in eventsource","description":"When fetching an url with a link to an external site (Redirect), the users Cookies & Autorisation headers are leaked to the third party application. According to the same-origin-policy, the header should be \"sanitized.\"","severity":"critical","identifiers":[{"value":"GHSA-6h5x-7c5m-7cr7","type":"GHSA"},{"value":"CVE-2022-1650","type":"CVE"}],"references":[{"url":"https://nvd.nist.gov/vuln/detail/CVE-2022-1650"},{"url":"https://github.com/eventsource/eventsource/commit/10ee0c4881a6ba2fe65ec18ed195ac35889583c4"},{"url":"https://huntr.dev/bounties/dc9e467f-be5d-4945-867d-1044d27e9b8e"},{"url":"https://github.com/EventSource/eventsource/pull/273#issuecomment-1127624508"},{"url":"https://github.com/EventSource/eventsource/commit/f9f6416567bff62c1af2f4314be51d9870e94bc2"},{"url":"https://github.com/advisories/GHSA-6h5x-7c5m-7cr7"}],"published_at":"2022-05-13T00:01:12Z","updated_at":"2022-05-31T23:17:01Z","withdrawn_at":null,"vulnerabilities":[{"package":{"ecosystem":"npm","name":"eventsource"},"severity":"critical","vulnerable_version_range":"< 1.1.1","first_patched_version":{"identifier":"1.1.1"}},{"package":{"ecosystem":"npm","name":"eventsource"},"severity":"critical","vulnerable_version_range":">= 2.0.0, < 2.0.2","first_patched_version":{"identifier":"2.0.2"}}],"cvss":{"vector_string":"CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:N","score":9.3},"cwes":[{"cwe_id":"CWE-200","name":"Exposure of Sensitive Information to an Unauthorized Actor"}]},"security_vulnerability":{"package":{"ecosystem":"npm","name":"eventsource"},"severity":"critical","vulnerable_version_range":"< 1.1.1","first_patched_version":{"identifier":"1.1.1"}},"url":"https://api.github.com/repos/advanced-security-demo/bb-demo/dependabot/alerts/57","html_url":"https://github.com/advanced-security-demo/bb-demo/security/dependabot/57","created_at":"2022-10-18T11:38:45Z","updated_at":"2022-10-18T11:38:45Z","dismissed_at":null,"dismissed_by":null,"dismissed_reason":null,"dismissed_comment":null,"fixed_at":null},{"number":56,"state":"open","dependency":{"package":{"ecosystem":"npm","name":"ejs"},"manifest_path":"frontend/package-lock.json","scope":"development"},"security_advisory":{"ghsa_id":"GHSA-phwq-j96m-2c2q","cve_id":"CVE-2022-29078","summary":"ejs template injection vulnerability","description":"The ejs (aka Embedded JavaScript templates) package 3.1.6 for Node.js allows server-side template injection in settings[view options][outputFunctionName]. This is parsed as an internal option, and overwrites the outputFunctionName option with an arbitrary OS command (which is executed upon template compilation).","severity":"critical","identifiers":[{"value":"GHSA-phwq-j96m-2c2q","type":"GHSA"},{"value":"CVE-2022-29078","type":"CVE"}],"references":[{"url":"https://nvd.nist.gov/vuln/detail/CVE-2022-29078"},{"url":"https://eslam.io/posts/ejs-server-side-template-injection-rce/"},{"url":"https://github.com/mde/ejs/commit/15ee698583c98dadc456639d6245580d17a24baf"},{"url":"https://github.com/mde/ejs/releases"},{"url":"https://security.netapp.com/advisory/ntap-20220804-0001/"},{"url":"https://github.com/advisories/GHSA-phwq-j96m-2c2q"}],"published_at":"2022-04-26T00:00:40Z","updated_at":"2022-08-19T03:02:14Z","withdrawn_at":null,"vulnerabilities":[{"package":{"ecosystem":"npm","name":"ejs"},"severity":"critical","vulnerable_version_range":"< 3.1.7","first_patched_version":{"identifier":"3.1.7"}}],"cvss":{"vector_string":"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H","score":9.8},"cwes":[{"cwe_id":"CWE-74","name":"Improper Neutralization of Special Elements in Output Used by a Downstream Component ('Injection')"}]},"security_vulnerability":{"package":{"ecosystem":"npm","name":"ejs"},"severity":"critical","vulnerable_version_range":"< 3.1.7","first_patched_version":{"identifier":"3.1.7"}},"url":"https://api.github.com/repos/advanced-security-demo/bb-demo/dependabot/alerts/56","html_url":"https://github.com/advanced-security-demo/bb-demo/security/dependabot/56","created_at":"2022-10-18T11:38:45Z","updated_at":"2022-10-18T11:38:45Z","dismissed_at":null,"dismissed_by":null,"dismissed_reason":null,"dismissed_comment":null,"fixed_at":null},{"number":45,"state":"open","dependency":{"package":{"ecosystem":"npm","name":"url-parse"},"manifest_path":"frontend/package-lock.json","scope":"development"},"security_advisory":{"ghsa_id":"GHSA-hgjh-723h-mx2j","cve_id":"CVE-2022-0686","summary":"Authorization Bypass Through User-Controlled Key in url-parse","description":"url-parse prior to version 1.5.8 is vulnerable to Authorization Bypass Through User-Controlled Key.","severity":"critical","identifiers":[{"value":"GHSA-hgjh-723h-mx2j","type":"GHSA"},{"value":"CVE-2022-0686","type":"CVE"}],"references":[{"url":"https://nvd.nist.gov/vuln/detail/CVE-2022-0686"},{"url":"https://github.com/unshiftio/url-parse/commit/d5c64791ef496ca5459ae7f2176a31ea53b127e5"},{"url":"https://huntr.dev/bounties/55fd06cd-9054-4d80-83be-eb5a454be78c"},{"url":"https://security.netapp.com/advisory/ntap-20220325-0006/"},{"url":"https://github.com/advisories/GHSA-hgjh-723h-mx2j"}],"published_at":"2022-02-21T00:00:21Z","updated_at":"2022-03-29T22:13:52Z","withdrawn_at":null,"vulnerabilities":[{"package":{"ecosystem":"npm","name":"url-parse"},"severity":"critical","vulnerable_version_range":"< 1.5.8","first_patched_version":{"identifier":"1.5.8"}}],"cvss":{"vector_string":"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N","score":9.1},"cwes":[{"cwe_id":"CWE-639","name":"Authorization Bypass Through User-Controlled Key"}]},"security_vulnerability":{"package":{"ecosystem":"npm","name":"url-parse"},"severity":"critical","vulnerable_version_range":"< 1.5.8","first_patched_version":{"identifier":"1.5.8"}},"url":"https://api.github.com/repos/advanced-security-demo/bb-demo/dependabot/alerts/45","html_url":"https://github.com/advanced-security-demo/bb-demo/security/dependabot/45","created_at":"2022-10-18T11:38:44Z","updated_at":"2022-10-18T11:38:44Z","dismissed_at":null,"dismissed_by":null,"dismissed_reason":null,"dismissed_comment":null,"fixed_at":null},{"number":33,"state":"open","dependency":{"package":{"ecosystem":"npm","name":"json-schema"},"manifest_path":"frontend/package-lock.json","scope":"development"},"security_advisory":{"ghsa_id":"GHSA-896r-f27r-55mw","cve_id":"CVE-2021-3918","summary":"json-schema is vulnerable to Prototype Pollution","description":"json-schema before version 0.4.0 is vulnerable to Improperly Controlled Modification of Object Prototype Attributes ('Prototype Pollution').","severity":"critical","identifiers":[{"value":"GHSA-896r-f27r-55mw","type":"GHSA"},{"value":"CVE-2021-3918","type":"CVE"}],"references":[{"url":"https://nvd.nist.gov/vuln/detail/CVE-2021-3918"},{"url":"https://github.com/kriszyp/json-schema/commit/22f146111f541d9737e832823699ad3528ca7741"},{"url":"https://huntr.dev/bounties/bb6ccd63-f505-4e3a-b55f-cd2662c261a9"},{"url":"https://github.com/kriszyp/json-schema/commit/b62f1da1ff5442f23443d6be6a92d00e65cba93a"},{"url":"https://github.com/kriszyp/json-schema/commit/f6f6a3b02d667aa4ba2d5d50cc19208c4462abfa"},{"url":"https://github.com/advisories/GHSA-896r-f27r-55mw"}],"published_at":"2021-11-19T20:16:17Z","updated_at":"2022-08-10T23:36:11Z","withdrawn_at":null,"vulnerabilities":[{"package":{"ecosystem":"npm","name":"json-schema"},"severity":"critical","vulnerable_version_range":"< 0.4.0","first_patched_version":{"identifier":"0.4.0"}}],"cvss":{"vector_string":"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H","score":9.8},"cwes":[{"cwe_id":"CWE-915","name":"Improperly Controlled Modification of Dynamically-Determined Object Attributes"},{"cwe_id":"CWE-1321","name":"Improperly Controlled Modification of Object Prototype Attributes ('Prototype Pollution')"}]},"security_vulnerability":{"package":{"ecosystem":"npm","name":"json-schema"},"severity":"critical","vulnerable_version_range":"< 0.4.0","first_patched_version":{"identifier":"0.4.0"}},"url":"https://api.github.com/repos/advanced-security-demo/bb-demo/dependabot/alerts/33","html_url":"https://github.com/advanced-security-demo/bb-demo/security/dependabot/33","created_at":"2022-10-18T11:38:42Z","updated_at":"2022-10-18T11:38:42Z","dismissed_at":null,"dismissed_by":null,"dismissed_reason":null,"dismissed_comment":null,"fixed_at":null},{"number":2,"state":"open","dependency":{"package":{"ecosystem":"pip","name":"pycrypto"},"manifest_path":"authn-service/requirements.txt","scope":"runtime"},"security_advisory":{"ghsa_id":"GHSA-cq27-v7xp-c356","cve_id":"CVE-2013-7459","summary":"Buffer Overflow in pycrypto","description":"Heap-based buffer overflow in the ALGnew function in block_templace.c in Python Cryptography Toolkit (aka pycrypto) allows remote attackers to execute arbitrary code as demonstrated by a crafted iv parameter to cryptmsg.py.","severity":"critical","identifiers":[{"value":"GHSA-cq27-v7xp-c356","type":"GHSA"},{"value":"CVE-2013-7459","type":"CVE"}],"references":[{"url":"https://nvd.nist.gov/vuln/detail/CVE-2013-7459"},{"url":"https://github.com/dlitz/pycrypto/issues/176"},{"url":"https://github.com/dlitz/pycrypto/commit/8dbe0dc3eea5c689d4f76b37b93fe216cf1f00d4"},{"url":"https://bugzilla.redhat.com/show_bug.cgi?id=1409754"},{"url":"https://github.com/advisories/GHSA-cq27-v7xp-c356"},{"url":"https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/C6BWNADPLKDBBQBUT3P75W7HAJCE7M3B/"},{"url":"https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/RJ37R2YLX56YZABFNAOWV4VTHTGYREAE/"},{"url":"https://pony7.fr/ctf:public:32c3:cryptmsg"},{"url":"https://security.gentoo.org/glsa/201702-14"},{"url":"http://www.openwall.com/lists/oss-security/2016/12/27/8"},{"url":"http://www.securityfocus.com/bid/95122"}],"published_at":"2018-12-14T18:51:38Z","updated_at":"2022-09-14T22:11:12Z","withdrawn_at":null,"vulnerabilities":[{"package":{"ecosystem":"pip","name":"pycrypto"},"severity":"critical","vulnerable_version_range":"<= 2.6.1","first_patched_version":null}],"cvss":{"vector_string":"CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H","score":9.8},"cwes":[{"cwe_id":"CWE-119","name":"Improper Restriction of Operations within the Bounds of a Memory Buffer"}]},"security_vulnerability":{"package":{"ecosystem":"pip","name":"pycrypto"},"severity":"critical","vulnerable_version_range":"<= 2.6.1","first_patched_version":null},"url":"https://api.github.com/repos/advanced-security-demo/bb-demo/dependabot/alerts/2","html_url":"https://github.com/advanced-security-demo/bb-demo/security/dependabot/2","created_at":"2022-10-18T11:38:37Z","updated_at":"2022-10-18T11:38:37Z","dismissed_at":null,"dismissed_by":null,"dismissed_reason":null,"dismissed_comment":null,"fixed_at":null},{"number":69,"state":"open","dependency":{"package":{"ecosystem":"npm","name":"loader-utils"},"manifest_path":"frontend/package-lock.json","scope":"development"},"security_advisory":{"ghsa_id":"GHSA-3rfm-jhwj-7488","cve_id":"CVE-2022-37603","summary":"loader-utils is vulnerable to Regular Expression Denial of Service (ReDoS) via url variable","description":"A Regular expression denial of service (ReDoS) flaw was found in Function interpolateName in interpolateName.js in webpack loader-utils 2.0.0 via the url variable in interpolateName.js. A badly or maliciously formed string could be used to send crafted requests that cause a system to crash or take a disproportional amount of time to process. This issue has been patched in versions 1.4.2, 2.0.4 and 3.2.1.","severity":"high","identifiers":[{"value":"GHSA-3rfm-jhwj-7488","type":"GHSA"},{"value":"CVE-2022-37603","type":"CVE"}],"references":[{"url":"https://nvd.nist.gov/vuln/detail/CVE-2022-37603"},{"url":"https://github.com/webpack/loader-utils/issues/213"},{"url":"https://github.com/webpack/loader-utils/blob/d9f4e23cf411d8556f8bac2d3bf05a6e0103b568/lib/interpolateName.js#L107"},{"url":"https://github.com/webpack/loader-utils/blob/d9f4e23cf411d8556f8bac2d3bf05a6e0103b568/lib/interpolateName.js#L38"},{"url":"https://github.com/webpack/loader-utils/issues/216"},{"url":"https://github.com/advisories/GHSA-3rfm-jhwj-7488"}],"published_at":"2022-10-14T19:00:38Z","updated_at":"2022-11-15T21:26:43Z","withdrawn_at":null,"vulnerabilities":[{"package":{"ecosystem":"npm","name":"loader-utils"},"severity":"high","vulnerable_version_range":">= 1.0.0, < 1.4.2","first_patched_version":{"identifier":"1.4.2"}},{"package":{"ecosystem":"npm","name":"loader-utils"},"severity":"high","vulnerable_version_range":">= 2.0.0, < 2.0.4","first_patched_version":{"identifier":"2.0.4"}},{"package":{"ecosystem":"npm","name":"loader-utils"},"severity":"high","vulnerable_version_range":">= 3.0.0, < 3.2.1","first_patched_version":{"identifier":"3.2.1"}}],"cvss":{"vector_string":"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H","score":7.5},"cwes":[{"cwe_id":"CWE-400","name":"Uncontrolled Resource Consumption"}]},"security_vulnerability":{"package":{"ecosystem":"npm","name":"loader-utils"},"severity":"high","vulnerable_version_range":">= 1.0.0, < 1.4.2","first_patched_version":{"identifier":"1.4.2"}},"url":"https://api.github.com/repos/advanced-security-demo/bb-demo/dependabot/alerts/69","html_url":"https://github.com/advanced-security-demo/bb-demo/security/dependabot/69","created_at":"2022-11-23T10:19:32Z","updated_at":"2022-11-23T10:19:32Z","dismissed_at":null,"dismissed_by":null,"dismissed_reason":null,"dismissed_comment":null,"fixed_at":null},{"number":68,"state":"open","dependency":{"package":{"ecosystem":"npm","name":"loader-utils"},"manifest_path":"frontend/package-lock.json","scope":"development"},"security_advisory":{"ghsa_id":"GHSA-hhq3-ff78-jv3g","cve_id":"CVE-2022-37599","summary":"loader-utils is vulnerable to Regular Expression Denial of Service (ReDoS)","description":"A regular expression denial of service (ReDoS) flaw was found in Function interpolateName in interpolateName.js in webpack loader-utils via the resourcePath variable in interpolateName.js. A badly or maliciously formed string could be used to send crafted requests that cause a system to crash or take a disproportional amount of time to process. This issue has been patched in versions 1.4.2, 2.0.4 and 3.2.1.","severity":"high","identifiers":[{"value":"GHSA-hhq3-ff78-jv3g","type":"GHSA"},{"value":"CVE-2022-37599","type":"CVE"}],"references":[{"url":"https://nvd.nist.gov/vuln/detail/CVE-2022-37599"},{"url":"https://github.com/webpack/loader-utils/issues/211"},{"url":"https://github.com/webpack/loader-utils/blob/d9f4e23cf411d8556f8bac2d3bf05a6e0103b568/lib/interpolateName.js#L38"},{"url":"https://github.com/webpack/loader-utils/blob/d9f4e23cf411d8556f8bac2d3bf05a6e0103b568/lib/interpolateName.js#L83"},{"url":"https://github.com/webpack/loader-utils/issues/216"},{"url":"https://github.com/webpack/loader-utils/commit/36dc86617930a5cf18af51cf3f53d0ee284d2824"},{"url":"https://github.com/advisories/GHSA-hhq3-ff78-jv3g"}],"published_at":"2022-10-12T12:00:27Z","updated_at":"2022-11-22T22:52:16Z","withdrawn_at":null,"vulnerabilities":[{"package":{"ecosystem":"npm","name":"loader-utils"},"severity":"high","vulnerable_version_range":">= 1.0.0, < 1.4.2","first_patched_version":{"identifier":"1.4.2"}},{"package":{"ecosystem":"npm","name":"loader-utils"},"severity":"high","vulnerable_version_range":">= 2.0.0, < 2.0.4","first_patched_version":{"identifier":"2.0.4"}},{"package":{"ecosystem":"npm","name":"loader-utils"},"severity":"high","vulnerable_version_range":">= 3.0.0, < 3.2.1","first_patched_version":{"identifier":"3.2.1"}}],"cvss":{"vector_string":"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H","score":7.5},"cwes":[{"cwe_id":"CWE-400","name":"Uncontrolled Resource Consumption"}]},"security_vulnerability":{"package":{"ecosystem":"npm","name":"loader-utils"},"severity":"high","vulnerable_version_range":">= 1.0.0, < 1.4.2","first_patched_version":{"identifier":"1.4.2"}},"url":"https://api.github.com/repos/advanced-security-demo/bb-demo/dependabot/alerts/68","html_url":"https://github.com/advanced-security-demo/bb-demo/security/dependabot/68","created_at":"2022-11-23T10:19:32Z","updated_at":"2022-11-23T10:19:32Z","dismissed_at":null,"dismissed_by":null,"dismissed_reason":null,"dismissed_comment":null,"fixed_at":null}]
+[
+  {
+    "number": 64,
+    "state": "open",
+    "dependency": {
+      "package": { "ecosystem": "npm", "name": "loader-utils" },
+      "manifest_path": "frontend/package-lock.json",
+      "scope": "runtime"
+    },
+    "security_advisory": {
+      "ghsa_id": "GHSA-76p3-8jx3-jpfq",
+      "cve_id": "CVE-2022-37601",
+      "summary": "Prototype pollution in webpack loader-utils",
+      "description": "Prototype pollution vulnerability in function parseQuery in parseQuery.js in webpack loader-utils prior to version 2.0.3 via the name variable in parseQuery.js.",
+      "severity": "critical",
+      "identifiers": [
+        { "value": "GHSA-76p3-8jx3-jpfq", "type": "GHSA" },
+        { "value": "CVE-2022-37601", "type": "CVE" }
+      ],
+      "references": [
+        { "url": "https://nvd.nist.gov/vuln/detail/CVE-2022-37601" },
+        { "url": "https://github.com/webpack/loader-utils/issues/212" },
+        {
+          "url": "https://github.com/webpack/loader-utils/blob/d9f4e23cf411d8556f8bac2d3bf05a6e0103b568/lib/parseQuery.js#L11"
+        },
+        {
+          "url": "https://github.com/webpack/loader-utils/blob/d9f4e23cf411d8556f8bac2d3bf05a6e0103b568/lib/parseQuery.js#L47"
+        },
+        {
+          "url": "https://github.com/webpack/loader-utils/releases/tag/v2.0.3"
+        },
+        { "url": "https://github.com/webpack/loader-utils/pull/217" },
+        { "url": "https://github.com/webpack/loader-utils/pull/220" },
+        {
+          "url": "https://github.com/webpack/loader-utils/releases/tag/v1.4.1"
+        },
+        { "url": "https://github.com/advisories/GHSA-76p3-8jx3-jpfq" }
+      ],
+      "published_at": "2022-10-13T12:00:28Z",
+      "updated_at": "2022-11-07T22:14:16Z",
+      "withdrawn_at": null,
+      "vulnerabilities": [
+        {
+          "package": { "ecosystem": "npm", "name": "loader-utils" },
+          "severity": "critical",
+          "vulnerable_version_range": ">= 2.0.0, < 2.0.3",
+          "first_patched_version": { "identifier": "2.0.3" }
+        },
+        {
+          "package": { "ecosystem": "npm", "name": "loader-utils" },
+          "severity": "critical",
+          "vulnerable_version_range": "< 1.4.1",
+          "first_patched_version": { "identifier": "1.4.1" }
+        }
+      ],
+      "cvss": {
+        "vector_string": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+        "score": 9.8
+      },
+      "cwes": [
+        {
+          "cwe_id": "CWE-1321",
+          "name": "Improperly Controlled Modification of Object Prototype Attributes ('Prototype Pollution')"
+        }
+      ]
+    },
+    "security_vulnerability": {
+      "package": { "ecosystem": "npm", "name": "loader-utils" },
+      "severity": "critical",
+      "vulnerable_version_range": ">= 2.0.0, < 2.0.3",
+      "first_patched_version": { "identifier": "2.0.3" }
+    },
+    "url": "https://api.github.com/repos/advanced-security-demo/bb-demo/dependabot/alerts/64",
+    "html_url": "https://github.com/advanced-security-demo/bb-demo/security/dependabot/64",
+    "created_at": "2022-11-08T18:49:31Z",
+    "updated_at": "2022-11-08T18:49:31Z",
+    "dismissed_at": null,
+    "dismissed_by": null,
+    "dismissed_reason": null,
+    "dismissed_comment": null,
+    "fixed_at": null
+  },
+  {
+    "number": 63,
+    "state": "open",
+    "dependency": {
+      "package": { "ecosystem": "npm", "name": "loader-utils" },
+      "manifest_path": "frontend/package-lock.json",
+      "scope": "development"
+    },
+    "security_advisory": {
+      "ghsa_id": "GHSA-76p3-8jx3-jpfq",
+      "cve_id": "CVE-2022-37601",
+      "summary": "Prototype pollution in webpack loader-utils",
+      "description": "Prototype pollution vulnerability in function parseQuery in parseQuery.js in webpack loader-utils prior to version 2.0.3 via the name variable in parseQuery.js.",
+      "severity": "critical",
+      "identifiers": [
+        { "value": "GHSA-76p3-8jx3-jpfq", "type": "GHSA" },
+        { "value": "CVE-2022-37601", "type": "CVE" }
+      ],
+      "references": [
+        { "url": "https://nvd.nist.gov/vuln/detail/CVE-2022-37601" },
+        { "url": "https://github.com/webpack/loader-utils/issues/212" },
+        {
+          "url": "https://github.com/webpack/loader-utils/blob/d9f4e23cf411d8556f8bac2d3bf05a6e0103b568/lib/parseQuery.js#L11"
+        },
+        {
+          "url": "https://github.com/webpack/loader-utils/blob/d9f4e23cf411d8556f8bac2d3bf05a6e0103b568/lib/parseQuery.js#L47"
+        },
+        {
+          "url": "https://github.com/webpack/loader-utils/releases/tag/v2.0.3"
+        },
+        { "url": "https://github.com/webpack/loader-utils/pull/217" },
+        { "url": "https://github.com/webpack/loader-utils/pull/220" },
+        {
+          "url": "https://github.com/webpack/loader-utils/releases/tag/v1.4.1"
+        },
+        { "url": "https://github.com/advisories/GHSA-76p3-8jx3-jpfq" }
+      ],
+      "published_at": "2022-10-13T12:00:28Z",
+      "updated_at": "2022-11-07T22:14:16Z",
+      "withdrawn_at": null,
+      "vulnerabilities": [
+        {
+          "package": { "ecosystem": "npm", "name": "loader-utils" },
+          "severity": "critical",
+          "vulnerable_version_range": ">= 2.0.0, < 2.0.3",
+          "first_patched_version": { "identifier": "2.0.3" }
+        },
+        {
+          "package": { "ecosystem": "npm", "name": "loader-utils" },
+          "severity": "critical",
+          "vulnerable_version_range": "< 1.4.1",
+          "first_patched_version": { "identifier": "1.4.1" }
+        }
+      ],
+      "cvss": {
+        "vector_string": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+        "score": 9.8
+      },
+      "cwes": [
+        {
+          "cwe_id": "CWE-1321",
+          "name": "Improperly Controlled Modification of Object Prototype Attributes ('Prototype Pollution')"
+        }
+      ]
+    },
+    "security_vulnerability": {
+      "package": { "ecosystem": "npm", "name": "loader-utils" },
+      "severity": "critical",
+      "vulnerable_version_range": "< 1.4.1",
+      "first_patched_version": { "identifier": "1.4.1" }
+    },
+    "url": "https://api.github.com/repos/advanced-security-demo/bb-demo/dependabot/alerts/63",
+    "html_url": "https://github.com/advanced-security-demo/bb-demo/security/dependabot/63",
+    "created_at": "2022-11-08T09:45:27Z",
+    "updated_at": "2022-11-08T09:45:27Z",
+    "dismissed_at": null,
+    "dismissed_by": null,
+    "dismissed_reason": null,
+    "dismissed_comment": null,
+    "fixed_at": null
+  },
+  {
+    "number": 59,
+    "state": "open",
+    "dependency": {
+      "package": { "ecosystem": "npm", "name": "shell-quote" },
+      "manifest_path": "frontend/package-lock.json",
+      "scope": "development"
+    },
+    "security_advisory": {
+      "ghsa_id": "GHSA-g4rg-993r-mgx7",
+      "cve_id": "CVE-2021-42740",
+      "summary": "Improper Neutralization of Special Elements used in a Command in Shell-quote",
+      "description": "The shell-quote package before 1.7.3 for Node.js allows command injection. An attacker can inject unescaped shell metacharacters through a regex designed to support Windows drive letters. If the output of this package is passed to a real shell as a quoted argument to a command with exec(), an attacker can inject arbitrary commands. This is because the Windows drive letter regex character class is {A-z] instead of the correct {A-Za-z]. Several shell metacharacters exist in the space between capital letter Z and lower case letter a, such as the backtick character.",
+      "severity": "critical",
+      "identifiers": [
+        { "value": "GHSA-g4rg-993r-mgx7", "type": "GHSA" },
+        { "value": "CVE-2021-42740", "type": "CVE" }
+      ],
+      "references": [
+        { "url": "https://nvd.nist.gov/vuln/detail/CVE-2021-42740" },
+        { "url": "https://www.npmjs.com/package/shell-quote" },
+        {
+          "url": "https://github.com/ljharb/shell-quote/commit/5799416ed454aa4ec9afafc895b4e31760ea1abe"
+        },
+        {
+          "url": "https://github.com/ljharb/shell-quote/blob/master/CHANGELOG.md#173"
+        },
+        { "url": "https://github.com/advisories/GHSA-g4rg-993r-mgx7" }
+      ],
+      "published_at": "2022-05-24T19:18:27Z",
+      "updated_at": "2022-10-21T23:00:14Z",
+      "withdrawn_at": null,
+      "vulnerabilities": [
+        {
+          "package": { "ecosystem": "npm", "name": "shell-quote" },
+          "severity": "critical",
+          "vulnerable_version_range": "<= 1.7.2",
+          "first_patched_version": { "identifier": "1.7.3" }
+        }
+      ],
+      "cvss": {
+        "vector_string": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+        "score": 9.8
+      },
+      "cwes": [
+        {
+          "cwe_id": "CWE-77",
+          "name": "Improper Neutralization of Special Elements used in a Command ('Command Injection')"
+        }
+      ]
+    },
+    "security_vulnerability": {
+      "package": { "ecosystem": "npm", "name": "shell-quote" },
+      "severity": "critical",
+      "vulnerable_version_range": "<= 1.7.2",
+      "first_patched_version": { "identifier": "1.7.3" }
+    },
+    "url": "https://api.github.com/repos/advanced-security-demo/bb-demo/dependabot/alerts/59",
+    "html_url": "https://github.com/advanced-security-demo/bb-demo/security/dependabot/59",
+    "created_at": "2022-10-18T11:38:45Z",
+    "updated_at": "2022-10-18T11:38:45Z",
+    "dismissed_at": null,
+    "dismissed_by": null,
+    "dismissed_reason": null,
+    "dismissed_comment": null,
+    "fixed_at": null
+  },
+  {
+    "number": 57,
+    "state": "open",
+    "dependency": {
+      "package": { "ecosystem": "npm", "name": "eventsource" },
+      "manifest_path": "frontend/package-lock.json",
+      "scope": "development"
+    },
+    "security_advisory": {
+      "ghsa_id": "GHSA-6h5x-7c5m-7cr7",
+      "cve_id": "CVE-2022-1650",
+      "summary": "Exposure of Sensitive Information in eventsource",
+      "description": "When fetching an url with a link to an external site (Redirect), the users Cookies & Autorisation headers are leaked to the third party application. According to the same-origin-policy, the header should be \"sanitized.\"",
+      "severity": "critical",
+      "identifiers": [
+        { "value": "GHSA-6h5x-7c5m-7cr7", "type": "GHSA" },
+        { "value": "CVE-2022-1650", "type": "CVE" }
+      ],
+      "references": [
+        { "url": "https://nvd.nist.gov/vuln/detail/CVE-2022-1650" },
+        {
+          "url": "https://github.com/eventsource/eventsource/commit/10ee0c4881a6ba2fe65ec18ed195ac35889583c4"
+        },
+        {
+          "url": "https://huntr.dev/bounties/dc9e467f-be5d-4945-867d-1044d27e9b8e"
+        },
+        {
+          "url": "https://github.com/EventSource/eventsource/pull/273#issuecomment-1127624508"
+        },
+        {
+          "url": "https://github.com/EventSource/eventsource/commit/f9f6416567bff62c1af2f4314be51d9870e94bc2"
+        },
+        { "url": "https://github.com/advisories/GHSA-6h5x-7c5m-7cr7" }
+      ],
+      "published_at": "2022-05-13T00:01:12Z",
+      "updated_at": "2022-05-31T23:17:01Z",
+      "withdrawn_at": null,
+      "vulnerabilities": [
+        {
+          "package": { "ecosystem": "npm", "name": "eventsource" },
+          "severity": "critical",
+          "vulnerable_version_range": "< 1.1.1",
+          "first_patched_version": { "identifier": "1.1.1" }
+        },
+        {
+          "package": { "ecosystem": "npm", "name": "eventsource" },
+          "severity": "critical",
+          "vulnerable_version_range": ">= 2.0.0, < 2.0.2",
+          "first_patched_version": { "identifier": "2.0.2" }
+        }
+      ],
+      "cvss": {
+        "vector_string": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:N",
+        "score": 9.3
+      },
+      "cwes": [
+        {
+          "cwe_id": "CWE-200",
+          "name": "Exposure of Sensitive Information to an Unauthorized Actor"
+        }
+      ]
+    },
+    "security_vulnerability": {
+      "package": { "ecosystem": "npm", "name": "eventsource" },
+      "severity": "critical",
+      "vulnerable_version_range": "< 1.1.1",
+      "first_patched_version": { "identifier": "1.1.1" }
+    },
+    "url": "https://api.github.com/repos/advanced-security-demo/bb-demo/dependabot/alerts/57",
+    "html_url": "https://github.com/advanced-security-demo/bb-demo/security/dependabot/57",
+    "created_at": "2022-10-18T11:38:45Z",
+    "updated_at": "2022-10-18T11:38:45Z",
+    "dismissed_at": null,
+    "dismissed_by": null,
+    "dismissed_reason": null,
+    "dismissed_comment": null,
+    "fixed_at": null
+  },
+  {
+    "number": 56,
+    "state": "open",
+    "dependency": {
+      "package": { "ecosystem": "npm", "name": "ejs" },
+      "manifest_path": "frontend/package-lock.json",
+      "scope": "development"
+    },
+    "security_advisory": {
+      "ghsa_id": "GHSA-phwq-j96m-2c2q",
+      "cve_id": "CVE-2022-29078",
+      "summary": "ejs template injection vulnerability",
+      "description": "The ejs (aka Embedded JavaScript templates) package 3.1.6 for Node.js allows server-side template injection in settings[view options][outputFunctionName]. This is parsed as an internal option, and overwrites the outputFunctionName option with an arbitrary OS command (which is executed upon template compilation).",
+      "severity": "critical",
+      "identifiers": [
+        { "value": "GHSA-phwq-j96m-2c2q", "type": "GHSA" },
+        { "value": "CVE-2022-29078", "type": "CVE" }
+      ],
+      "references": [
+        { "url": "https://nvd.nist.gov/vuln/detail/CVE-2022-29078" },
+        {
+          "url": "https://eslam.io/posts/ejs-server-side-template-injection-rce/"
+        },
+        {
+          "url": "https://github.com/mde/ejs/commit/15ee698583c98dadc456639d6245580d17a24baf"
+        },
+        { "url": "https://github.com/mde/ejs/releases" },
+        { "url": "https://security.netapp.com/advisory/ntap-20220804-0001/" },
+        { "url": "https://github.com/advisories/GHSA-phwq-j96m-2c2q" }
+      ],
+      "published_at": "2022-04-26T00:00:40Z",
+      "updated_at": "2022-08-19T03:02:14Z",
+      "withdrawn_at": null,
+      "vulnerabilities": [
+        {
+          "package": { "ecosystem": "npm", "name": "ejs" },
+          "severity": "critical",
+          "vulnerable_version_range": "< 3.1.7",
+          "first_patched_version": { "identifier": "3.1.7" }
+        }
+      ],
+      "cvss": {
+        "vector_string": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+        "score": 9.8
+      },
+      "cwes": [
+        {
+          "cwe_id": "CWE-74",
+          "name": "Improper Neutralization of Special Elements in Output Used by a Downstream Component ('Injection')"
+        }
+      ]
+    },
+    "security_vulnerability": {
+      "package": { "ecosystem": "npm", "name": "ejs" },
+      "severity": "critical",
+      "vulnerable_version_range": "< 3.1.7",
+      "first_patched_version": { "identifier": "3.1.7" }
+    },
+    "url": "https://api.github.com/repos/advanced-security-demo/bb-demo/dependabot/alerts/56",
+    "html_url": "https://github.com/advanced-security-demo/bb-demo/security/dependabot/56",
+    "created_at": "2022-10-18T11:38:45Z",
+    "updated_at": "2022-10-18T11:38:45Z",
+    "dismissed_at": null,
+    "dismissed_by": null,
+    "dismissed_reason": null,
+    "dismissed_comment": null,
+    "fixed_at": null
+  },
+  {
+    "number": 45,
+    "state": "open",
+    "dependency": {
+      "package": { "ecosystem": "npm", "name": "url-parse" },
+      "manifest_path": "frontend/package-lock.json",
+      "scope": "development"
+    },
+    "security_advisory": {
+      "ghsa_id": "GHSA-hgjh-723h-mx2j",
+      "cve_id": "CVE-2022-0686",
+      "summary": "Authorization Bypass Through User-Controlled Key in url-parse",
+      "description": "url-parse prior to version 1.5.8 is vulnerable to Authorization Bypass Through User-Controlled Key.",
+      "severity": "critical",
+      "identifiers": [
+        { "value": "GHSA-hgjh-723h-mx2j", "type": "GHSA" },
+        { "value": "CVE-2022-0686", "type": "CVE" }
+      ],
+      "references": [
+        { "url": "https://nvd.nist.gov/vuln/detail/CVE-2022-0686" },
+        {
+          "url": "https://github.com/unshiftio/url-parse/commit/d5c64791ef496ca5459ae7f2176a31ea53b127e5"
+        },
+        {
+          "url": "https://huntr.dev/bounties/55fd06cd-9054-4d80-83be-eb5a454be78c"
+        },
+        { "url": "https://security.netapp.com/advisory/ntap-20220325-0006/" },
+        { "url": "https://github.com/advisories/GHSA-hgjh-723h-mx2j" }
+      ],
+      "published_at": "2022-02-21T00:00:21Z",
+      "updated_at": "2022-03-29T22:13:52Z",
+      "withdrawn_at": null,
+      "vulnerabilities": [
+        {
+          "package": { "ecosystem": "npm", "name": "url-parse" },
+          "severity": "critical",
+          "vulnerable_version_range": "< 1.5.8",
+          "first_patched_version": { "identifier": "1.5.8" }
+        }
+      ],
+      "cvss": {
+        "vector_string": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N",
+        "score": 9.1
+      },
+      "cwes": [
+        {
+          "cwe_id": "CWE-639",
+          "name": "Authorization Bypass Through User-Controlled Key"
+        }
+      ]
+    },
+    "security_vulnerability": {
+      "package": { "ecosystem": "npm", "name": "url-parse" },
+      "severity": "critical",
+      "vulnerable_version_range": "< 1.5.8",
+      "first_patched_version": { "identifier": "1.5.8" }
+    },
+    "url": "https://api.github.com/repos/advanced-security-demo/bb-demo/dependabot/alerts/45",
+    "html_url": "https://github.com/advanced-security-demo/bb-demo/security/dependabot/45",
+    "created_at": "2022-10-18T11:38:44Z",
+    "updated_at": "2022-10-18T11:38:44Z",
+    "dismissed_at": null,
+    "dismissed_by": null,
+    "dismissed_reason": null,
+    "dismissed_comment": null,
+    "fixed_at": null
+  },
+  {
+    "number": 33,
+    "state": "open",
+    "dependency": {
+      "package": { "ecosystem": "npm", "name": "json-schema" },
+      "manifest_path": "frontend/package-lock.json",
+      "scope": "development"
+    },
+    "security_advisory": {
+      "ghsa_id": "GHSA-896r-f27r-55mw",
+      "cve_id": "CVE-2021-3918",
+      "summary": "json-schema is vulnerable to Prototype Pollution",
+      "description": "json-schema before version 0.4.0 is vulnerable to Improperly Controlled Modification of Object Prototype Attributes ('Prototype Pollution').",
+      "severity": "critical",
+      "identifiers": [
+        { "value": "GHSA-896r-f27r-55mw", "type": "GHSA" },
+        { "value": "CVE-2021-3918", "type": "CVE" }
+      ],
+      "references": [
+        { "url": "https://nvd.nist.gov/vuln/detail/CVE-2021-3918" },
+        {
+          "url": "https://github.com/kriszyp/json-schema/commit/22f146111f541d9737e832823699ad3528ca7741"
+        },
+        {
+          "url": "https://huntr.dev/bounties/bb6ccd63-f505-4e3a-b55f-cd2662c261a9"
+        },
+        {
+          "url": "https://github.com/kriszyp/json-schema/commit/b62f1da1ff5442f23443d6be6a92d00e65cba93a"
+        },
+        {
+          "url": "https://github.com/kriszyp/json-schema/commit/f6f6a3b02d667aa4ba2d5d50cc19208c4462abfa"
+        },
+        { "url": "https://github.com/advisories/GHSA-896r-f27r-55mw" }
+      ],
+      "published_at": "2021-11-19T20:16:17Z",
+      "updated_at": "2022-08-10T23:36:11Z",
+      "withdrawn_at": null,
+      "vulnerabilities": [
+        {
+          "package": { "ecosystem": "npm", "name": "json-schema" },
+          "severity": "critical",
+          "vulnerable_version_range": "< 0.4.0",
+          "first_patched_version": { "identifier": "0.4.0" }
+        }
+      ],
+      "cvss": {
+        "vector_string": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+        "score": 9.8
+      },
+      "cwes": [
+        {
+          "cwe_id": "CWE-915",
+          "name": "Improperly Controlled Modification of Dynamically-Determined Object Attributes"
+        },
+        {
+          "cwe_id": "CWE-1321",
+          "name": "Improperly Controlled Modification of Object Prototype Attributes ('Prototype Pollution')"
+        }
+      ]
+    },
+    "security_vulnerability": {
+      "package": { "ecosystem": "npm", "name": "json-schema" },
+      "severity": "critical",
+      "vulnerable_version_range": "< 0.4.0",
+      "first_patched_version": { "identifier": "0.4.0" }
+    },
+    "url": "https://api.github.com/repos/advanced-security-demo/bb-demo/dependabot/alerts/33",
+    "html_url": "https://github.com/advanced-security-demo/bb-demo/security/dependabot/33",
+    "created_at": "2022-10-18T11:38:42Z",
+    "updated_at": "2022-10-18T11:38:42Z",
+    "dismissed_at": null,
+    "dismissed_by": null,
+    "dismissed_reason": null,
+    "dismissed_comment": null,
+    "fixed_at": null
+  },
+  {
+    "number": 2,
+    "state": "open",
+    "dependency": {
+      "package": { "ecosystem": "pip", "name": "pycrypto" },
+      "manifest_path": "authn-service/requirements.txt",
+      "scope": "runtime"
+    },
+    "security_advisory": {
+      "ghsa_id": "GHSA-cq27-v7xp-c356",
+      "cve_id": "CVE-2013-7459",
+      "summary": "Buffer Overflow in pycrypto",
+      "description": "Heap-based buffer overflow in the ALGnew function in block_templace.c in Python Cryptography Toolkit (aka pycrypto) allows remote attackers to execute arbitrary code as demonstrated by a crafted iv parameter to cryptmsg.py.",
+      "severity": "critical",
+      "identifiers": [
+        { "value": "GHSA-cq27-v7xp-c356", "type": "GHSA" },
+        { "value": "CVE-2013-7459", "type": "CVE" }
+      ],
+      "references": [
+        { "url": "https://nvd.nist.gov/vuln/detail/CVE-2013-7459" },
+        { "url": "https://github.com/dlitz/pycrypto/issues/176" },
+        {
+          "url": "https://github.com/dlitz/pycrypto/commit/8dbe0dc3eea5c689d4f76b37b93fe216cf1f00d4"
+        },
+        { "url": "https://bugzilla.redhat.com/show_bug.cgi?id=1409754" },
+        { "url": "https://github.com/advisories/GHSA-cq27-v7xp-c356" },
+        {
+          "url": "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/C6BWNADPLKDBBQBUT3P75W7HAJCE7M3B/"
+        },
+        {
+          "url": "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/RJ37R2YLX56YZABFNAOWV4VTHTGYREAE/"
+        },
+        { "url": "https://pony7.fr/ctf:public:32c3:cryptmsg" },
+        { "url": "https://security.gentoo.org/glsa/201702-14" },
+        { "url": "http://www.openwall.com/lists/oss-security/2016/12/27/8" },
+        { "url": "http://www.securityfocus.com/bid/95122" }
+      ],
+      "published_at": "2018-12-14T18:51:38Z",
+      "updated_at": "2022-09-14T22:11:12Z",
+      "withdrawn_at": null,
+      "vulnerabilities": [
+        {
+          "package": { "ecosystem": "pip", "name": "pycrypto" },
+          "severity": "critical",
+          "vulnerable_version_range": "<= 2.6.1",
+          "first_patched_version": null
+        }
+      ],
+      "cvss": {
+        "vector_string": "CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+        "score": 9.8
+      },
+      "cwes": [
+        {
+          "cwe_id": "CWE-119",
+          "name": "Improper Restriction of Operations within the Bounds of a Memory Buffer"
+        }
+      ]
+    },
+    "security_vulnerability": {
+      "package": { "ecosystem": "pip", "name": "pycrypto" },
+      "severity": "critical",
+      "vulnerable_version_range": "<= 2.6.1",
+      "first_patched_version": null
+    },
+    "url": "https://api.github.com/repos/advanced-security-demo/bb-demo/dependabot/alerts/2",
+    "html_url": "https://github.com/advanced-security-demo/bb-demo/security/dependabot/2",
+    "created_at": "2022-10-18T11:38:37Z",
+    "updated_at": "2022-10-18T11:38:37Z",
+    "dismissed_at": null,
+    "dismissed_by": null,
+    "dismissed_reason": null,
+    "dismissed_comment": null,
+    "fixed_at": null
+  },
+  {
+    "number": 69,
+    "state": "open",
+    "dependency": {
+      "package": { "ecosystem": "npm", "name": "loader-utils" },
+      "manifest_path": "frontend/package-lock.json",
+      "scope": "development"
+    },
+    "security_advisory": {
+      "ghsa_id": "GHSA-3rfm-jhwj-7488",
+      "cve_id": "CVE-2022-37603",
+      "summary": "loader-utils is vulnerable to Regular Expression Denial of Service (ReDoS) via url variable",
+      "description": "A Regular expression denial of service (ReDoS) flaw was found in Function interpolateName in interpolateName.js in webpack loader-utils 2.0.0 via the url variable in interpolateName.js. A badly or maliciously formed string could be used to send crafted requests that cause a system to crash or take a disproportional amount of time to process. This issue has been patched in versions 1.4.2, 2.0.4 and 3.2.1.",
+      "severity": "high",
+      "identifiers": [
+        { "value": "GHSA-3rfm-jhwj-7488", "type": "GHSA" },
+        { "value": "CVE-2022-37603", "type": "CVE" }
+      ],
+      "references": [
+        { "url": "https://nvd.nist.gov/vuln/detail/CVE-2022-37603" },
+        { "url": "https://github.com/webpack/loader-utils/issues/213" },
+        {
+          "url": "https://github.com/webpack/loader-utils/blob/d9f4e23cf411d8556f8bac2d3bf05a6e0103b568/lib/interpolateName.js#L107"
+        },
+        {
+          "url": "https://github.com/webpack/loader-utils/blob/d9f4e23cf411d8556f8bac2d3bf05a6e0103b568/lib/interpolateName.js#L38"
+        },
+        { "url": "https://github.com/webpack/loader-utils/issues/216" },
+        { "url": "https://github.com/advisories/GHSA-3rfm-jhwj-7488" }
+      ],
+      "published_at": "2022-10-14T19:00:38Z",
+      "updated_at": "2022-11-15T21:26:43Z",
+      "withdrawn_at": null,
+      "vulnerabilities": [
+        {
+          "package": { "ecosystem": "npm", "name": "loader-utils" },
+          "severity": "high",
+          "vulnerable_version_range": ">= 1.0.0, < 1.4.2",
+          "first_patched_version": { "identifier": "1.4.2" }
+        },
+        {
+          "package": { "ecosystem": "npm", "name": "loader-utils" },
+          "severity": "high",
+          "vulnerable_version_range": ">= 2.0.0, < 2.0.4",
+          "first_patched_version": { "identifier": "2.0.4" }
+        },
+        {
+          "package": { "ecosystem": "npm", "name": "loader-utils" },
+          "severity": "high",
+          "vulnerable_version_range": ">= 3.0.0, < 3.2.1",
+          "first_patched_version": { "identifier": "3.2.1" }
+        }
+      ],
+      "cvss": {
+        "vector_string": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+        "score": 7.5
+      },
+      "cwes": [
+        { "cwe_id": "CWE-400", "name": "Uncontrolled Resource Consumption" }
+      ]
+    },
+    "security_vulnerability": {
+      "package": { "ecosystem": "npm", "name": "loader-utils" },
+      "severity": "high",
+      "vulnerable_version_range": ">= 1.0.0, < 1.4.2",
+      "first_patched_version": { "identifier": "1.4.2" }
+    },
+    "url": "https://api.github.com/repos/advanced-security-demo/bb-demo/dependabot/alerts/69",
+    "html_url": "https://github.com/advanced-security-demo/bb-demo/security/dependabot/69",
+    "created_at": "2022-11-23T10:19:32Z",
+    "updated_at": "2022-11-23T10:19:32Z",
+    "dismissed_at": null,
+    "dismissed_by": null,
+    "dismissed_reason": null,
+    "dismissed_comment": null,
+    "fixed_at": null
+  },
+  {
+    "number": 68,
+    "state": "open",
+    "dependency": {
+      "package": { "ecosystem": "npm", "name": "loader-utils" },
+      "manifest_path": "frontend/package-lock.json",
+      "scope": "development"
+    },
+    "security_advisory": {
+      "ghsa_id": "GHSA-hhq3-ff78-jv3g",
+      "cve_id": "CVE-2022-37599",
+      "summary": "loader-utils is vulnerable to Regular Expression Denial of Service (ReDoS)",
+      "description": "A regular expression denial of service (ReDoS) flaw was found in Function interpolateName in interpolateName.js in webpack loader-utils via the resourcePath variable in interpolateName.js. A badly or maliciously formed string could be used to send crafted requests that cause a system to crash or take a disproportional amount of time to process. This issue has been patched in versions 1.4.2, 2.0.4 and 3.2.1.",
+      "severity": "high",
+      "identifiers": [
+        { "value": "GHSA-hhq3-ff78-jv3g", "type": "GHSA" },
+        { "value": "CVE-2022-37599", "type": "CVE" }
+      ],
+      "references": [
+        { "url": "https://nvd.nist.gov/vuln/detail/CVE-2022-37599" },
+        { "url": "https://github.com/webpack/loader-utils/issues/211" },
+        {
+          "url": "https://github.com/webpack/loader-utils/blob/d9f4e23cf411d8556f8bac2d3bf05a6e0103b568/lib/interpolateName.js#L38"
+        },
+        {
+          "url": "https://github.com/webpack/loader-utils/blob/d9f4e23cf411d8556f8bac2d3bf05a6e0103b568/lib/interpolateName.js#L83"
+        },
+        { "url": "https://github.com/webpack/loader-utils/issues/216" },
+        {
+          "url": "https://github.com/webpack/loader-utils/commit/36dc86617930a5cf18af51cf3f53d0ee284d2824"
+        },
+        { "url": "https://github.com/advisories/GHSA-hhq3-ff78-jv3g" }
+      ],
+      "published_at": "2022-10-12T12:00:27Z",
+      "updated_at": "2022-11-22T22:52:16Z",
+      "withdrawn_at": null,
+      "vulnerabilities": [
+        {
+          "package": { "ecosystem": "npm", "name": "loader-utils" },
+          "severity": "high",
+          "vulnerable_version_range": ">= 1.0.0, < 1.4.2",
+          "first_patched_version": { "identifier": "1.4.2" }
+        },
+        {
+          "package": { "ecosystem": "npm", "name": "loader-utils" },
+          "severity": "high",
+          "vulnerable_version_range": ">= 2.0.0, < 2.0.4",
+          "first_patched_version": { "identifier": "2.0.4" }
+        },
+        {
+          "package": { "ecosystem": "npm", "name": "loader-utils" },
+          "severity": "high",
+          "vulnerable_version_range": ">= 3.0.0, < 3.2.1",
+          "first_patched_version": { "identifier": "3.2.1" }
+        }
+      ],
+      "cvss": {
+        "vector_string": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+        "score": 7.5
+      },
+      "cwes": [
+        { "cwe_id": "CWE-400", "name": "Uncontrolled Resource Consumption" }
+      ]
+    },
+    "security_vulnerability": {
+      "package": { "ecosystem": "npm", "name": "loader-utils" },
+      "severity": "high",
+      "vulnerable_version_range": ">= 1.0.0, < 1.4.2",
+      "first_patched_version": { "identifier": "1.4.2" }
+    },
+    "url": "https://api.github.com/repos/advanced-security-demo/bb-demo/dependabot/alerts/68",
+    "html_url": "https://github.com/advanced-security-demo/bb-demo/security/dependabot/68",
+    "created_at": "2022-11-23T10:19:32Z",
+    "updated_at": "2022-11-23T10:19:32Z",
+    "dismissed_at": null,
+    "dismissed_by": null,
+    "dismissed_reason": null,
+    "dismissed_comment": null,
+    "fixed_at": null
+  }
+]
