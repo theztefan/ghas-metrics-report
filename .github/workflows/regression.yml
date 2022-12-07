@@ -1,6 +1,8 @@
-name: "Regression Testing using local provided PAT"
+name: "Regression Testing with GitHub App token"
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   regression-test:
