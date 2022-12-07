@@ -1,34 +1,28 @@
----
+name: "Regression Testing using local provided PAT"
+on:
+  workflow_dispatch:
+
 jobs:
-  regression:
-    name: regression
+  regression-test:
+    name: Regression Testing with GitHub App token
     runs-on: ubuntu-20.04
     steps:
-      - name: "Git Checkout"
+      - name: Git Checkout
         uses: actions/checkout@v3
         with:
-          path: regression
-      - id: build_id
-        name: "Set build id"
-        run: 'echo "::set-output name=id::$(date +%s)"'
-      - id: token-collection
-        name: "Generate GitHub App JWT"
-        uses: getsentry/action-github-app-token@v1
+          path: ghas-metrics-report
+      - name: Get Token
+        id: get_workflow_token
+        uses: peter-murray/workflow-application-token-action@v1
         with:
-          app_id: "${{ secrets.APP_ID }}"
-          private_key: "${{ secrets.APP_KEY }}"
-      - env:
-          GITHUB_TOKEN: "${{ steps.token-collection.outputs.token }}"
-        name: "Test Action"
-        uses: ./regression
+          application_id: ${{ secrets.APPLICATION_ID }}
+          application_private_key: ${{ secrets.APPLICATION_PRIVATE_KEY }}
+      - name: Test Action
+        uses: ./ghas-metrics-report
+        env:
+          GITHUB_TOKEN:  ${{ steps.get_workflow_token.outputs.token }}
+          RUN_USING_ACT: "true"
         with:
-          exampleInput: "${{ github.event.inputs.exampleInput }}"
-
-name: "Regression Testing"
-"on":
-  workflow_dispatch:
-    # inputs:
-    #   exampleInput:
-    #     default: xys
-    #     description: "xyz"
-    #     required: true
+          repo: "ghas-metrics-report"
+          org: "advanced-security-demo"
+          features: "dependabot, code-scanning, secret-scanning"
