@@ -1,13 +1,14 @@
 import * as core from "@actions/core";
-import { DependancyAlert, CodeScanningAlert, SecretScanningAlert } from "../../types/common/main";
+import { DependancyAlert, CodeScanningAlert, SecretScanningAlert } from "../types/common/main";
 
+// Metrics
 interface AlertsMetrics {
     fixedYesterday: number,
     fixedLastWeek: number
     openVulnerabilities: number,
-    top10: any[]
+    top10: any[],
+    mttr: MTTRMetrics
 }
-
 interface MTTRMetrics {
     mttr: number,
     count: number
@@ -35,11 +36,15 @@ export const AlertsMetrics = (alerts: any[], dateField: string, state: string): 
     const openAlerts = alerts.filter(a => a.state === "open");
     const top10Alerts = openAlerts.sort(compareAlertSeverity).slice(0, 10);
 
+    //get MTTR
+    const mttr = CalculateMTTR(alerts, dateField, state);
+
     const result: AlertsMetrics = {
         fixedYesterday: fixedAlertsYesterday.length,
         fixedLastWeek: fixedAlertsLastWeek.length,
         openVulnerabilities: alerts.filter(a => a.state === "open").length,
         top10: top10Alerts,
+        mttr: mttr
     };
 
     return result;

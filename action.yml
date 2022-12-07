@@ -15,7 +15,7 @@ inputs:
     required: false
     default: dependabot, code-scanning, secret-scanning
 outputs:
-  reportOutput:
+  report-json:
     description: 'GHAS Metrics Report'
 runs:
   using: 'node16'

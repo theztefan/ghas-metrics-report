@@ -3,6 +3,7 @@ import { DependabotAlerts } from "./DependabotAlerts";
 import { CodeScanningAlerts  } from "./CodeScanningAlerts";
 import { SecretScanningAlerts } from "./SecretScanningAlerts";
 import { AlertsMetrics, PrintAlertsMetrics, CalculateMTTR } from "./AlertMetrics";
+import { syncWriteFile } from "./files";
 
 export {
     inputs,
@@ -11,5 +12,6 @@ export {
     SecretScanningAlerts,
     AlertsMetrics,
     PrintAlertsMetrics,
-    CalculateMTTR
+    CalculateMTTR,
+    syncWriteFile,
 };

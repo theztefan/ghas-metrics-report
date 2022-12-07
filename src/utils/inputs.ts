@@ -1,5 +1,5 @@
 import * as core from "@actions/core";
-import { inputsReturned, ghasFeatures } from "../../types/common/main";
+import { inputsReturned, ghasFeatures } from "../types/common/main";
 
 
 

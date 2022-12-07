@@ -10957,41 +10957,56 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const utils_1 = __nccwpck_require__(6252);
+const crypto_1 = __nccwpck_require__(6113);
 const run = async () => {
     // get inputs
     const inputs = await (0, utils_1.inputs)();
     core.debug(`[✅] Inputs parsed]`);
+    const id = (0, crypto_1.randomUUID)();
+    const output = {
+        id: id,
+        inputs: inputs,
+        dependabot_metrics: null,
+        code_scanning_metrics: null,
+        secret_scanning_metrics: null
+    };
     // get dependabot alerts
     if (inputs.features.includes("dependabot")) {
-        let dependabotRes = await ((0, utils_1.DependabotAlerts)("advanced-security-demo", "srdemo-demo"));
+        const dependabotRes = await ((0, utils_1.DependabotAlerts)("advanced-security-demo", "srdemo-demo"));
         core.debug(`[🔎] Dependabot alerts: ` + dependabotRes.length);
-        core.debug(`[✅] Dependabot alerts fetched`);
+        core.info(`[✅] Dependabot alerts fetched`);
         const dependabotAlertsMetrics = (0, utils_1.AlertsMetrics)(dependabotRes, "fixed_at", "fixed");
-        const dependabotMttr = (0, utils_1.CalculateMTTR)(dependabotRes, "fixed_at", "fixed");
         (0, utils_1.PrintAlertsMetrics)("Dependabot", dependabotAlertsMetrics);
-        core.debug(`[🔎] Dependabot - MTTR: ` + dependabotMttr.mttr);
+        core.debug(`[🔎] Dependabot - MTTR: ` + dependabotAlertsMetrics.mttr.mttr);
+        core.info(`[✅] Dependabot metrics calculated`);
+        output.dependabot_metrics = dependabotAlertsMetrics;
     }
     // get code scanning alerts
     if (inputs.features.includes("code-scanning")) {
-        let codeScanningRes = await ((0, utils_1.CodeScanningAlerts)("advanced-security-demo", "srdemo-demo"));
+        const codeScanningRes = await ((0, utils_1.CodeScanningAlerts)("advanced-security-demo", "srdemo-demo"));
         core.debug(`[🔎] Code Scanning alerts: ` + codeScanningRes.length);
-        core.debug(`[✅] Code Scanning alerts fetched`);
+        core.info(`[✅] Code Scanning alerts fetched`);
         const codeScanningAlertsMetrics = (0, utils_1.AlertsMetrics)(codeScanningRes, "fixed_at", "fixed");
-        const codeScanningMttr = (0, utils_1.CalculateMTTR)(codeScanningRes, "fixed_at", "fixed");
         (0, utils_1.PrintAlertsMetrics)("Code Scanning", codeScanningAlertsMetrics);
-        core.debug(`[🔎] Code Scanning - MTTR: ` + codeScanningMttr.mttr);
+        core.debug(`[🔎] Code Scanning - MTTR: ` + codeScanningAlertsMetrics.mttr.mttr);
+        core.info(`[✅] Code Scanning metrics calculated`);
+        output.code_scanning_metrics = codeScanningAlertsMetrics;
     }
     // get secret scanning alerts
     if (inputs.features.includes("secret-scanning")) {
-        let secretScanningRes = await ((0, utils_1.SecretScanningAlerts)("advanced-security-demo", "srdemo-demo"));
+        const secretScanningRes = await ((0, utils_1.SecretScanningAlerts)("advanced-security-demo", "srdemo-demo"));
         core.debug(`[🔎] Secret Scanning alerts ` + secretScanningRes.length);
         core.debug(`[✅] Secret Scanning alerts fetched`);
         const secretScanningAlertsMetrics = (0, utils_1.AlertsMetrics)(secretScanningRes, "resolved_at", "resolved");
-        const secretScanningMttr = (0, utils_1.CalculateMTTR)(secretScanningRes, "resolved_at", "resolved");
         (0, utils_1.PrintAlertsMetrics)("Secret Scanning", secretScanningAlertsMetrics);
-        core.debug(`[🔎] Secret Scanning - MTTR: ` + secretScanningMttr.mttr);
+        core.debug(`[🔎] Secret Scanning - MTTR: ` + secretScanningAlertsMetrics.mttr.mttr);
+        core.info(`[✅] Secret scanning metrics calculated`);
+        output.secret_scanning_metrics = secretScanningAlertsMetrics;
     }
     // prepare output
+    core.setOutput("report-json", output);
+    (0, utils_1.syncWriteFile)("report.json", JSON.stringify(output, null, 2));
+    core.info(`[✅] Report written to file`);
     return;
 };
 run();
@@ -11046,11 +11061,14 @@ const AlertsMetrics = (alerts, dateField, state) => {
     //get Top 10 by criticality
     const openAlerts = alerts.filter(a => a.state === "open");
     const top10Alerts = openAlerts.sort(compareAlertSeverity).slice(0, 10);
+    //get MTTR
+    const mttr = (0, exports.CalculateMTTR)(alerts, dateField, state);
     const result = {
         fixedYesterday: fixedAlertsYesterday.length,
         fixedLastWeek: fixedAlertsLastWeek.length,
         openVulnerabilities: alerts.filter(a => a.state === "open").length,
         top10: top10Alerts,
+        mttr: mttr
     };
     return result;
 };
@@ -11263,24 +11281,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SecretScanningAlerts = exports.xSecretScanningAlerts = void 0;
+exports.SecretScanningAlerts = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const action_1 = __nccwpck_require__(1231);
-const xSecretScanningAlerts = async (owner, repository) => {
-    try {
-        const octokit = new action_1.Octokit();
-        let response = await octokit.request('GET /repos/{owner}/{repo}/secret-scanning/alerts', {
-            owner: owner,
-            repo: repository
-        });
-        console.log(`Alerts` + JSON.stringify(response.data[0]));
-    }
-    catch (error) {
-        console.log(error);
-        core.setFailed("There was an erron. Please check the logs");
-    }
-};
-exports.xSecretScanningAlerts = xSecretScanningAlerts;
 const SecretScanningAlerts = async (owner, repository) => {
     let res = [];
     try {
@@ -11304,13 +11307,59 @@ exports.SecretScanningAlerts = SecretScanningAlerts;
 
 /***/ }),
 
+/***/ 6455:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.syncWriteFile = void 0;
+const core = __importStar(__nccwpck_require__(2186));
+const fs_1 = __nccwpck_require__(7147);
+const path_1 = __nccwpck_require__(1017);
+const syncWriteFile = (filename, data) => {
+    const outputFilename = (0, path_1.join)(__dirname, filename);
+    (0, fs_1.writeFileSync)(outputFilename, data, {
+        flag: 'w',
+    });
+    core.debug(`[📝] File ${outputFilename} written`);
+    return;
+};
+exports.syncWriteFile = syncWriteFile;
+
+
+/***/ }),
+
 /***/ 6252:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.CalculateMTTR = exports.PrintAlertsMetrics = exports.AlertsMetrics = exports.SecretScanningAlerts = exports.CodeScanningAlerts = exports.DependabotAlerts = exports.inputs = void 0;
+exports.syncWriteFile = exports.CalculateMTTR = exports.PrintAlertsMetrics = exports.AlertsMetrics = exports.SecretScanningAlerts = exports.CodeScanningAlerts = exports.DependabotAlerts = exports.inputs = void 0;
 const inputs_1 = __nccwpck_require__(9378);
 Object.defineProperty(exports, "inputs", ({ enumerable: true, get: function () { return inputs_1.inputs; } }));
 const DependabotAlerts_1 = __nccwpck_require__(1514);
@@ -11323,6 +11372,8 @@ const AlertMetrics_1 = __nccwpck_require__(2344);
 Object.defineProperty(exports, "AlertsMetrics", ({ enumerable: true, get: function () { return AlertMetrics_1.AlertsMetrics; } }));
 Object.defineProperty(exports, "PrintAlertsMetrics", ({ enumerable: true, get: function () { return AlertMetrics_1.PrintAlertsMetrics; } }));
 Object.defineProperty(exports, "CalculateMTTR", ({ enumerable: true, get: function () { return AlertMetrics_1.CalculateMTTR; } }));
+const files_1 = __nccwpck_require__(6455);
+Object.defineProperty(exports, "syncWriteFile", ({ enumerable: true, get: function () { return files_1.syncWriteFile; } }));
 
 
 /***/ }),

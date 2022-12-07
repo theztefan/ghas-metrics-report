@@ -1,6 +1,6 @@
 import * as core from "@actions/core";
 import { Octokit } from "@octokit/action";
-import { CodeScanningAlert } from "../../types/common/main";
+import { CodeScanningAlert } from "../types/common/main";
 
 
 export const CodeScanningAlerts  = async (owner: string, repository: string): Promise<CodeScanningAlert[]> => {

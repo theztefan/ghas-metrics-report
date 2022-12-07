@@ -1,6 +1,6 @@
 import * as core from "@actions/core";
 import { Octokit } from "@octokit/action";
-import { DependancyAlert } from "../../types/common/main";
+import { DependancyAlert } from "../types/common/main";
 
 
 export const DependabotAlerts  = async (owner: string, repository: string): Promise<DependancyAlert[]> => {
