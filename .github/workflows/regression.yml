@@ -28,3 +28,8 @@ jobs:
           repo: "ghas-metrics-report"
           org: "advanced-security-demo"
           features: "dependabot, code-scanning, secret-scanning"
+      - name: upload GHAS metrics report
+        uses: actions/upload-artifact@v3
+        with:
+          name: ghas-metrics-report
+          path: report.json
