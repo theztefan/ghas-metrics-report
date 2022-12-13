@@ -831,7 +831,6 @@ class Summary {
      * @returns {Summary} summary instance
      */
     addTable(rows) {
-        console.log("row", JSON.stringify(row))
         const tableBody = rows
             .map(row => {
             const cells = row
@@ -839,7 +838,6 @@ class Summary {
                 if (typeof cell === 'string') {
                     return this.wrap('td', cell);
                 }
-                console.log("cell", JSON.stringify(cell))
                 const { header, data, colspan, rowspan } = cell;
                 const tag = header ? 'th' : 'td';
                 const attrs = Object.assign(Object.assign({}, (colspan && { colspan })), (rowspan && { rowspan }));
