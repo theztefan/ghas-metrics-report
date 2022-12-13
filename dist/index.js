@@ -11344,7 +11344,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.prepareSummary = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 function prepareSummary(report) {
-    core.summary.addHeading('GHAS Metrics Summary');
+    core.summary.addHeading("GHAS Metrics Summary");
     core.summary.addBreak();
     const dependabotTop10rows = report.dependabot_metrics?.top10.map((a) => [
         a.security_vulnerability?.package.name,
@@ -11352,7 +11352,7 @@ function prepareSummary(report) {
         a.security_vulnerability?.vulnerable_version_range,
         a.security_vulnerability?.first_patched_version?.identifier,
         a.security_advisory?.cve_id,
-        a.security_advisory?.cvss?.vector_string
+        a.security_advisory?.cvss?.vector_string,
     ]);
     const codeScanningTop10rows = report.code_scanning_metrics?.top10.map((a) => [
         a.rule?.name,
@@ -11368,7 +11368,7 @@ function prepareSummary(report) {
         a.html_url,
     ]);
     core.summary
-        .addHeading('Dependabot')
+        .addHeading("Dependabot")
         .addList([
         `Open Alerts: ${report.dependabot_metrics?.openVulnerabilities}`,
         `Fixed Yesterday: ${report.dependabot_metrics?.fixedYesterday}`,
@@ -11376,31 +11376,41 @@ function prepareSummary(report) {
         `MTTR: ${report.dependabot_metrics?.mttr.mttr}`,
     ])
         .addBreak()
-        .addHeading('Dependabot - Top 10', 2)
-        .addTable([['Package', 'Severity', 'Vulnerable versions', 'Patched version', 'CVE', 'CVSS'],
-        dependabotTop10rows
+        .addHeading("Dependabot - Top 10", 2)
+        .addTable([
+        [
+            "Package",
+            "Severity",
+            "Vulnerable versions",
+            "Patched version",
+            "CVE",
+            "CVSS",
+        ],
+        dependabotTop10rows,
     ])
         .addBreak()
-        .addHeading('Code Scanning')
+        .addHeading("Code Scanning")
         .addList([
         `Open Alerts: ${report.code_scanning_metrics?.openVulnerabilities}`,
         `Fixed Yesterday: ${report.code_scanning_metrics?.fixedYesterday}`,
         `Fixed in the past 7 days: ${report.code_scanning_metrics?.fixedLastWeek}`,
         `MTTR: ${report.code_scanning_metrics?.mttr.mttr}`,
     ])
-        .addTable([['Vulnerability', 'Severity', 'Tool', 'Vulnerable file', 'Link'],
-        codeScanningTop10rows
+        .addTable([
+        ["Vulnerability", "Severity", "Tool", "Vulnerable file", "Link"],
+        codeScanningTop10rows,
     ])
         .addBreak()
-        .addHeading('Secret Scanning')
+        .addHeading("Secret Scanning")
         .addList([
         `Open Alerts: ${report.secret_scanning_metrics?.openVulnerabilities}`,
         `Fixed Yesterday: ${report.secret_scanning_metrics?.fixedYesterday}`,
         `Fixed in the past 7 days: ${report.secret_scanning_metrics?.fixedLastWeek}`,
         `MTTR: ${report.secret_scanning_metrics?.mttr.mttr}`,
     ])
-        .addTable([['Secret Type', 'Found at', 'Push Protection Bypass', 'Link'],
-        secretScanningTop10rows
+        .addTable([
+        ["Secret Type", "Found at", "Push Protection Bypass", "Link"],
+        secretScanningTop10rows,
     ]);
 }
 exports.prepareSummary = prepareSummary;

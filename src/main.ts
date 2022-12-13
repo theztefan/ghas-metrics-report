@@ -98,7 +98,6 @@ const run = async (): Promise<void> => {
   writeReportToFile("report.json", JSON.stringify(output, null, 2));
   core.info(`[✅] Report written to file`);
 
-
   prepareSummary(output);
   core.summary.write();
   core.info(`[✅] Report written to summary`);
