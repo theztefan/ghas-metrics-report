@@ -16,16 +16,15 @@ export function prepareSummary(report: Report): void {
       a.security_advisory?.cvss?.vector_string,
     ]);
 
-  core.info("dependabotTop10rows: " + JSON.stringify(dependabotTop10rows));
-
   //replace occurences of null with empty string
   dependabotTop10rows.forEach((row) => {
     row.forEach((cell, index) => {
-      if (cell === null) {
+      if (cell === null || cell == undefined) {
         row[index] = "";
       }
     });
   });
+  core.info("dependabotTop10rows: " + JSON.stringify(dependabotTop10rows));
 
   const codeScanningTop10rows: SummaryTableRow[] =
     report.code_scanning_metrics?.top10.map((a: any) => [
@@ -36,6 +35,13 @@ export function prepareSummary(report: Report): void {
       a.instances_url,
     ]);
 
+  codeScanningTop10rows.forEach((row) => {
+    row.forEach((cell, index) => {
+      if (cell === null || cell == undefined) {
+        row[index] = "";
+      }
+    });
+  });
   core.info("codeScanningTop10rows: " + JSON.stringify(codeScanningTop10rows));
 
   const secretScanningTop10rows: SummaryTableRow[] =
@@ -46,6 +52,13 @@ export function prepareSummary(report: Report): void {
       a.html_url,
     ]);
 
+  secretScanningTop10rows.forEach((row) => {
+    row.forEach((cell, index) => {
+      if (cell === null || cell == undefined) {
+        row[index] = "";
+      }
+    });
+  });
   core.info(
     "secretScanningTop10rows: " + JSON.stringify(secretScanningTop10rows)
   );

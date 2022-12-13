@@ -11354,15 +11354,15 @@ function prepareSummary(report) {
         a.security_advisory?.cve_id,
         a.security_advisory?.cvss?.vector_string,
     ]);
-    core.info("dependabotTop10rows: " + JSON.stringify(dependabotTop10rows));
     //replace occurences of null with empty string
     dependabotTop10rows.forEach((row) => {
         row.forEach((cell, index) => {
-            if (cell === null) {
+            if (cell === null || cell == undefined) {
                 row[index] = "";
             }
         });
     });
+    core.info("dependabotTop10rows: " + JSON.stringify(dependabotTop10rows));
     const codeScanningTop10rows = report.code_scanning_metrics?.top10.map((a) => [
         a.rule?.name,
         a.rule?.severity,
@@ -11370,6 +11370,13 @@ function prepareSummary(report) {
         a.location?.path,
         a.instances_url,
     ]);
+    codeScanningTop10rows.forEach((row) => {
+        row.forEach((cell, index) => {
+            if (cell === null || cell == undefined) {
+                row[index] = "";
+            }
+        });
+    });
     core.info("codeScanningTop10rows: " + JSON.stringify(codeScanningTop10rows));
     const secretScanningTop10rows = report.secret_scanning_metrics?.top10.map((a) => [
         a.secret_type_display_name,
@@ -11377,6 +11384,13 @@ function prepareSummary(report) {
         a.push_protection_bypassed,
         a.html_url,
     ]);
+    secretScanningTop10rows.forEach((row) => {
+        row.forEach((cell, index) => {
+            if (cell === null || cell == undefined) {
+                row[index] = "";
+            }
+        });
+    });
     core.info("secretScanningTop10rows: " + JSON.stringify(secretScanningTop10rows));
     core.summary
         .addHeading("Dependabot")
