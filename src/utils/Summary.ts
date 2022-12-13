@@ -6,25 +6,15 @@ export function prepareSummary(report: Report): void {
   core.summary.addHeading("GHAS Metrics Summary");
   core.summary.addBreak();
 
-  const dependabotTop10rows: SummaryTableRow[] = [];
-  for (const a of report.dependabot_metrics.top10) {
-    dependabotTop10rows.push([
-      a.security_vulnerability.package.name,
-      a.security_vulnerability.severity,
-      a.security_vulnerability.vulnerable_version_range,
-      a.security_vulnerability.first_patched_version?.identifier,
-      a.security_advisory.cve_id,
-      a.security_advisory.cvss?.vector_string,
+  const dependabotTop10rows: SummaryTableRow[] =
+    report.dependabot_metrics?.top10.map((a: any) => [
+      a.security_vulnerability?.package.name,
+      a.security_vulnerability?.severity,
+      a.security_vulnerability?.vulnerable_version_range,
+      a.security_vulnerability?.first_patched_version?.identifier,
+      a.security_advisory?.cve_id,
+      a.security_advisory?.cvss?.vector_string,
     ]);
-  }
-  // report.dependabot_metrics?.top10.map((a: any) => [
-  //   a.security_vulnerability?.package.name,
-  //   a.security_vulnerability?.severity,
-  //   a.security_vulnerability?.vulnerable_version_range,
-  //   a.security_vulnerability?.first_patched_version?.identifier,
-  //   a.security_advisory?.cve_id,
-  //   a.security_advisory?.cvss?.vector_string,
-  // ]);
 
   const codeScanningTop10rows: SummaryTableRow[] =
     report.code_scanning_metrics?.top10.map((a: any) => [
@@ -74,10 +64,10 @@ export function prepareSummary(report: Report): void {
       `MTTR: ${report.code_scanning_metrics?.mttr.mttr}`,
     ])
     .addHeading("Code Scanning - Top 10", 2)
-    // .addTable([
-    //   ["Vulnerability", "Severity", "Tool", "Vulnerable file", "Link"],
-    //   ...codeScanningTop10rows,
-    // ])
+    .addTable([
+      ["Vulnerability", "Severity", "Tool", "Vulnerable file", "Link"],
+      ...codeScanningTop10rows,
+    ])
 
     .addBreak()
     .addHeading("Secret Scanning")
@@ -87,9 +77,9 @@ export function prepareSummary(report: Report): void {
       `Fixed in the past 7 days: ${report.secret_scanning_metrics?.fixedLastWeek}`,
       `MTTR: ${report.secret_scanning_metrics?.mttr.mttr}`,
     ])
-    .addHeading("Secret Scanning - Top 10", 2);
-  // .addTable([
-  //   ["Secret Type", "Found at", "Push Protection Bypass", "Link"],
-  //   ...secretScanningTop10rows,
-  // ]);
+    .addHeading("Secret Scanning - Top 10", 2)
+    .addTable([
+      ["Secret Type", "Found at", "Push Protection Bypass", "Link"],
+      ...secretScanningTop10rows,
+    ]);
 }

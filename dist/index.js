@@ -14222,6 +14222,7 @@
               { data: "CVE", header: true },
               { data: "CVSS", header: true },
             ],
+            ...dependabotTop10rows,
           ])
           .addBreak()
           .addHeading("Code Scanning")
