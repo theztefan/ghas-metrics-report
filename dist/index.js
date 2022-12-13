@@ -10965,6 +10965,7 @@ const run = async () => {
     const id = (0, crypto_1.randomUUID)();
     const output = {
         id: id,
+        created_at: new Date().toISOString(),
         inputs: inputs,
         dependabot_metrics: null,
         code_scanning_metrics: null,
@@ -11007,6 +11008,9 @@ const run = async () => {
     core.setOutput("report-json", output);
     (0, utils_1.syncWriteFile)("report.json", JSON.stringify(output, null, 2));
     core.info(`[✅] Report written to file`);
+    (0, utils_1.prepareSummary)(output);
+    core.summary.write();
+    core.info(`[✅] Report written to summary`);
     return;
 };
 run();
@@ -11308,6 +11312,102 @@ exports.SecretScanningAlerts = SecretScanningAlerts;
 
 /***/ }),
 
+/***/ 165:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.prepareSummary = void 0;
+const core = __importStar(__nccwpck_require__(2186));
+function prepareSummary(report) {
+    core.summary.addHeading('GHAS Metrics Summary');
+    core.summary.addBreak();
+    const dependabotTop10rows = report.dependabot_metrics?.top10.map((a) => [
+        a.security_vulnerability?.package.name,
+        a.security_vulnerability?.severity,
+        a.security_vulnerability?.vulnerable_version_range,
+        a.security_vulnerability?.first_patched_version?.identifier,
+        a.security_advisory?.cve_id,
+        a.security_advisory?.cvss?.vector_string
+    ]);
+    const codeScanningTop10rows = report.code_scanning_metrics?.top10.map((a) => [
+        a.rule?.name,
+        a.rule?.severity,
+        a.tool?.name,
+        a.location?.path,
+        a.instances_url,
+    ]);
+    const secretScanningTop10rows = report.secret_scanning_metrics?.top10.map((a) => [
+        a.secret_type_display_name,
+        a.created_at,
+        a.push_protection_bypassed,
+        a.html_url,
+    ]);
+    core.summary
+        .addHeading('Dependabot')
+        .addList([
+        `Open Alerts: ${report.dependabot_metrics?.openVulnerabilities}`,
+        `Fixed Yesterday: ${report.dependabot_metrics?.fixedYesterday}`,
+        `Fixed in the past 7 days: ${report.dependabot_metrics?.fixedLastWeek}`,
+        `MTTR: ${report.dependabot_metrics?.mttr.mttr}`,
+    ])
+        .addBreak()
+        .addHeading('Dependabot - Top 10', 2)
+        .addTable([['Package', 'Severity', 'Vulnerable versions', 'Patched version', 'CVE', 'CVSS'],
+        dependabotTop10rows
+    ])
+        .addBreak()
+        .addHeading('Code Scanning')
+        .addList([
+        `Open Alerts: ${report.code_scanning_metrics?.openVulnerabilities}`,
+        `Fixed Yesterday: ${report.code_scanning_metrics?.fixedYesterday}`,
+        `Fixed in the past 7 days: ${report.code_scanning_metrics?.fixedLastWeek}`,
+        `MTTR: ${report.code_scanning_metrics?.mttr.mttr}`,
+    ])
+        .addTable([['Vulnerability', 'Severity', 'Tool', 'Vulnerable file', 'Link'],
+        codeScanningTop10rows
+    ])
+        .addBreak()
+        .addHeading('Secret Scanning')
+        .addList([
+        `Open Alerts: ${report.secret_scanning_metrics?.openVulnerabilities}`,
+        `Fixed Yesterday: ${report.secret_scanning_metrics?.fixedYesterday}`,
+        `Fixed in the past 7 days: ${report.secret_scanning_metrics?.fixedLastWeek}`,
+        `MTTR: ${report.secret_scanning_metrics?.mttr.mttr}`,
+    ])
+        .addTable([['Secret Type', 'Found at', 'Push Protection Bypass', 'Link'],
+        secretScanningTop10rows
+    ]);
+}
+exports.prepareSummary = prepareSummary;
+
+
+/***/ }),
+
 /***/ 6455:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -11360,7 +11460,7 @@ exports.syncWriteFile = syncWriteFile;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.syncWriteFile = exports.CalculateMTTR = exports.PrintAlertsMetrics = exports.AlertsMetrics = exports.SecretScanningAlerts = exports.CodeScanningAlerts = exports.DependabotAlerts = exports.inputs = void 0;
+exports.prepareSummary = exports.syncWriteFile = exports.CalculateMTTR = exports.PrintAlertsMetrics = exports.AlertsMetrics = exports.SecretScanningAlerts = exports.CodeScanningAlerts = exports.DependabotAlerts = exports.inputs = void 0;
 const inputs_1 = __nccwpck_require__(9378);
 Object.defineProperty(exports, "inputs", ({ enumerable: true, get: function () { return inputs_1.inputs; } }));
 const DependabotAlerts_1 = __nccwpck_require__(1514);
@@ -11369,6 +11469,8 @@ const CodeScanningAlerts_1 = __nccwpck_require__(798);
 Object.defineProperty(exports, "CodeScanningAlerts", ({ enumerable: true, get: function () { return CodeScanningAlerts_1.CodeScanningAlerts; } }));
 const SecretScanningAlerts_1 = __nccwpck_require__(5667);
 Object.defineProperty(exports, "SecretScanningAlerts", ({ enumerable: true, get: function () { return SecretScanningAlerts_1.SecretScanningAlerts; } }));
+const Summary_1 = __nccwpck_require__(165);
+Object.defineProperty(exports, "prepareSummary", ({ enumerable: true, get: function () { return Summary_1.prepareSummary; } }));
 const AlertMetrics_1 = __nccwpck_require__(2344);
 Object.defineProperty(exports, "AlertsMetrics", ({ enumerable: true, get: function () { return AlertMetrics_1.AlertsMetrics; } }));
 Object.defineProperty(exports, "PrintAlertsMetrics", ({ enumerable: true, get: function () { return AlertMetrics_1.PrintAlertsMetrics; } }));

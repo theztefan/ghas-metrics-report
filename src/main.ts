@@ -7,6 +7,7 @@ import {
   AlertsMetrics,
   PrintAlertsMetrics,
   syncWriteFile as writeReportToFile,
+  prepareSummary,
 } from "./utils";
 import { Report } from "./types/common/main";
 import { randomUUID } from "crypto";
@@ -96,6 +97,11 @@ const run = async (): Promise<void> => {
   core.setOutput("report-json", output);
   writeReportToFile("report.json", JSON.stringify(output, null, 2));
   core.info(`[✅] Report written to file`);
+
+
+  prepareSummary(output);
+  core.summary.write();
+  core.info(`[✅] Report written to summary`);
   return;
 };
 
