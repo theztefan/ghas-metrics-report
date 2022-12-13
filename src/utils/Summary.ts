@@ -6,36 +6,32 @@ export function prepareSummary(report: Report): void {
   core.summary.addHeading("GHAS Metrics Summary");
   core.summary.addBreak();
 
-  const dependabotTop10rows = report.dependabot_metrics?.top10.map((a: any) => [
-    a.security_vulnerability?.package.name,
-    a.security_vulnerability?.severity,
-    a.security_vulnerability?.vulnerable_version_range,
-    a.security_vulnerability?.first_patched_version?.identifier,
-    a.security_advisory?.cve_id,
-    a.security_advisory?.cvss?.vector_string,
-  ]);
+  const dependabotTop10rows: SummaryTableRow[] =
+    report.dependabot_metrics?.top10.map((a: any) => [
+      a.security_vulnerability?.package.name,
+      a.security_vulnerability?.severity,
+      a.security_vulnerability?.vulnerable_version_range,
+      a.security_vulnerability?.first_patched_version?.identifier,
+      a.security_advisory?.cve_id,
+      a.security_advisory?.cvss?.vector_string,
+    ]);
 
-  core.debug("#####");
-  core.debug(dependabotTop10rows);
-
-  const codeScanningTop10rows = report.code_scanning_metrics?.top10.map(
-    (a: any) => [
+  const codeScanningTop10rows: SummaryTableRow[] =
+    report.code_scanning_metrics?.top10.map((a: any) => [
       a.rule?.name,
       a.rule?.severity,
       a.tool?.name,
       a.location?.path,
       a.instances_url,
-    ]
-  );
+    ]);
 
-  const secretScanningTop10rows = report.secret_scanning_metrics?.top10.map(
-    (a: any) => [
+  const secretScanningTop10rows: SummaryTableRow[] =
+    report.secret_scanning_metrics?.top10.map((a: any) => [
       a.secret_type_display_name,
       a.created_at,
       a.push_protection_bypassed,
       a.html_url,
-    ]
-  );
+    ]);
 
   core.summary
     .addHeading("Dependabot")
@@ -49,14 +45,13 @@ export function prepareSummary(report: Report): void {
     .addHeading("Dependabot - Top 10", 2)
     .addTable([
       [
-        "Package",
-        "Severity",
-        "Vulnerable versions",
-        "Patched version",
-        "CVE",
-        "CVSS",
+        { data: "Package", header: true },
+        { data: "Severity", header: true },
+        { data: "Vulnerable versions", header: true },
+        { data: "Patched version", header: true },
+        { data: "CVE", header: true },
+        { data: "CVSS", header: true },
       ],
-      ...dependabotTop10rows,
     ])
 
     .addBreak()
