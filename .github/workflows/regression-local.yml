@@ -20,3 +20,8 @@ jobs:
           repo: "srdemo-demo"
           org: "advanced-security-demo"
           features: "dependabot, code-scanning, secret-scanning"
+      - name: upload GHAS metrics report
+        uses: actions/upload-artifact@v3
+        with:
+          name: ghas-metrics-report
+          path: dist/report.json
