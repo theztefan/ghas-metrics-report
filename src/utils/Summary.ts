@@ -16,6 +16,8 @@ export function prepareSummary(report: Report): void {
       a.security_advisory?.cvss?.vector_string,
     ]);
 
+  core.info("dependabotTop10rows: " + JSON.stringify(dependabotTop10rows));
+
   const codeScanningTop10rows: SummaryTableRow[] =
     report.code_scanning_metrics?.top10.map((a: any) => [
       a.rule?.name,
@@ -25,6 +27,8 @@ export function prepareSummary(report: Report): void {
       a.instances_url,
     ]);
 
+  core.info("codeScanningTop10rows: " + JSON.stringify(codeScanningTop10rows));
+
   const secretScanningTop10rows: SummaryTableRow[] =
     report.secret_scanning_metrics?.top10.map((a: any) => [
       a.secret_type_display_name,
@@ -32,6 +36,10 @@ export function prepareSummary(report: Report): void {
       a.push_protection_bypassed,
       a.html_url,
     ]);
+
+  core.info(
+    "secretScanningTop10rows: " + JSON.stringify(secretScanningTop10rows)
+  );
 
   core.summary
     .addHeading("Dependabot")
@@ -53,8 +61,11 @@ export function prepareSummary(report: Report): void {
         { data: "CVSS", header: true },
       ],
       ...dependabotTop10rows,
-    ])
+    ]);
 
+  core.info("Created Dependabot");
+
+  core.summary
     .addBreak()
     .addHeading("Code Scanning")
     .addList([
@@ -67,8 +78,11 @@ export function prepareSummary(report: Report): void {
     .addTable([
       ["Vulnerability", "Severity", "Tool", "Vulnerable file", "Link"],
       ...codeScanningTop10rows,
-    ])
+    ]);
 
+  core.info("Created Code Scanning");
+
+  core.summary
     .addBreak()
     .addHeading("Secret Scanning")
     .addList([
@@ -82,4 +96,6 @@ export function prepareSummary(report: Report): void {
       ["Secret Type", "Found at", "Push Protection Bypass", "Link"],
       ...secretScanningTop10rows,
     ]);
+
+  core.info("Created Secret Scanning");
 }
