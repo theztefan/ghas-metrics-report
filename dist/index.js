@@ -831,15 +831,15 @@ class Summary {
      * @returns {Summary} summary instance
      */
     addTable(rows) {
+        console.log("row", JSON.stringify(row))
         const tableBody = rows
             .map(row => {
-            console.log("Table row: ", JSON.stringify(row))
             const cells = row
                 .map(cell => {
                 if (typeof cell === 'string') {
                     return this.wrap('td', cell);
                 }
-                console.log("Table cell: ", JSON.stringify(cell))    
+                console.log("cell", JSON.stringify(cell))
                 const { header, data, colspan, rowspan } = cell;
                 const tag = header ? 'th' : 'td';
                 const attrs = Object.assign(Object.assign({}, (colspan && { colspan })), (rowspan && { rowspan }));
@@ -11357,6 +11357,14 @@ function prepareSummary(report) {
         a.security_advisory?.cvss?.vector_string,
     ]);
     core.info("dependabotTop10rows: " + JSON.stringify(dependabotTop10rows));
+    //replace occurences of null with empty string
+    dependabotTop10rows.forEach((row) => {
+        row.forEach((cell, index) => {
+            if (cell === null) {
+                row[index] = "";
+            }
+        });
+    });
     const codeScanningTop10rows = report.code_scanning_metrics?.top10.map((a) => [
         a.rule?.name,
         a.rule?.severity,
@@ -11394,7 +11402,8 @@ function prepareSummary(report) {
         ...dependabotTop10rows,
     ]);
     core.info("Created Dependabot");
-    core.summary.addBreak()
+    core.summary
+        .addBreak()
         .addHeading("Code Scanning")
         .addList([
         `Open Alerts: ${report.code_scanning_metrics?.openVulnerabilities}`,
@@ -11408,7 +11417,8 @@ function prepareSummary(report) {
         ...codeScanningTop10rows,
     ]);
     core.info("Created Code Scanning");
-    core.summary.addBreak()
+    core.summary
+        .addBreak()
         .addHeading("Secret Scanning")
         .addList([
         `Open Alerts: ${report.secret_scanning_metrics?.openVulnerabilities}`,

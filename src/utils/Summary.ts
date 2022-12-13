@@ -18,6 +18,15 @@ export function prepareSummary(report: Report): void {
 
   core.info("dependabotTop10rows: " + JSON.stringify(dependabotTop10rows));
 
+  //replace occurences of null with empty string
+  dependabotTop10rows.forEach((row) => {
+    row.forEach((cell, index) => {
+      if (cell === null) {
+        row[index] = "";
+      }
+    });
+  });
+
   const codeScanningTop10rows: SummaryTableRow[] =
     report.code_scanning_metrics?.top10.map((a: any) => [
       a.rule?.name,
