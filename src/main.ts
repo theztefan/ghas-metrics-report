@@ -20,6 +20,7 @@ const run = async (): Promise<void> => {
 
   const output: Report = {
     id: id,
+    created_at: new Date().toISOString(),
     inputs: inputs,
     dependabot_metrics: null,
     code_scanning_metrics: null,

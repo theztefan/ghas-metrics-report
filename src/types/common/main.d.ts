@@ -205,6 +205,7 @@ export interface SecretScanningAlert {
 
 export interface Report {
   id: string;
+  created_at: string;
   inputs: inputsReturned;
   dependabot_metrics: alertMettics;
   code_scanning_metrics: alertMettics;
