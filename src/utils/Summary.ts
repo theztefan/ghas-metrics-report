@@ -62,6 +62,7 @@ export function prepareSummary(report: Report): void {
         { data: "CVE", header: true },
         { data: "CVSS", header: true },
       ],
+      ...dependabotTop10rows,
     ])
 
     .addBreak()
