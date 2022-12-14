@@ -24,15 +24,14 @@ export function prepareSummary(report: Report): void {
       }
     });
   });
-  core.info("dependabotTop10rows: " + JSON.stringify(dependabotTop10rows));
 
   const codeScanningTop10rows: SummaryTableRow[] =
     report.code_scanning_metrics?.top10.map((a: any) => [
       a.rule?.name,
       a.rule?.severity,
       a.tool?.name,
-      a.location?.path,
-      a.instances_url,
+      a.most_recent_instance?.location.path,
+      createUrlLink(a.html_url, "Link"),
     ]);
 
   codeScanningTop10rows.forEach((row) => {
@@ -42,14 +41,13 @@ export function prepareSummary(report: Report): void {
       }
     });
   });
-  core.info("codeScanningTop10rows: " + JSON.stringify(codeScanningTop10rows));
 
   const secretScanningTop10rows: SummaryTableRow[] =
     report.secret_scanning_metrics?.top10.map((a: any) => [
       a.secret_type_display_name,
       a.created_at,
-      a.push_protection_bypassed,
-      a.html_url,
+      (a.push_protection_bypassed as boolean) ? "True" : "False",
+      createUrlLink(a.html_url, "Link"),
     ]);
 
   secretScanningTop10rows.forEach((row) => {
@@ -59,9 +57,6 @@ export function prepareSummary(report: Report): void {
       }
     });
   });
-  core.info(
-    "secretScanningTop10rows: " + JSON.stringify(secretScanningTop10rows)
-  );
 
   core.summary
     .addHeading("Dependabot")
@@ -120,4 +115,8 @@ export function prepareSummary(report: Report): void {
     ]);
 
   core.info("Created Secret Scanning");
+}
+
+function createUrlLink(url: string | null, text: string): string {
+  return `<a target=_blank href="${url}">${text}</a>`;
 }
