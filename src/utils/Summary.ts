@@ -82,8 +82,6 @@ export function prepareSummary(report: Report): void {
       ...dependabotTop10rows,
     ]);
 
-  core.info("Created Dependabot");
-
   core.summary
     .addBreak()
     .addHeading("Code Scanning")
@@ -105,8 +103,6 @@ export function prepareSummary(report: Report): void {
       ...codeScanningTop10rows,
     ]);
 
-  core.info("Created Code Scanning");
-
   core.summary
     .addBreak()
     .addHeading("Secret Scanning")
@@ -127,8 +123,6 @@ export function prepareSummary(report: Report): void {
       ],
       ...secretScanningTop10rows,
     ]);
-
-  core.info("Created Secret Scanning");
 }
 
 function createUrlLink(url: string | null, text: string): string {
