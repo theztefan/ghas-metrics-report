@@ -14,6 +14,7 @@ export function prepareSummary(report: Report): void {
       a.security_vulnerability?.first_patched_version?.identifier,
       a.security_advisory?.cve_id,
       a.security_advisory?.cvss?.vector_string,
+      createUrlLink(a.html_url, "Link"),
     ]);
 
   //replace occurences of null with empty string
@@ -76,6 +77,7 @@ export function prepareSummary(report: Report): void {
         { data: "Patched version", header: true },
         { data: "CVE", header: true },
         { data: "CVSS", header: true },
+        { data: "Link", header: true },
       ],
       ...dependabotTop10rows,
     ]);
@@ -93,7 +95,13 @@ export function prepareSummary(report: Report): void {
     ])
     .addHeading("Code Scanning - Top 10", 2)
     .addTable([
-      ["Vulnerability", "Severity", "Tool", "Vulnerable file", "Link"],
+      [
+        { data: "Vulnerability", header: true },
+        { data: "Severity", header: true },
+        { data: "Tool", header: true },
+        { data: "Vulnerable file", header: true },
+        { data: "Link", header: true },
+      ],
       ...codeScanningTop10rows,
     ]);
 
@@ -110,7 +118,13 @@ export function prepareSummary(report: Report): void {
     ])
     .addHeading("Secret Scanning - Top 10", 2)
     .addTable([
-      ["Secret Type", "Found at", "Push Protection Bypass", "Link"],
+      [
+        { data: "Secret Type", header: true },
+        { data: "Found at", header: true },
+        { data: "Push Protection Bypass", header: true },
+        { data: "Patched version", header: true },
+        { data: "Link", header: true },
+      ],
       ...secretScanningTop10rows,
     ]);
 

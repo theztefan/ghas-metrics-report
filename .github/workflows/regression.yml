@@ -23,7 +23,6 @@ jobs:
         uses: ./ghas-metrics-report
         env:
           GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
-          RUN_USING_ACT: "true"
         with:
           repo: "ghas-metrics-report"
           org: "advanced-security-demo"
