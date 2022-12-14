@@ -1,42 +1,89 @@
-# GitHub Actions Boilerplate
+# GitHub Advanced Security - Metrics Report Action
 
 ## Introduction
 
-A sample GitHub action boilerplate for Typescript actions.
+A GitHub Action for generating scheduled reports for GitHub Advanced Security alerts.
 
-It comes with:
+The action is currently intended to be used on a repository level. The way to setup is adding a new Actions workflow file that runs this action on a scheduled interval once a day. 
 
-- **Node 16 Support**: Current LTS.
-- **ESlint and Prettier**: Code quality and consistency tooling.
-- **Husky**: Pre-commit hook ensuring code is built before being deployed to GitHub.
+This action will generate GHAS Metric report for the previous day. The report is generated in the form of a JSON file which we upload as an Action run artifact. Additionally it prints the summarized report as an Action run Summary.
 
-There are many open source actions boilerplates/templates. I use this one as I try and keep it up to date and simplistic.
+The report will include the following metrics for Dependabot, Code Scanning and Secret scanning:
+- Open alerts
+- Fixed alerts yesterday
+- Fixed alerts in the past 7 days
+- Total MTTR (Mean Time To Remediate)
 
-## Getting Started
+## Usage
 
-Click [Use this template](https://github.com/NickLiffen/actions-boilerplate/generate) on this repository. Enter in your action repository name and description, and click _Create repository from template_.
+This action uses the GitHub API and requires a GitHub access token. The suggested way to do it is by using `peter-murray/workflow-application-token-action@v2`. Follow the [steps described](https://github.com/peter-murray/workflow-application-token-action#creating-a-github-application) in the README of the action to set up a GitHub App and use it with the Action. 
 
-Close down locally, and run:
+Official documentation on how to create a GitHub App can also be found on: [Creating a GitHub App](https://docs.github.com/en/developers/apps/creating-a-github-app)
 
+Invoking GHAS Metrics Report action is as simple as:
+
+```yaml
+  - name: Generate GHAS Metrics Report
+        uses: theztefan/ghas-metric-report
+        env:
+          GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
+        with:
+          repo: "Repo-name"
+          org: "Organization-name"
+          features: "dependabot, code-scanning, secret-scanning" # comma separated list of features.
 ```
-yarn install --frozen-lockfile && yarn run build
+
+
+### Example workflow using the action
+
+```yaml
+name: "GitHub Advanced Security - Metrics Report Action"
+on:
+  schedule:
+    - cron: "30 5 * * *" # Run every day at 5.30
+
+jobs:
+  ghas-metrics-report:
+    name: Regression Testing with GitHub App token
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v3
+        with:
+          path: ghas-metrics-report
+      - name: Get Token
+        id: get_workflow_token
+        uses: theztefan/ghas-metric-report
+        with:
+          application_id: ${{ secrets.APPLICATION_ID }}
+          application_private_key: ${{ secrets.APPLICATION_PRIVATE_KEY }}
+      - name: Generate GHAS Metrics Report
+        uses: ./ghas-metrics-report
+        env:
+          GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
+        with:
+          repo: "ghas-metrics-report"
+          org: "advanced-security-demo"
+          features: "dependabot, code-scanning, secret-scanning"
+      - name: Upload GHAS metrics report as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ghas-metrics-report
+          path: ghas-metrics-report/dist/report.json
 ```
 
-Edit the required fields within the `package.json` and `action.yml` and you should be good to go. Simply start writing code within the `src` directory.
+### Available option
 
-## Testing Locally
+Currently the action supports the following configuration options:
+- `repo` - The name of the repository to generate the report for. This is a required field.
+-  `org` - The name of the organization to generate the report for. This is a required field.
+-  `features` - A comma separated list of features to generate the report for. This is a required field. The supported values are: `dependabot`, `code-scanning` and `secret-scanning`.
 
-We use [act](https://github.com/nektos/act) to test our actions locally. If you are interested in testing your action locally, you will need to do a few things:
+### Output
+![Sample report output](ghas-metrics-report-sample-summary.png)
 
-1. Create a `my.secrets` file. This file will contain all the secrets required in your workflow to test this action.
-2. Create a `.env.` within the root of this repository. This file will contain any environment variables required in your workflow to test this action.
-3. Update the `.github/workflows/regression.yml` file to test your action. This will include updating any `events` in the workflow and inputs.
-4. Update the `.github/workflows/regression/payload.yml` file, which contains the input payload for your action.
 
-Once you have done the above, you are ready to test locally and run `yarn run local`. This will trigger `act` to run your workflow and, therefore, your action.
+## Contrubting
 
-For more information on how to use act, see the instructions here: [Act Overview](https://github.com/nektos/act/blob/master/README.md).
-
-## Contrubting?
-
-Simply raise a pull request :) Make sure CI passes and then you should be good to go.
+- Create an issue to the repo with suggestions and bugs
+- Raise a pull request :) 
