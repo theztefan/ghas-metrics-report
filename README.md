@@ -53,12 +53,12 @@ jobs:
           path: ghas-metrics-report
       - name: Get Token
         id: get_workflow_token
-        uses: theztefan/ghas-metric-report
+        uses: peter-murray/workflow-application-token-action@v2
         with:
           application_id: ${{ secrets.APPLICATION_ID }}
           application_private_key: ${{ secrets.APPLICATION_PRIVATE_KEY }}
       - name: Generate GHAS Metrics Report
-        uses: ./ghas-metrics-report
+        uses: theztefan/ghas-metric-report
         env:
           GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
         with:
