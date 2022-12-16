@@ -95,7 +95,7 @@ const run = async (): Promise<void> => {
 
   // prepare output
   core.setOutput("report-json", output);
-  writeReportToFile("report.json", JSON.stringify(output, null, 2));
+  writeReportToFile("/tmp/report.json", JSON.stringify(output, null, 2));
   core.info(`[✅] Report written to file`);
 
   prepareSummary(output);
