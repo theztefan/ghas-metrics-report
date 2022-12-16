@@ -58,7 +58,7 @@ jobs:
           application_id: ${{ secrets.APPLICATION_ID }}
           application_private_key: ${{ secrets.APPLICATION_PRIVATE_KEY }}
       - name: Generate GHAS Metrics Report
-        uses: theztefan/ghas-metric-report
+        uses: theztefan/ghas-metrics-report
         env:
           GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
         with:
