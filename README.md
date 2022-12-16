@@ -44,7 +44,7 @@ on:
 
 jobs:
   ghas-metrics-report:
-    name: Regression Testing with GitHub App token
+    name: GitHub Advanced Security - Metrics Report Action
     runs-on: ubuntu-20.04
     steps:
       - name: Git Checkout
