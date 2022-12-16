@@ -94,7 +94,7 @@ const run = async (): Promise<void> => {
   }
 
   // prepare output
-  core.setOutput("report-json", output);
+  core.setOutput("report-json", JSON.stringify(output, null, 2));
   core.info(`[✅] Report written outpu 'report-json' file`);
   // writeReportToFile("ghas-report.json", JSON.stringify(output, null, 2));
   // core.info(`[✅] Report written to file`);
