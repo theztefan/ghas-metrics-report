@@ -11006,8 +11006,9 @@ const run = async () => {
     }
     // prepare output
     core.setOutput("report-json", output);
-    (0, utils_1.syncWriteFile)("ghas-report.json", JSON.stringify(output, null, 2));
-    core.info(`[✅] Report written to file`);
+    core.info(`[✅] Report written outpu 'report-json' file`);
+    // writeReportToFile("ghas-report.json", JSON.stringify(output, null, 2));
+    // core.info(`[✅] Report written to file`);
     (0, utils_1.prepareSummary)(output);
     core.summary.write();
     core.info(`[✅] Report written to summary`);
