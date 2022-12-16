@@ -11006,7 +11006,7 @@ const run = async () => {
     }
     // prepare output
     core.setOutput("report-json", output);
-    (0, utils_1.syncWriteFile)("/tmp/report.json", JSON.stringify(output, null, 2));
+    (0, utils_1.syncWriteFile)("ghas-report.json", JSON.stringify(output, null, 2));
     core.info(`[✅] Report written to file`);
     (0, utils_1.prepareSummary)(output);
     core.summary.write();
@@ -11505,13 +11505,11 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.syncWriteFile = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const fs_1 = __nccwpck_require__(7147);
-const path_1 = __nccwpck_require__(1017);
 const syncWriteFile = (filename, data) => {
-    const outputFilename = (0, path_1.join)(__dirname, filename);
-    (0, fs_1.writeFileSync)(outputFilename, data, {
+    (0, fs_1.writeFileSync)(filename, data, {
         flag: "w",
     });
-    core.debug(`[📝] File ${outputFilename} written`);
+    core.debug(`[📝] File ${filename} written`);
     return;
 };
 exports.syncWriteFile = syncWriteFile;
