@@ -1,7 +1,6 @@
 import * as core from "@actions/core";
 import { writeFileSync } from "fs";
 import jsPDF from "jspdf";
-import autoTable, { RowInput } from "jspdf-autotable";
 import { join } from "path";
 
 export const syncWriteFile = (filename: string, data: any): void => {

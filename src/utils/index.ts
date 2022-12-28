@@ -4,6 +4,7 @@ import { CodeScanningAlerts } from "./CodeScanningAlerts";
 import { SecretScanningAlerts } from "./SecretScanningAlerts";
 import { GetCommitDate } from "./CommitUtils";
 import { prepareSummary } from "./Summary";
+import { preparePdf } from "./Summary";
 import {
   AlertsMetrics,
   PrintAlertsMetrics,
@@ -21,6 +22,7 @@ export {
   CalculateMTTR,
   syncWriteFile,
   prepareSummary,
+  preparePdf,
   GetCommitDate,
   preparePdfAndWriteToFile,
 };

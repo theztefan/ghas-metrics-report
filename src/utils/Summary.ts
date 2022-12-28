@@ -145,15 +145,6 @@ export function preparePdf(report: Report): jsPDF {
     ]
   );
 
-  //replace occurences of null with empty string
-  // dependabotTop10rows.forEach((row) => {
-  //   row.forEach((cell, index) => {
-  //     if (cell === null || cell == undefined) {
-  //       row[index] = "";
-  //     }
-  //   });
-  // });
-
   const codeScanningTop10rows: RowInput[] =
     report.code_scanning_metrics?.top10.map((a: any) => [
       a.rule?.name,
@@ -163,14 +154,6 @@ export function preparePdf(report: Report): jsPDF {
       createUrlLink(a.html_url, "Link"),
     ]);
 
-  // codeScanningTop10rows.forEach((row) => {
-  //   row.forEach((cell, index) => {
-  //     if (cell === null || cell == undefined) {
-  //       row[index] = "";
-  //     }
-  //   });
-  // });
-
   const secretScanningTop10rows: RowInput[] =
     report.secret_scanning_metrics?.top10.map((a: any) => [
       a.secret_type_display_name,
@@ -178,14 +161,6 @@ export function preparePdf(report: Report): jsPDF {
       (a.push_protection_bypassed as boolean) ? "True" : "False",
       createUrlLink(a.html_url, "Link"),
     ]);
-
-  // secretScanningTop10rows.forEach((row) => {
-  //   row.forEach((cell, index) => {
-  //     if (cell === null || cell == undefined) {
-  //       row[index] = "";
-  //     }
-  //   });
-  // });
 
   pdf.text("Dependabot", 10, 20);
   pdf.text(
