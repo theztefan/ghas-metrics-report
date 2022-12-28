@@ -8,16 +8,23 @@ interface AlertsMetrics {
   openVulnerabilities: number;
   top10: any[];
   mttr: MTTRMetrics;
+  mttd?: MTTDMetrics;
 }
 interface MTTRMetrics {
   mttr: number;
   count: number;
 }
+interface MTTDMetrics {
+  mttd: number;
+}
 
 export const AlertsMetrics = (
   alerts: any[],
-  dateField: string,
-  state: string
+  fixedDateField: string,
+  state: string,
+  calculateMTTD: boolean,
+  introducedDateField?: string,
+  detectedDateField?: string
 ): AlertsMetrics => {
   const todayDate = new Date();
   todayDate.setHours(0, 0, 0, 0);
@@ -33,10 +40,10 @@ export const AlertsMetrics = (
 
   const fixedAlerts = alerts.filter((a) => a.state === state);
   const fixedAlertsYesterday = fixedAlerts.filter((a) =>
-    FilterBetweenDates(a[dateField], yesterday, today)
+    FilterBetweenDates(a[fixedDateField], yesterday, today)
   );
   const fixedAlertsLastWeek = fixedAlerts.filter((a) =>
-    FilterBetweenDates(a[dateField], lastWeek, today)
+    FilterBetweenDates(a[fixedDateField], lastWeek, today)
   );
 
   //get Top 10 by criticality
@@ -44,7 +51,12 @@ export const AlertsMetrics = (
   const top10Alerts = openAlerts.sort(compareAlertSeverity).slice(0, 10);
 
   //get MTTR
-  const mttr = CalculateMTTR(alerts, dateField, state);
+  const mttr = CalculateMTTR(alerts, fixedDateField, state);
+
+  let mttd = undefined;
+  if (calculateMTTD) {
+    mttd = CalculateMTTD(alerts, introducedDateField!, detectedDateField!);
+  }
 
   const result: AlertsMetrics = {
     fixedYesterday: fixedAlertsYesterday.length,
@@ -52,6 +64,7 @@ export const AlertsMetrics = (
     openVulnerabilities: alerts.filter((a) => a.state === "open").length,
     top10: top10Alerts,
     mttr: mttr,
+    mttd: mttd,
   };
 
   return result;
@@ -89,6 +102,41 @@ export const CalculateMTTR = (
   const result: MTTRMetrics = {
     mttr: alert_count === 0 ? 0 : total_time_to_remediate_seconds / alert_count,
     count: alert_count,
+  };
+
+  return result;
+};
+
+export const CalculateMTTD = (
+  alerts: any[],
+  introducedDateField: string,
+  detectedDateField: string
+): MTTDMetrics => {
+  let alert_count = 0;
+  let total_time_to_detect_seconds = 0;
+
+  for (const alert of alerts) {
+    const introducedDate: number = Date.parse(
+      introducedDateField
+        .split(".")
+        .filter((s) => s)
+        .reduce((acc, val) => acc && acc[val], alert)
+    );
+    const detectedDate: number = Date.parse(
+      detectedDateField
+        .split(".")
+        .filter((s) => s)
+        .reduce((acc, val) => acc && acc[val], alert)
+    );
+
+    const time_to_remediate = detectedDate - introducedDate;
+    total_time_to_detect_seconds += time_to_remediate / 1000;
+
+    alert_count += 1;
+  }
+
+  const result: MTTDMetrics = {
+    mttd: alert_count === 0 ? 0 : total_time_to_detect_seconds / alert_count,
   };
 
   return result;

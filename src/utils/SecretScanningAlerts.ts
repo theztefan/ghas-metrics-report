@@ -1,6 +1,9 @@
 import * as core from "@actions/core";
 import { Octokit } from "@octokit/action";
-import { SecretScanningAlert } from "../types/common/main";
+import {
+  SecretScanningAlert,
+  SecretScanningLocation,
+} from "../types/common/main";
 
 export const SecretScanningAlerts = async (
   owner: string,
@@ -21,6 +24,20 @@ export const SecretScanningAlerts = async (
       }
     );
     res = iterator as SecretScanningAlert[];
+
+    for (const alert of res) {
+      const { data: locationData } = await octokit.request(
+        "GET /repos/{owner}/{repo}/secret-scanning/alerts/{alert_number}/locations",
+        {
+          owner: owner,
+          repo: repository,
+          alert_number: alert.number,
+        }
+      );
+      alert["commitsSha"] = (locationData as SecretScanningLocation[]).map(
+        (location) => location.details.commit_sha
+      );
+    }
   } catch (error) {
     core.setFailed("There was an error. Please check the logs" + error);
   }

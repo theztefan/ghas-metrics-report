@@ -8,6 +8,7 @@ import {
   PrintAlertsMetrics,
   syncWriteFile as writeReportToFile,
   prepareSummary,
+  GetCommitDate,
 } from "./utils";
 import { Report } from "./types/common/main";
 import { randomUUID } from "crypto";
@@ -30,42 +31,52 @@ const run = async (): Promise<void> => {
 
   // get dependabot alerts
   if (inputs.features.includes("dependabot")) {
-    const dependabotRes = await DependabotAlerts(
-      "advanced-security-demo",
-      "srdemo-demo"
-    );
+    const dependabotRes = await DependabotAlerts(inputs.org, inputs.repo);
     core.debug(`[🔎] Dependabot alerts: ` + dependabotRes.length);
     core.info(`[✅] Dependabot alerts fetched`);
 
     const dependabotAlertsMetrics = AlertsMetrics(
       dependabotRes,
       "fixed_at",
-      "fixed"
+      "fixed",
+      false
     );
     PrintAlertsMetrics("Dependabot", dependabotAlertsMetrics);
     core.debug(`[🔎] Dependabot - MTTR: ` + dependabotAlertsMetrics.mttr.mttr);
+    //core.debug(`[🔎] Dependabot - MTTD: ` + dependabotAlertsMetrics.mttd.mttd);
     core.info(`[✅] Dependabot metrics calculated`);
     output.dependabot_metrics = dependabotAlertsMetrics;
   }
 
   // get code scanning alerts
   if (inputs.features.includes("code-scanning")) {
-    const codeScanningRes = await CodeScanningAlerts(
-      "advanced-security-demo",
-      "srdemo-demo"
-    );
+    const codeScanningRes = await CodeScanningAlerts(inputs.org, inputs.repo);
     core.debug(`[🔎] Code Scanning alerts: ` + codeScanningRes.length);
     core.info(`[✅] Code Scanning alerts fetched`);
+
+    await GetCommitDate(
+      inputs.org,
+      inputs.repo,
+      codeScanningRes,
+      "most_recent_instance.commit_sha"
+    );
 
     const codeScanningAlertsMetrics = AlertsMetrics(
       codeScanningRes,
       "fixed_at",
-      "fixed"
+      "fixed",
+      true,
+      "commitDate",
+      "created_at"
     );
     PrintAlertsMetrics("Code Scanning", codeScanningAlertsMetrics);
     core.debug(
       `[🔎] Code Scanning - MTTR: ` + codeScanningAlertsMetrics.mttr.mttr
     );
+    core.debug(
+      `[🔎] Code Scanning - MTTD: ` + codeScanningAlertsMetrics.mttd?.mttd
+    );
+
     core.info(`[✅] Code Scanning metrics calculated`);
 
     output.code_scanning_metrics = codeScanningAlertsMetrics;
@@ -74,21 +85,35 @@ const run = async (): Promise<void> => {
   // get secret scanning alerts
   if (inputs.features.includes("secret-scanning")) {
     const secretScanningRes = await SecretScanningAlerts(
-      "advanced-security-demo",
-      "srdemo-demo"
+      inputs.org,
+      inputs.repo
     );
     core.debug(`[🔎] Secret Scanning alerts ` + secretScanningRes.length);
     core.debug(`[✅] Secret Scanning alerts fetched`);
 
+    await GetCommitDate(
+      inputs.org,
+      inputs.repo,
+      secretScanningRes,
+      "commitsSha"
+    );
+
     const secretScanningAlertsMetrics = AlertsMetrics(
       secretScanningRes,
       "resolved_at",
-      "resolved"
+      "resolved",
+      true,
+      "commitDate",
+      "created_at"
     );
     PrintAlertsMetrics("Secret Scanning", secretScanningAlertsMetrics);
     core.debug(
       `[🔎] Secret Scanning - MTTR: ` + secretScanningAlertsMetrics.mttr.mttr
     );
+    core.debug(
+      `[🔎] Secret Scanning - MTTD: ` + secretScanningAlertsMetrics.mttd?.mttd
+    );
+
     core.info(`[✅] Secret scanning metrics calculated`);
     output.secret_scanning_metrics = secretScanningAlertsMetrics;
   }

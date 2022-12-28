@@ -201,6 +201,16 @@ export interface SecretScanningAlert {
   push_protection_bypassed: boolean;
   push_protection_bypassed_by: any;
   push_protection_bypassed_at: any;
+  commitsSha?: string[];
+}
+
+export interface SecretScanningLocation {
+  type: string;
+  details: SecretScanningLocationDetail;
+}
+
+export interface SecretScanningLocationDetail {
+  commit_sha: string;
 }
 
 export interface Report {
