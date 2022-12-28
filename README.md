@@ -71,10 +71,10 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ghas-metrics-report
-          path: ghas-metrics-report/dist/report.json
+          path: ${{ github.workspace }}/ghas-report.*
 ```
 
-### Available option
+### Available options
 
 Currently the action supports the following configuration options:
 
@@ -82,8 +82,15 @@ Currently the action supports the following configuration options:
 - `org` - The name of the organization to generate the report for. This is a required field.
 - `features` - A comma separated list of features to generate the report for. This is a required field. The supported values are: `dependabot`, `code-scanning` and `secret-scanning`.
 - `frequency` - Used to calculate the `Fixed alerts in the past X days`. Possible values are `daily`, `weekly`, `monthly`.
+- `ouput-format` - The format of the report. A comma separated list of values for the output format. Supported currentl: `json` and `pdf`. Default is `json, pdf`.
 
 ### Output
+
+The action will output:
+
+- The report in JSON format in `report-json` variable. You can use `${{ steps.generate-report.outputs.report-json }}` in subsequent jobs to process the report.
+- Summarized report as an Action run Summary.
+- It is also generate the report in the defined `output-format` as an artifact. You can upload these using `actions/upload-artifact@v3` as shown in the example workflow.
 
 ![Sample report output](ghas-metrics-report-sample-summary.png)
 

@@ -7,11 +7,13 @@ import {
   AlertsMetrics,
   PrintAlertsMetrics,
   syncWriteFile as writeReportToFile,
+  preparePdfAndWriteToFile as writeReportToPdf,
   prepareSummary,
   GetCommitDate,
 } from "./utils";
 import { Report } from "./types/common/main";
 import { randomUUID } from "crypto";
+import { preparePdf } from "./utils/Summary";
 
 const run = async (): Promise<void> => {
   // get inputs
@@ -44,7 +46,6 @@ const run = async (): Promise<void> => {
     );
     PrintAlertsMetrics("Dependabot", dependabotAlertsMetrics);
     core.debug(`[🔎] Dependabot - MTTR: ` + dependabotAlertsMetrics.mttr.mttr);
-    //core.debug(`[🔎] Dependabot - MTTD: ` + dependabotAlertsMetrics.mttd.mttd);
     core.info(`[✅] Dependabot metrics calculated`);
     output.dependabot_metrics = dependabotAlertsMetrics;
   }
@@ -123,13 +124,24 @@ const run = async (): Promise<void> => {
 
   // prepare output
   core.setOutput("report-json", JSON.stringify(output, null, 2));
-  core.info(`[✅] Report written outpu 'report-json' file`);
-  // writeReportToFile("ghas-report.json", JSON.stringify(output, null, 2));
-  // core.info(`[✅] Report written to file`);
+  core.info(`[✅] Report written output 'report-json' variable`);
 
-  prepareSummary(output);
-  core.summary.write();
-  core.info(`[✅] Report written to summary`);
+  if (inputs.outputFormat.includes("json")) {
+    writeReportToFile("ghas-report.json", JSON.stringify(output, null, 2));
+    core.info(`[✅] JSON Report written to file`);
+  }
+
+  if (inputs.outputFormat.includes("pdf")) {
+    writeReportToPdf("ghas-report.pdf", preparePdf(output));
+    core.info(`[✅] PDF Report written to file`);
+  }
+
+  if (process.env.RUN_USING_ACT !== "true") {
+    prepareSummary(output);
+    core.summary.write();
+    core.info(`[✅] Report written to summary`);
+  }
+
   return;
 };
 

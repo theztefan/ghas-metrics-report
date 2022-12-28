@@ -21,8 +21,9 @@ jobs:
           org: "thez-org"
           features: "dependabot, code-scanning, secret-scanning"
           frequency: "monthly"
-      - name: upload GHAS metrics report
-        uses: actions/upload-artifact@v3
-        with:
-          name: ghas-metrics-report
-          path: ghas-metrics-report/dist/report.json
+          output-format: "json, pdf"
+      # - name: upload GHAS metrics report
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: ghas-metrics-report
+      #     path: ghas-metrics-report/dist/report.json

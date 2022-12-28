@@ -9,7 +9,7 @@ import {
   PrintAlertsMetrics,
   CalculateMTTR,
 } from "./AlertMetrics";
-import { syncWriteFile } from "./files";
+import { syncWriteFile, preparePdfAndWriteToFile } from "./files";
 
 export {
   inputs,
@@ -22,4 +22,5 @@ export {
   syncWriteFile,
   prepareSummary,
   GetCommitDate,
+  preparePdfAndWriteToFile,
 };

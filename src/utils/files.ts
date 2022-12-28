@@ -1,11 +1,25 @@
 import * as core from "@actions/core";
 import { writeFileSync } from "fs";
+import jsPDF from "jspdf";
+import autoTable, { RowInput } from "jspdf-autotable";
 import { join } from "path";
 
 export const syncWriteFile = (filename: string, data: any): void => {
-  writeFileSync(filename, data, {
+  const outputFilename = join(__dirname, filename);
+  writeFileSync(outputFilename, data, {
     flag: "w",
   });
-  core.debug(`[📝] File ${filename} written`);
+  core.debug(`[📝] File ${outputFilename} written`);
+  return;
+};
+
+export const preparePdfAndWriteToFile = (
+  filename: string,
+  report: jsPDF
+): void => {
+  const outputFilename = join(__dirname, filename);
+
+  report.save(outputFilename);
+  core.debug(`[📝] File ${outputFilename} written`);
   return;
 };

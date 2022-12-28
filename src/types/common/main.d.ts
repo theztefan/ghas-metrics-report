@@ -4,11 +4,12 @@ type inputsReturned = {
   org: string;
   features: ghasFeatures[];
   frequency: reportFrequency;
+  outputFormat: outputFormat[];
 };
 
 type ghasFeatures = "secret-scanning" | "dependabot" | "code-scanning";
-
 type reportFrequency = "weekly" | "monthly" | "daily";
+type outputFormat = "json" | "pdf" | "html";
 
 // Dependabot alerts
 export interface DependancyAlert {
