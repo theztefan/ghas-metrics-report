@@ -11,9 +11,6 @@ dotenv.config();
 export const inputs = async (): Promise<inputsReturned> => {
   try {
     // get the inputs
-    const team: string =
-      (process.env.TEAM as string) ||
-      core.getInput("team", { required: false });
     const repo: string =
       (process.env.REPO as string) ||
       core.getInput("repo", { required: false });
@@ -48,7 +45,6 @@ export const inputs = async (): Promise<inputsReturned> => {
     core.debug(`The following output was inputted: ${outputFormat}`);
 
     return {
-      team,
       repo,
       org,
       features,

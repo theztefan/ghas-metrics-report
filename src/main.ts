@@ -10,6 +10,7 @@ import {
 import { Alert, AlertsMetrics, Report } from "./types/common/main";
 import { randomUUID } from "crypto";
 import { Context } from "./context/Context";
+import * as fs from "fs";
 
 const run = async (): Promise<void> => {
   // get inputs
@@ -58,6 +59,12 @@ const run = async (): Promise<void> => {
   }
 
   // prepare output
+  if (process.env.LOCAL === "true") {
+    core.info("[❗] Local run, output written to output.json file");
+    fs.writeFileSync("output.json", JSON.stringify(output, null, 2));
+    return;
+  }
+
   core.setOutput("report-json", JSON.stringify(output, null, 2));
   core.info(`[✅] Report written output 'report-json' variable`);
 

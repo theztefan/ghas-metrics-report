@@ -10,14 +10,13 @@ export function prepareSummary(report: Report): void {
 
   report.features.forEach((feature) => {
     core.summary
-      .addBreak()
       .addHeading(feature.name)
       .addList([
         `Open Alerts: ${feature.metrics?.openVulnerabilities}`,
         `Fixed in the past X days: ${feature.metrics?.fixedLastXDays}`,
         `Frequency: ${report.inputs.frequency}`,
         "MTTR: " + secondsToReadable(feature.metrics?.mttr.mttr),
-        "MTTD: " + secondsToReadable(feature.metrics?.mttd.mttd),
+        "MTTD: " + secondsToReadable(feature.metrics?.mttd?.mttd),
       ])
       .addHeading(feature.name + " - Top 10", 2)
       .addTable([
@@ -25,7 +24,8 @@ export function prepareSummary(report: Report): void {
           return { data: attribute, header: true };
         }),
         ...[feature.summaryTop10()],
-      ] as SummaryTableRow[]);
+      ] as SummaryTableRow[])
+      .addBreak();
   });
 
   const codeScanningTop10rows: SummaryTableRow[] =

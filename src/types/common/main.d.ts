@@ -2,7 +2,6 @@ import { Feature } from "../../context/Feature";
 
 // Inputs from configuration options
 type inputsReturned = {
-  team?: string;
   repo?: string;
   org?: string;
   features: ghasFeatures[];

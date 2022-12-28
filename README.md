@@ -15,6 +15,13 @@ The report will include the following metrics for Dependabot, Code Scanning and 
 - Total MTTR (Mean Time To Remediate)
 - Total MTTD (Mean Time To Detect) for Code Scanning and Secret Scanning
 
+## Development
+
+This Action can be executed as a script with `npx`. In order to do that:
+1. copy `.env.sample` to a new `.env` file and replace the variables with the desired values.
+2. Keep both GITHUB_ACTION and LOCAL variables as `true`
+3. The output will be written to `output.json` file
+
 ## Usage
 
 This action uses the GitHub API and requires a GitHub access token. The suggested way to do it is by using `peter-murray/workflow-application-token-action@v2`. Follow the [steps described](https://github.com/peter-murray/workflow-application-token-action#creating-a-github-application) in the README of the action to set up a GitHub App and use it with the Action.
