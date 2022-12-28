@@ -1,12 +1,12 @@
 import * as core from "@actions/core";
 import { Octokit } from "@octokit/action";
-import { CodeScanningAlert } from "../types/common/main";
+import { Alert } from "../types/common/main";
 
 export const CodeScanningAlerts = async (
   owner: string,
   repository: string
-): Promise<CodeScanningAlert[]> => {
-  let res: Array<CodeScanningAlert> = [];
+): Promise<Alert[]> => {
+  let res: Array<Alert> = [];
   try {
     const octokit = new Octokit();
     const iterator = await octokit.paginate(
@@ -20,7 +20,7 @@ export const CodeScanningAlerts = async (
         return response.data;
       }
     );
-    res = iterator as CodeScanningAlert[];
+    res = iterator as Alert[];
   } catch (error) {
     core.setFailed("There was an error. Please check the logs" + error);
   }

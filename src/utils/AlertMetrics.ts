@@ -3,33 +3,23 @@ import {
   DependancyAlert,
   CodeScanningAlert,
   reportFrequency,
+  AlertsMetrics as AlertsMetricsType,
+  MTTRMetrics,
+  MTTDMetrics,
+  DependencyOrCodeAlert,
+  Alert,
 } from "../types/common/main";
-
-// Metrics
-interface AlertsMetrics {
-  fixedLastXDays: number;
-  openVulnerabilities: number;
-  top10: any[];
-  mttr: MTTRMetrics;
-  mttd?: MTTDMetrics;
-}
-interface MTTRMetrics {
-  mttr: number;
-  count: number;
-}
-interface MTTDMetrics {
-  mttd: number;
-}
+import { SecretScanningAlerts } from "./SecretScanningAlerts";
 
 export const AlertsMetrics = (
-  alerts: any[],
+  alerts: Alert[],
   frequency: reportFrequency,
   fixedDateField: string,
   state: string,
   calculateMTTD: boolean,
   introducedDateField?: string,
   detectedDateField?: string
-): AlertsMetrics => {
+): AlertsMetricsType => {
   const todayDate = new Date();
   todayDate.setHours(0, 0, 0, 0);
   const today = todayDate.getDate();
@@ -59,7 +49,13 @@ export const AlertsMetrics = (
     const lastMonth = lastMonthDate.setMonth(lastMonthDate.getMonth() - 1);
     core.debug(`last Month: ` + lastMonth);
     fixedLastXDays = fixedAlerts.filter((a) =>
-      FilterBetweenDates(a.dismissed_at, lastMonth, today)
+      !(a instanceof SecretScanningAlerts)
+        ? FilterBetweenDates(
+            (a as DependencyOrCodeAlert).dismissed_at,
+            lastMonth,
+            today
+          )
+        : true
     );
   }
 
@@ -72,10 +68,14 @@ export const AlertsMetrics = (
 
   let mttd = undefined;
   if (calculateMTTD) {
-    mttd = CalculateMTTD(alerts, introducedDateField!, detectedDateField!);
+    mttd = CalculateMTTD(
+      alerts as DependencyOrCodeAlert[],
+      introducedDateField,
+      detectedDateField
+    );
   }
 
-  const result: AlertsMetrics = {
+  const result: AlertsMetricsType = {
     fixedLastXDays: fixedLastXDays.length,
     openVulnerabilities: alerts.filter((a) => a.state === "open").length,
     top10: top10Alerts,
@@ -88,18 +88,18 @@ export const AlertsMetrics = (
 
 export const PrintAlertsMetrics = (
   category: string,
-  alertsMetrics: AlertsMetrics
+  alertsMetrics: AlertsMetricsType
 ): void => {
   for (const metric in alertsMetrics) {
     core.debug(
       `[🔎] ${category} - ${metric}: ` +
-        alertsMetrics[metric as keyof AlertsMetrics]
+        alertsMetrics[metric as keyof AlertsMetricsType]
     );
   }
 };
 
 export const CalculateMTTR = (
-  alerts: any[],
+  alerts: Alert[],
   dateField: string,
   state: string
 ): MTTRMetrics => {
@@ -124,7 +124,7 @@ export const CalculateMTTR = (
 };
 
 export const CalculateMTTD = (
-  alerts: any[],
+  alerts: DependencyOrCodeAlert[],
   introducedDateField: string,
   detectedDateField: string
 ): MTTDMetrics => {
@@ -167,7 +167,7 @@ const FilterBetweenDates = (
   return date >= minDate && date < maxDate;
 };
 
-function compareAlertSeverity(a: any, b: any) {
+function compareAlertSeverity(a: Alert, b: Alert) {
   //critical, high, medium, low, warning, note, error
   const weight: { [key: string]: number } = {
     critical: 7,
@@ -183,14 +183,12 @@ function compareAlertSeverity(a: any, b: any) {
   let severity1 = "none";
   let severity2 = "none";
 
-  // different comparisons depending on alert type alerts
-  if (isDependancyAlert(a) && isDependancyAlert(b)) {
-    severity1 = a.security_advisory.severity.toLowerCase();
-    severity2 = b.security_advisory.severity.toLowerCase();
-  } else if (isCodeScanningAlert(a) && isCodeScanningAlert(b)) {
-    severity1 = a.rule.severity.toLowerCase();
-    severity2 = b.rule.severity.toLowerCase();
-  }
+  severity1 = isDependancyAlert(a)
+    ? a.security_advisory.severity.toLowerCase()
+    : (a as CodeScanningAlert).rule?.severity.toLowerCase();
+  severity2 = isDependancyAlert(b)
+    ? b.security_advisory.severity.toLowerCase()
+    : (b as CodeScanningAlert).rule?.severity.toLowerCase();
 
   if (weight[severity1] < weight[severity2]) {
     comparison = 1;
@@ -201,11 +199,6 @@ function compareAlertSeverity(a: any, b: any) {
   return comparison;
 }
 
-function isDependancyAlert(alert: DependancyAlert): alert is DependancyAlert {
+function isDependancyAlert(alert: Alert): alert is DependancyAlert {
   return "security_advisory" in alert;
-}
-function isCodeScanningAlert(
-  alert: CodeScanningAlert
-): alert is CodeScanningAlert {
-  return "rule" in alert && "severity" in alert.rule;
 }

@@ -28,11 +28,14 @@ const run = async (): Promise<void> => {
     dependabot_metrics: null,
     code_scanning_metrics: null,
     secret_scanning_metrics: null,
-  };
+  } as Report;
 
   // get dependabot alerts
   if (inputs.features.includes("dependabot")) {
-    const dependabotRes = await DependabotAlerts(inputs.org, inputs.repo);
+    const dependabotRes = await DependabotAlerts(
+      inputs.org as string,
+      inputs.repo as string
+    );
     core.debug(`[🔎] Dependabot alerts: ` + dependabotRes.length);
     core.info(`[✅] Dependabot alerts fetched`);
 
@@ -51,13 +54,16 @@ const run = async (): Promise<void> => {
 
   // get code scanning alerts
   if (inputs.features.includes("code-scanning")) {
-    const codeScanningRes = await CodeScanningAlerts(inputs.org, inputs.repo);
+    const codeScanningRes = await CodeScanningAlerts(
+      inputs.org as string,
+      inputs.repo as string
+    );
     core.debug(`[🔎] Code Scanning alerts: ` + codeScanningRes.length);
     core.info(`[✅] Code Scanning alerts fetched`);
 
     await GetCommitDate(
-      inputs.org,
-      inputs.repo,
+      inputs.org as string,
+      inputs.repo as string,
       codeScanningRes,
       "most_recent_instance.commit_sha"
     );
@@ -73,10 +79,12 @@ const run = async (): Promise<void> => {
     );
     PrintAlertsMetrics("Code Scanning", codeScanningAlertsMetrics);
     core.debug(
-      `[🔎] Code Scanning - MTTR: ` + codeScanningAlertsMetrics.mttr.mttr
+      `[🔎] Code Scanning - MTTR: ` +
+        JSON.stringify(codeScanningAlertsMetrics.mttr.mttr)
     );
     core.debug(
-      `[🔎] Code Scanning - MTTD: ` + codeScanningAlertsMetrics.mttd?.mttd
+      `[🔎] Code Scanning - MTTD: ` +
+        JSON.stringify(codeScanningAlertsMetrics.mttd?.mttd)
     );
 
     core.info(`[✅] Code Scanning metrics calculated`);
@@ -87,15 +95,15 @@ const run = async (): Promise<void> => {
   // get secret scanning alerts
   if (inputs.features.includes("secret-scanning")) {
     const secretScanningRes = await SecretScanningAlerts(
-      inputs.org,
-      inputs.repo
+      inputs.org as string,
+      inputs.repo as string
     );
     core.debug(`[🔎] Secret Scanning alerts ` + secretScanningRes.length);
     core.debug(`[✅] Secret Scanning alerts fetched`);
 
     await GetCommitDate(
-      inputs.org,
-      inputs.repo,
+      inputs.org as string,
+      inputs.repo as string,
       secretScanningRes,
       "commitsSha"
     );

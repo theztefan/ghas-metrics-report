@@ -1,5 +1,10 @@
 import * as core from "@actions/core";
-import { Report } from "../types/common/main";
+import {
+  CodeScanningAlert,
+  DependancyAlert,
+  Report,
+  SecretScanningAlert,
+} from "../types/common/main";
 import { SummaryTableRow } from "@actions/core/lib/summary";
 import jsPDF from "jspdf";
 import autoTable, { RowInput } from "jspdf-autotable";
@@ -9,15 +14,18 @@ export function prepareSummary(report: Report): void {
   core.summary.addBreak();
 
   const dependabotTop10rows: SummaryTableRow[] =
-    report.dependabot_metrics?.top10.map((a: any) => [
-      a.security_vulnerability?.package.name,
-      a.security_vulnerability?.severity,
-      a.security_vulnerability?.vulnerable_version_range,
-      a.security_vulnerability?.first_patched_version?.identifier,
-      a.security_advisory?.cve_id,
-      a.security_advisory?.cvss?.vector_string,
-      createUrlLink(a.html_url, "Link"),
-    ]);
+    report.dependabot_metrics?.top10.map(
+      (a: DependancyAlert) =>
+        [
+          a.security_vulnerability?.package.name,
+          a.security_vulnerability?.severity,
+          a.security_vulnerability?.vulnerable_version_range,
+          a.security_vulnerability?.first_patched_version?.identifier,
+          a.security_advisory?.cve_id,
+          a.security_advisory?.cvss?.vector_string,
+          createUrlLink(a.html_url, "Link"),
+        ] as SummaryTableRow
+    );
 
   //replace occurences of null with empty string
   dependabotTop10rows.forEach((row) => {
@@ -29,7 +37,7 @@ export function prepareSummary(report: Report): void {
   });
 
   const codeScanningTop10rows: SummaryTableRow[] =
-    report.code_scanning_metrics?.top10.map((a: any) => [
+    report.code_scanning_metrics?.top10.map((a: CodeScanningAlert) => [
       a.rule?.name,
       a.rule?.severity,
       a.tool?.name,
@@ -46,7 +54,7 @@ export function prepareSummary(report: Report): void {
   });
 
   const secretScanningTop10rows: SummaryTableRow[] =
-    report.secret_scanning_metrics?.top10.map((a: any) => [
+    report.secret_scanning_metrics?.top10.map((a: SecretScanningAlert) => [
       a.secret_type_display_name,
       a.created_at,
       (a.push_protection_bypassed as boolean) ? "True" : "False",

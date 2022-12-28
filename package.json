@@ -23,7 +23,8 @@
     "@octokit/action": "^4.0.10",
     "@vercel/ncc": "^0.34.0",
     "jspdf": "^2.5.1",
-    "jspdf-autotable": "^3.5.28"
+    "jspdf-autotable": "^3.5.28",
+    "dotenv": "^16.0.3"
   },
   "devDependencies": {
     "@tsconfig/node18": "^1.0.1",
