@@ -64500,14 +64500,6 @@ WebPRiffParser dominikhlbg@gmail.com
             createUrlLink(a.html_url, "Link"),
           ]
         );
-        //replace occurences of null with empty string
-        // dependabotTop10rows.forEach((row) => {
-        //   row.forEach((cell, index) => {
-        //     if (cell === null || cell == undefined) {
-        //       row[index] = "";
-        //     }
-        //   });
-        // });
         const codeScanningTop10rows = report.code_scanning_metrics?.top10.map(
           (a) => [
             a.rule?.name,
@@ -64517,13 +64509,6 @@ WebPRiffParser dominikhlbg@gmail.com
             createUrlLink(a.html_url, "Link"),
           ]
         );
-        // codeScanningTop10rows.forEach((row) => {
-        //   row.forEach((cell, index) => {
-        //     if (cell === null || cell == undefined) {
-        //       row[index] = "";
-        //     }
-        //   });
-        // });
         const secretScanningTop10rows =
           report.secret_scanning_metrics?.top10.map((a) => [
             a.secret_type_display_name,
@@ -64531,13 +64516,6 @@ WebPRiffParser dominikhlbg@gmail.com
             a.push_protection_bypassed ? "True" : "False",
             createUrlLink(a.html_url, "Link"),
           ]);
-        // secretScanningTop10rows.forEach((row) => {
-        //   row.forEach((cell, index) => {
-        //     if (cell === null || cell == undefined) {
-        //       row[index] = "";
-        //     }
-        //   });
-        // });
         pdf.text("Dependabot", 10, 20);
         pdf.text(
           `Open Alerts: ${report.dependabot_metrics?.openVulnerabilities}`,
@@ -64812,6 +64790,7 @@ WebPRiffParser dominikhlbg@gmail.com
       Object.defineProperty(exports, "__esModule", { value: true });
       exports.preparePdfAndWriteToFile =
         exports.GetCommitDate =
+        exports.preparePdf =
         exports.prepareSummary =
         exports.syncWriteFile =
         exports.CalculateMTTR =
@@ -64862,6 +64841,13 @@ WebPRiffParser dominikhlbg@gmail.com
         enumerable: true,
         get: function () {
           return Summary_1.prepareSummary;
+        },
+      });
+      const Summary_2 = __nccwpck_require__(165);
+      Object.defineProperty(exports, "preparePdf", {
+        enumerable: true,
+        get: function () {
+          return Summary_2.preparePdf;
         },
       });
       const AlertMetrics_1 = __nccwpck_require__(2344);

@@ -9,11 +9,11 @@ import {
   syncWriteFile as writeReportToFile,
   preparePdfAndWriteToFile as writeReportToPdf,
   prepareSummary,
+  preparePdf,
   GetCommitDate,
 } from "./utils";
 import { Report } from "./types/common/main";
 import { randomUUID } from "crypto";
-import { preparePdf } from "./utils/Summary";
 
 const run = async (): Promise<void> => {
   // get inputs
@@ -21,7 +21,6 @@ const run = async (): Promise<void> => {
   core.debug(`[✅] Inputs parsed]`);
 
   const id = randomUUID();
-
   const output: Report = {
     id: id,
     created_at: new Date().toISOString(),
