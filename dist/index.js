@@ -10973,39 +10973,44 @@ const run = async () => {
     };
     // get dependabot alerts
     if (inputs.features.includes("dependabot")) {
-        const dependabotRes = await (0, utils_1.DependabotAlerts)("advanced-security-demo", "srdemo-demo");
+        const dependabotRes = await (0, utils_1.DependabotAlerts)(inputs.org, inputs.repo);
         core.debug(`[🔎] Dependabot alerts: ` + dependabotRes.length);
         core.info(`[✅] Dependabot alerts fetched`);
-        const dependabotAlertsMetrics = (0, utils_1.AlertsMetrics)(dependabotRes, "fixed_at", "fixed");
+        const dependabotAlertsMetrics = (0, utils_1.AlertsMetrics)(dependabotRes, "fixed_at", "fixed", false);
         (0, utils_1.PrintAlertsMetrics)("Dependabot", dependabotAlertsMetrics);
         core.debug(`[🔎] Dependabot - MTTR: ` + dependabotAlertsMetrics.mttr.mttr);
+        //core.debug(`[🔎] Dependabot - MTTD: ` + dependabotAlertsMetrics.mttd.mttd);
         core.info(`[✅] Dependabot metrics calculated`);
         output.dependabot_metrics = dependabotAlertsMetrics;
     }
     // get code scanning alerts
     if (inputs.features.includes("code-scanning")) {
-        const codeScanningRes = await (0, utils_1.CodeScanningAlerts)("advanced-security-demo", "srdemo-demo");
+        const codeScanningRes = await (0, utils_1.CodeScanningAlerts)(inputs.org, inputs.repo);
         core.debug(`[🔎] Code Scanning alerts: ` + codeScanningRes.length);
         core.info(`[✅] Code Scanning alerts fetched`);
-        const codeScanningAlertsMetrics = (0, utils_1.AlertsMetrics)(codeScanningRes, "fixed_at", "fixed");
+        await (0, utils_1.GetCommitDate)(inputs.org, inputs.repo, codeScanningRes, "most_recent_instance.commit_sha");
+        const codeScanningAlertsMetrics = (0, utils_1.AlertsMetrics)(codeScanningRes, "fixed_at", "fixed", true, "commitDate", "created_at");
         (0, utils_1.PrintAlertsMetrics)("Code Scanning", codeScanningAlertsMetrics);
         core.debug(`[🔎] Code Scanning - MTTR: ` + codeScanningAlertsMetrics.mttr.mttr);
+        core.debug(`[🔎] Code Scanning - MTTD: ` + codeScanningAlertsMetrics.mttd?.mttd);
         core.info(`[✅] Code Scanning metrics calculated`);
         output.code_scanning_metrics = codeScanningAlertsMetrics;
     }
     // get secret scanning alerts
     if (inputs.features.includes("secret-scanning")) {
-        const secretScanningRes = await (0, utils_1.SecretScanningAlerts)("advanced-security-demo", "srdemo-demo");
+        const secretScanningRes = await (0, utils_1.SecretScanningAlerts)(inputs.org, inputs.repo);
         core.debug(`[🔎] Secret Scanning alerts ` + secretScanningRes.length);
         core.debug(`[✅] Secret Scanning alerts fetched`);
-        const secretScanningAlertsMetrics = (0, utils_1.AlertsMetrics)(secretScanningRes, "resolved_at", "resolved");
+        await (0, utils_1.GetCommitDate)(inputs.org, inputs.repo, secretScanningRes, "commitsSha");
+        const secretScanningAlertsMetrics = (0, utils_1.AlertsMetrics)(secretScanningRes, "resolved_at", "resolved", true, "commitDate", "created_at");
         (0, utils_1.PrintAlertsMetrics)("Secret Scanning", secretScanningAlertsMetrics);
         core.debug(`[🔎] Secret Scanning - MTTR: ` + secretScanningAlertsMetrics.mttr.mttr);
+        core.debug(`[🔎] Code Scanning - MTTD: ` + secretScanningAlertsMetrics.mttd?.mttd);
         core.info(`[✅] Secret scanning metrics calculated`);
         output.secret_scanning_metrics = secretScanningAlertsMetrics;
     }
     // prepare output
-    core.setOutput("report-json", output);
+    core.setOutput("report-json", JSON.stringify(output, null, 2));
     core.info(`[✅] Report written outpu 'report-json' file`);
     // writeReportToFile("ghas-report.json", JSON.stringify(output, null, 2));
     // core.info(`[✅] Report written to file`);
@@ -11048,9 +11053,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.CalculateMTTR = exports.PrintAlertsMetrics = exports.AlertsMetrics = void 0;
+exports.CalculateMTTD = exports.CalculateMTTR = exports.PrintAlertsMetrics = exports.AlertsMetrics = void 0;
 const core = __importStar(__nccwpck_require__(2186));
-const AlertsMetrics = (alerts, dateField, state) => {
+const AlertsMetrics = (alerts, fixedDateField, state, calculateMTTD, introducedDateField, detectedDateField) => {
     const todayDate = new Date();
     todayDate.setHours(0, 0, 0, 0);
     const today = todayDate.getDate();
@@ -11061,19 +11066,24 @@ const AlertsMetrics = (alerts, dateField, state) => {
     lastWeekDate.setHours(0, 0, 0, 0);
     const lastWeek = lastWeekDate.setDate(lastWeekDate.getDate() - 7);
     const fixedAlerts = alerts.filter((a) => a.state === state);
-    const fixedAlertsYesterday = fixedAlerts.filter((a) => FilterBetweenDates(a[dateField], yesterday, today));
-    const fixedAlertsLastWeek = fixedAlerts.filter((a) => FilterBetweenDates(a[dateField], lastWeek, today));
+    const fixedAlertsYesterday = fixedAlerts.filter((a) => FilterBetweenDates(a[fixedDateField], yesterday, today));
+    const fixedAlertsLastWeek = fixedAlerts.filter((a) => FilterBetweenDates(a[fixedDateField], lastWeek, today));
     //get Top 10 by criticality
     const openAlerts = alerts.filter((a) => a.state === "open");
     const top10Alerts = openAlerts.sort(compareAlertSeverity).slice(0, 10);
     //get MTTR
-    const mttr = (0, exports.CalculateMTTR)(alerts, dateField, state);
+    const mttr = (0, exports.CalculateMTTR)(alerts, fixedDateField, state);
+    let mttd = undefined;
+    if (calculateMTTD) {
+        mttd = (0, exports.CalculateMTTD)(alerts, introducedDateField, detectedDateField);
+    }
     const result = {
         fixedYesterday: fixedAlertsYesterday.length,
         fixedLastWeek: fixedAlertsLastWeek.length,
         openVulnerabilities: alerts.filter((a) => a.state === "open").length,
         top10: top10Alerts,
         mttr: mttr,
+        mttd: mttd,
     };
     return result;
 };
@@ -11102,6 +11112,28 @@ const CalculateMTTR = (alerts, dateField, state) => {
     return result;
 };
 exports.CalculateMTTR = CalculateMTTR;
+const CalculateMTTD = (alerts, introducedDateField, detectedDateField) => {
+    let alert_count = 0;
+    let total_time_to_detect_seconds = 0;
+    for (const alert of alerts) {
+        const introducedDate = Date.parse(introducedDateField
+            .split(".")
+            .filter((s) => s)
+            .reduce((acc, val) => acc && acc[val], alert));
+        const detectedDate = Date.parse(detectedDateField
+            .split(".")
+            .filter((s) => s)
+            .reduce((acc, val) => acc && acc[val], alert));
+        const time_to_remediate = detectedDate - introducedDate;
+        total_time_to_detect_seconds += time_to_remediate / 1000;
+        alert_count += 1;
+    }
+    const result = {
+        mttd: alert_count === 0 ? 0 : total_time_to_detect_seconds / alert_count,
+    };
+    return result;
+};
+exports.CalculateMTTD = CalculateMTTD;
 const FilterBetweenDates = (stringDate, minDate, maxDate) => {
     const date = Date.parse(stringDate);
     return date >= minDate && date < maxDate;
@@ -11199,6 +11231,81 @@ const CodeScanningAlerts = async (owner, repository) => {
     return res;
 };
 exports.CodeScanningAlerts = CodeScanningAlerts;
+
+
+/***/ }),
+
+/***/ 1204:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GetCommitData = exports.GetCommitDate = void 0;
+const core = __importStar(__nccwpck_require__(2186));
+const action_1 = __nccwpck_require__(1231);
+const GetCommitDate = async (owner, repository, alerts, commitShaField) => {
+    try {
+        for (const alert of alerts) {
+            const commitsSha = commitShaField
+                .split(".")
+                .filter((s) => s)
+                .reduce((acc, val) => acc && acc[val], alert);
+            if (commitsSha instanceof Array) {
+                for (const commitSha of commitsSha) {
+                    const commitData = await (0, exports.GetCommitData)(owner, repository, commitSha);
+                    if (!alert["commitDate"] ||
+                        commitData.commit.author.date < alert["commitDate"]) {
+                        alert["commitDate"] = commitData.commit.author.date;
+                    }
+                }
+            }
+            else {
+                const commitData = await (0, exports.GetCommitData)(owner, repository, commitsSha);
+                alert["commitDate"] = commitData.commit.author.date;
+            }
+        }
+    }
+    catch (error) {
+        core.setFailed("There was an error. Please check the logs" + error);
+    }
+    return alerts;
+};
+exports.GetCommitDate = GetCommitDate;
+const GetCommitData = async (owner, repository, commitSha) => {
+    const octokit = new action_1.Octokit();
+    const { data: commitData } = await octokit.request("GET /repos/{owner}/{repo}/commits/{commitSha}", {
+        owner: owner,
+        repo: repository,
+        commitSha: commitSha,
+        per_page: 100,
+    });
+    return commitData;
+};
+exports.GetCommitData = GetCommitData;
 
 
 /***/ }),
@@ -11302,6 +11409,14 @@ const SecretScanningAlerts = async (owner, repository) => {
             return response.data;
         });
         res = iterator;
+        for (const alert of res) {
+            const { data: locationData } = await octokit.request("GET /repos/{owner}/{repo}/secret-scanning/alerts/{alert_number}/locations", {
+                owner: owner,
+                repo: repository,
+                alert_number: alert.number,
+            });
+            alert["commitsSha"] = locationData.map((location) => location.details.commit_sha);
+        }
     }
     catch (error) {
         core.setFailed("There was an error. Please check the logs" + error);
@@ -11524,7 +11639,7 @@ exports.syncWriteFile = syncWriteFile;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.prepareSummary = exports.syncWriteFile = exports.CalculateMTTR = exports.PrintAlertsMetrics = exports.AlertsMetrics = exports.SecretScanningAlerts = exports.CodeScanningAlerts = exports.DependabotAlerts = exports.inputs = void 0;
+exports.GetCommitDate = exports.prepareSummary = exports.syncWriteFile = exports.CalculateMTTR = exports.PrintAlertsMetrics = exports.AlertsMetrics = exports.SecretScanningAlerts = exports.CodeScanningAlerts = exports.DependabotAlerts = exports.inputs = void 0;
 const inputs_1 = __nccwpck_require__(9378);
 Object.defineProperty(exports, "inputs", ({ enumerable: true, get: function () { return inputs_1.inputs; } }));
 const DependabotAlerts_1 = __nccwpck_require__(1514);
@@ -11533,6 +11648,8 @@ const CodeScanningAlerts_1 = __nccwpck_require__(798);
 Object.defineProperty(exports, "CodeScanningAlerts", ({ enumerable: true, get: function () { return CodeScanningAlerts_1.CodeScanningAlerts; } }));
 const SecretScanningAlerts_1 = __nccwpck_require__(5667);
 Object.defineProperty(exports, "SecretScanningAlerts", ({ enumerable: true, get: function () { return SecretScanningAlerts_1.SecretScanningAlerts; } }));
+const CommitUtils_1 = __nccwpck_require__(1204);
+Object.defineProperty(exports, "GetCommitDate", ({ enumerable: true, get: function () { return CommitUtils_1.GetCommitDate; } }));
 const Summary_1 = __nccwpck_require__(165);
 Object.defineProperty(exports, "prepareSummary", ({ enumerable: true, get: function () { return Summary_1.prepareSummary; } }));
 const AlertMetrics_1 = __nccwpck_require__(2344);
