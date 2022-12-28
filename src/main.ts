@@ -30,103 +30,85 @@ const run = async (): Promise<void> => {
     secret_scanning_metrics: null,
   } as Report;
 
-  // get dependabot alerts
-  if (inputs.features.includes("dependabot")) {
-    const dependabotRes = await DependabotAlerts(
-      inputs.org as string,
-      inputs.repo as string
-    );
-    core.debug(`[🔎] Dependabot alerts: ` + dependabotRes.length);
-    core.info(`[✅] Dependabot alerts fetched`);
+  for (const feature of inputs.features) {
+    core.info(`[🔎] Fetching ${feature} alerts`);
+    let alerts;
+    if (feature === "dependabot") {
+      alerts = await DependabotAlerts(
+        inputs.org as string,
+        inputs.repo as string
+      );
+    } else if (feature === "code-scanning") {
+      alerts = await CodeScanningAlerts(
+        inputs.org as string,
+        inputs.repo as string
+      );
+    } else if (feature === "secret-scanning") {
+      alerts = await SecretScanningAlerts(
+        inputs.org as string,
+        inputs.repo as string
+      );
+    }
 
-    const dependabotAlertsMetrics = AlertsMetrics(
-      dependabotRes,
-      inputs.frequency,
-      "fixed_at",
-      "fixed",
-      false
-    );
-    PrintAlertsMetrics("Dependabot", dependabotAlertsMetrics);
-    core.debug(`[🔎] Dependabot - MTTR: ` + dependabotAlertsMetrics.mttr.mttr);
-    core.info(`[✅] Dependabot metrics calculated`);
-    output.dependabot_metrics = dependabotAlertsMetrics;
-  }
+    core.debug(`[🔎] ${feature} alerts: ` + alerts.length);
+    core.info(`[✅] ${feature} alerts fetched`);
 
-  // get code scanning alerts
-  if (inputs.features.includes("code-scanning")) {
-    const codeScanningRes = await CodeScanningAlerts(
-      inputs.org as string,
-      inputs.repo as string
-    );
-    core.debug(`[🔎] Code Scanning alerts: ` + codeScanningRes.length);
-    core.info(`[✅] Code Scanning alerts fetched`);
+    let metrics;
+    if (feature === "dependabot") {
+      metrics = AlertsMetrics(
+        alerts,
+        inputs.frequency,
+        "fixed_at",
+        "fixed",
+        false
+      );
 
-    await GetCommitDate(
-      inputs.org as string,
-      inputs.repo as string,
-      codeScanningRes,
-      "most_recent_instance.commit_sha"
-    );
+      output.dependabot_metrics = metrics;
+    } else if (feature === "code-scanning") {
+      await GetCommitDate(
+        inputs.org as string,
+        inputs.repo as string,
+        alerts,
+        "most_recent_instance.commit_sha"
+      );
 
-    const codeScanningAlertsMetrics = AlertsMetrics(
-      codeScanningRes,
-      inputs.frequency,
-      "fixed_at",
-      "fixed",
-      true,
-      "commitDate",
-      "created_at"
-    );
-    PrintAlertsMetrics("Code Scanning", codeScanningAlertsMetrics);
-    core.debug(
-      `[🔎] Code Scanning - MTTR: ` +
-        JSON.stringify(codeScanningAlertsMetrics.mttr.mttr)
-    );
-    core.debug(
-      `[🔎] Code Scanning - MTTD: ` +
-        JSON.stringify(codeScanningAlertsMetrics.mttd?.mttd)
-    );
+      metrics = AlertsMetrics(
+        alerts,
+        inputs.frequency,
+        "fixed_at",
+        "fixed",
+        true,
+        "commitDate",
+        "created_at"
+      );
 
-    core.info(`[✅] Code Scanning metrics calculated`);
+      output.code_scanning_metrics = metrics;
+    } else if (feature === "secret-scanning") {
+      await GetCommitDate(
+        inputs.org as string,
+        inputs.repo as string,
+        alerts,
+        "commitsSha"
+      );
 
-    output.code_scanning_metrics = codeScanningAlertsMetrics;
-  }
+      metrics = AlertsMetrics(
+        alerts,
+        inputs.frequency,
+        "resolved_at",
+        "resolved",
+        true,
+        "commitDate",
+        "created_at"
+      );
 
-  // get secret scanning alerts
-  if (inputs.features.includes("secret-scanning")) {
-    const secretScanningRes = await SecretScanningAlerts(
-      inputs.org as string,
-      inputs.repo as string
-    );
-    core.debug(`[🔎] Secret Scanning alerts ` + secretScanningRes.length);
-    core.debug(`[✅] Secret Scanning alerts fetched`);
+      output.secret_scanning_metrics = metrics;
+    }
 
-    await GetCommitDate(
-      inputs.org as string,
-      inputs.repo as string,
-      secretScanningRes,
-      "commitsSha"
-    );
+    PrintAlertsMetrics(`${feature}`, metrics);
+    core.debug(`[🔎] ${feature} - MTTR: ` + JSON.stringify(metrics.mttr.mttr));
+    core.debug(`[🔎] ${feature} - MTTD: ` + JSON.stringify(metrics.mttd?.mttd));
 
-    const secretScanningAlertsMetrics = AlertsMetrics(
-      secretScanningRes,
-      inputs.frequency,
-      "resolved_at",
-      "resolved",
-      true,
-      "commitDate",
-      "created_at"
-    );
-    PrintAlertsMetrics("Secret Scanning", secretScanningAlertsMetrics);
-    core.debug(
-      `[🔎] Secret Scanning - MTTR: ` + secretScanningAlertsMetrics.mttr.mttr
-    );
-    core.debug(
-      `[🔎] Secret Scanning - MTTD: ` + secretScanningAlertsMetrics.mttd?.mttd
-    );
-
-    core.info(`[✅] Secret scanning metrics calculated`);
-    output.secret_scanning_metrics = secretScanningAlertsMetrics;
+    core.info(`[✅] ${feature} metrics calculated`);
   }
 
   // prepare output
