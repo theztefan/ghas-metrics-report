@@ -11,8 +11,7 @@ This action will generate GHAS Metric report for the previous day. The report is
 The report will include the following metrics for Dependabot, Code Scanning and Secret scanning:
 
 - Open alerts
-- Fixed alerts yesterday
-- Fixed alerts in the past 7 days
+- Fixed alerts in the past X days
 - Total MTTR (Mean Time To Remediate)
 
 ## Usage
@@ -32,6 +31,7 @@ Invoking GHAS Metrics Report action is as simple as:
           repo: "Repo-name"
           org: "Organization-name"
           features: "dependabot, code-scanning, secret-scanning" # comma separated list of features.
+          frequency: "weekly" # weekly or monthly or daily
 ```
 
 ### Example workflow using the action
@@ -65,6 +65,7 @@ jobs:
           repo: "ghas-metrics-report"
           org: "advanced-security-demo"
           features: "dependabot, code-scanning, secret-scanning"
+          frequency: "weekly"
       - name: Upload GHAS metrics report as artifact
         uses: actions/upload-artifact@v3
         with:
@@ -79,6 +80,7 @@ Currently the action supports the following configuration options:
 - `repo` - The name of the repository to generate the report for. This is a required field.
 - `org` - The name of the organization to generate the report for. This is a required field.
 - `features` - A comma separated list of features to generate the report for. This is a required field. The supported values are: `dependabot`, `code-scanning` and `secret-scanning`.
+- `frequency` - Used to calculate the `Fixed alerts in the past x days`. Possible values are `daily`, `weekly`, `monthly`.
 
 ### Output
 

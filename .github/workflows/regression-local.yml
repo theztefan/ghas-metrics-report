@@ -14,12 +14,13 @@ jobs:
       - name: Test Action
         uses: ./ghas-metrics-report
         env:
-          GITHUB_TOKEN: ${{ steps.token-collection.outputs.token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RUN_USING_ACT: "true"
         with:
-          repo: "srdemo-demo"
-          org: "advanced-security-demo"
+          repo: "elc-demo"
+          org: "thez-org"
           features: "dependabot, code-scanning, secret-scanning"
+          frequency: "monthly"
       - name: upload GHAS metrics report
         uses: actions/upload-artifact@v3
         with:

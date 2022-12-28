@@ -1,10 +1,13 @@
 import * as core from "@actions/core";
-import { DependancyAlert, CodeScanningAlert } from "../types/common/main";
+import {
+  DependancyAlert,
+  CodeScanningAlert,
+  reportFrequency,
+} from "../types/common/main";
 
 // Metrics
 interface AlertsMetrics {
-  fixedYesterday: number;
-  fixedLastWeek: number;
+  fixedLastXDays: number;
   openVulnerabilities: number;
   top10: any[];
   mttr: MTTRMetrics;
@@ -20,6 +23,7 @@ interface MTTDMetrics {
 
 export const AlertsMetrics = (
   alerts: any[],
+  frequency: reportFrequency,
   fixedDateField: string,
   state: string,
   calculateMTTD: boolean,
@@ -30,21 +34,34 @@ export const AlertsMetrics = (
   todayDate.setHours(0, 0, 0, 0);
   const today = todayDate.getDate();
 
-  const yesterdayDate = new Date();
-  yesterdayDate.setHours(0, 0, 0, 0);
-  const yesterday = yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-
-  const lastWeekDate = new Date();
-  lastWeekDate.setHours(0, 0, 0, 0);
-  const lastWeek = lastWeekDate.setDate(lastWeekDate.getDate() - 7);
-
   const fixedAlerts = alerts.filter((a) => a.state === state);
-  const fixedAlertsYesterday = fixedAlerts.filter((a) =>
-    FilterBetweenDates(a[fixedDateField], yesterday, today)
-  );
-  const fixedAlertsLastWeek = fixedAlerts.filter((a) =>
-    FilterBetweenDates(a[fixedDateField], lastWeek, today)
-  );
+
+  let fixedLastXDays = [];
+
+  if (frequency === "daily") {
+    const yesterdayDate = new Date();
+    yesterdayDate.setHours(0, 0, 0, 0);
+    const yesterday = yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+    fixedLastXDays = fixedAlerts.filter((a) =>
+      FilterBetweenDates(a[fixedDateField], yesterday, today)
+    );
+  } else if (frequency === "weekly") {
+    const lastWeekDate = new Date();
+    lastWeekDate.setHours(0, 0, 0, 0);
+    const lastWeek = lastWeekDate.setDate(lastWeekDate.getDate() - 7);
+
+    fixedLastXDays = fixedAlerts.filter((a) =>
+      FilterBetweenDates(a[fixedDateField], lastWeek, today)
+    );
+  } else if (frequency === "monthly") {
+    const lastMonthDate = new Date();
+    lastMonthDate.setHours(0, 0, 0, 0);
+    const lastMonth = lastMonthDate.setMonth(lastMonthDate.getMonth() - 1);
+    core.debug(`last Month: ` + lastMonth);
+    fixedLastXDays = fixedAlerts.filter((a) =>
+      FilterBetweenDates(a.dismissed_at, lastMonth, today)
+    );
+  }
 
   //get Top 10 by criticality
   const openAlerts = alerts.filter((a) => a.state === "open");
@@ -59,8 +76,7 @@ export const AlertsMetrics = (
   }
 
   const result: AlertsMetrics = {
-    fixedYesterday: fixedAlertsYesterday.length,
-    fixedLastWeek: fixedAlertsLastWeek.length,
+    fixedLastXDays: fixedLastXDays.length,
     openVulnerabilities: alerts.filter((a) => a.state === "open").length,
     top10: top10Alerts,
     mttr: mttr,

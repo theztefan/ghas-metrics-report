@@ -37,6 +37,7 @@ const run = async (): Promise<void> => {
 
     const dependabotAlertsMetrics = AlertsMetrics(
       dependabotRes,
+      inputs.frequency,
       "fixed_at",
       "fixed",
       false
@@ -63,6 +64,7 @@ const run = async (): Promise<void> => {
 
     const codeScanningAlertsMetrics = AlertsMetrics(
       codeScanningRes,
+      inputs.frequency,
       "fixed_at",
       "fixed",
       true,
@@ -100,6 +102,7 @@ const run = async (): Promise<void> => {
 
     const secretScanningAlertsMetrics = AlertsMetrics(
       secretScanningRes,
+      inputs.frequency,
       "resolved_at",
       "resolved",
       true,
