@@ -111,7 +111,7 @@ const run = async (): Promise<void> => {
       `[🔎] Secret Scanning - MTTR: ` + secretScanningAlertsMetrics.mttr.mttr
     );
     core.debug(
-      `[🔎] Code Scanning - MTTD: ` + secretScanningAlertsMetrics.mttd?.mttd
+      `[🔎] Secret Scanning - MTTD: ` + secretScanningAlertsMetrics.mttd?.mttd
     );
 
     core.info(`[✅] Secret scanning metrics calculated`);
