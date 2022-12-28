@@ -3,8 +3,8 @@ import { DependabotAlerts } from "./DependabotAlerts";
 import { CodeScanningAlerts } from "./CodeScanningAlerts";
 import { SecretScanningAlerts } from "./SecretScanningAlerts";
 import { GetCommitDate } from "./CommitUtils";
-import { prepareSummary } from "./Summary";
 import { preparePdf } from "./Summary";
+import { prepareSummary, addSummarySection } from "./Summary";
 import {
   AlertsMetrics,
   PrintAlertsMetrics,
@@ -24,6 +24,7 @@ export {
   syncWriteFile,
   prepareSummary,
   preparePdf,
+  addSummarySection,
   GetCommitDate,
   preparePdfAndWriteToFile,
   secondsToReadable,

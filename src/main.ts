@@ -6,11 +6,13 @@ import {
   preparePdfAndWriteToFile as writeReportToPdf,
   prepareSummary,
   preparePdf,
+  secondsToReadable,
 } from "./utils";
 import { Alert, AlertsMetrics, Report } from "./types/common/main";
 import { randomUUID } from "crypto";
 import { Context } from "./context/Context";
 import * as fs from "fs";
+import { addSummarySection } from "./utils/Summary";
 
 const run = async (): Promise<void> => {
   // get inputs
@@ -84,6 +86,26 @@ const run = async (): Promise<void> => {
     core.info(`[✅] Report written to summary`);
   }
 
+  prepareSummary();
+
+  output.features.forEach((feature) =>
+    addSummarySection(
+      feature.prettyName,
+      `${feature.prettyName} - top 10`,
+      [
+        `Open Alerts: ${feature.metrics?.openVulnerabilities}`,
+        `Fixed in the past X days: ${feature.metrics?.fixedLastXDays}`,
+        `Frequency: ${inputs.frequency}`,
+        "MTTR: " + secondsToReadable(feature.metrics?.mttr.mttr),
+        "MTTD: " + secondsToReadable(feature.metrics?.mttd?.mttd),
+      ],
+      feature.attributes,
+      feature.summaryTop10()
+    )
+  );
+
+  core.summary.write();
+  core.info(`[✅] Report written to summary`);
   return;
 };
 

@@ -1,10 +1,9 @@
 import * as core from "@actions/core";
-import { Report } from "../types/common/main";
 import { SummaryTableRow } from "@actions/core/lib/summary";
 import jsPDF from "jspdf";
 import autoTable, { RowInput } from "jspdf-autotable";
 
-export function prepareSummary(report: Report): void {
+export function prepareSummary(): void {
   core.summary.addHeading("GHAS Metrics Summary");
   core.summary.addBreak();
 
@@ -336,4 +335,24 @@ function secondsToReadable(seconds: number): string {
   const mDisplay = m > 0 ? m + (m == 1 ? " minute, " : " minutes, ") : "";
   const sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
   return dDisplay + hDisplay + mDisplay + sDisplay;
+}
+
+export function addSummarySection(
+  name: string,
+  heading: string,
+  list: string[],
+  tableHeaders: string[],
+  tableBody: unknown[]
+): void {
+  core.summary
+    .addHeading(name)
+    .addList(list)
+    .addHeading(heading, 2)
+    .addTable([
+      tableHeaders.map((attribute) => {
+        return { data: attribute, header: true };
+      }),
+      ...tableBody,
+    ] as SummaryTableRow[])
+    .addBreak();
 }
