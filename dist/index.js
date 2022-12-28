@@ -11005,7 +11005,7 @@ const run = async () => {
         const secretScanningAlertsMetrics = (0, utils_1.AlertsMetrics)(secretScanningRes, inputs.frequency, "resolved_at", "resolved", true, "commitDate", "created_at");
         (0, utils_1.PrintAlertsMetrics)("Secret Scanning", secretScanningAlertsMetrics);
         core.debug(`[🔎] Secret Scanning - MTTR: ` + secretScanningAlertsMetrics.mttr.mttr);
-        core.debug(`[🔎] Code Scanning - MTTD: ` + secretScanningAlertsMetrics.mttd?.mttd);
+        core.debug(`[🔎] Secret Scanning - MTTD: ` + secretScanningAlertsMetrics.mttd?.mttd);
         core.info(`[✅] Secret scanning metrics calculated`);
         output.secret_scanning_metrics = secretScanningAlertsMetrics;
     }
@@ -11058,20 +11058,20 @@ const core = __importStar(__nccwpck_require__(2186));
 const AlertsMetrics = (alerts, frequency, fixedDateField, state, calculateMTTD, introducedDateField, detectedDateField) => {
     const todayDate = new Date();
     todayDate.setHours(0, 0, 0, 0);
-    const today = todayDate.getTime();
+    const today = todayDate.getDate();
     const fixedAlerts = alerts.filter((a) => a.state === state);
     let fixedLastXDays = [];
     if (frequency === "daily") {
         const yesterdayDate = new Date();
         yesterdayDate.setHours(0, 0, 0, 0);
         const yesterday = yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-        fixedLastXDays = fixedAlerts.filter((a) => FilterBetweenDates(a[dateField], yesterday, today));
+        fixedLastXDays = fixedAlerts.filter((a) => FilterBetweenDates(a[fixedDateField], yesterday, today));
     }
     else if (frequency === "weekly") {
         const lastWeekDate = new Date();
         lastWeekDate.setHours(0, 0, 0, 0);
         const lastWeek = lastWeekDate.setDate(lastWeekDate.getDate() - 7);
-        fixedLastXDays = fixedAlerts.filter((a) => FilterBetweenDates(a[dateField], lastWeek, today));
+        fixedLastXDays = fixedAlerts.filter((a) => FilterBetweenDates(a[fixedDateField], lastWeek, today));
     }
     else if (frequency === "monthly") {
         const lastMonthDate = new Date();
