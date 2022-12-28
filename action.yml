@@ -14,6 +14,10 @@ inputs:
     description: "The GHAS features enabled on the repo to generate the report for"
     required: false
     default: dependabot, code-scanning, secret-scanning
+  frequency:
+    description: "The frequency of the report. Can be daily, weekly or monthly"
+    required: false
+    default: weekly
 outputs:
   report-json:
     description: "GHAS Metrics Report"

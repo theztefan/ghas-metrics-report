@@ -3,9 +3,12 @@ type inputsReturned = {
   repo: string;
   org: string;
   features: ghasFeatures[];
+  frequency: reportFrequency;
 };
 
 type ghasFeatures = "secret-scanning" | "dependabot" | "code-scanning";
+
+type reportFrequency = "weekly" | "monthly" | "daily";
 
 // Dependabot alerts
 export interface DependancyAlert {

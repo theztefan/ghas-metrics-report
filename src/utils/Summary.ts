@@ -63,8 +63,8 @@ export function prepareSummary(report: Report): void {
     .addHeading("Dependabot")
     .addList([
       `Open Alerts: ${report.dependabot_metrics?.openVulnerabilities}`,
-      `Fixed Yesterday: ${report.dependabot_metrics?.fixedYesterday}`,
-      `Fixed in the past 7 days: ${report.dependabot_metrics?.fixedLastWeek}`,
+      `Fixed in the past X days: ${report.dependabot_metrics?.fixedLastXDays}`,
+      `Frequency: ${report.inputs.frequency}`,
       "MTTR: " + secondsToReadable(report.dependabot_metrics?.mttr.mttr),
     ])
     .addBreak()
@@ -87,8 +87,8 @@ export function prepareSummary(report: Report): void {
     .addHeading("Code Scanning")
     .addList([
       `Open Alerts: ${report.code_scanning_metrics?.openVulnerabilities}`,
-      `Fixed Yesterday: ${report.code_scanning_metrics?.fixedYesterday}`,
-      `Fixed in the past 7 days: ${report.code_scanning_metrics?.fixedLastWeek}`,
+      `Fixed in the past X days: ${report.code_scanning_metrics?.fixedLastXDays}`,
+      `Frequency: ${report.inputs.frequency}`,
       "MTTR: " + secondsToReadable(report.code_scanning_metrics?.mttr.mttr),
       "MTTD: " + secondsToReadable(report.code_scanning_metrics?.mttd.mttd),
     ])
@@ -109,8 +109,8 @@ export function prepareSummary(report: Report): void {
     .addHeading("Secret Scanning")
     .addList([
       `Open Alerts: ${report.secret_scanning_metrics?.openVulnerabilities}`,
-      `Fixed Yesterday: ${report.secret_scanning_metrics?.fixedYesterday}`,
-      `Fixed in the past 7 days: ${report.secret_scanning_metrics?.fixedLastWeek}`,
+      `Fixed in the past X days: ${report.secret_scanning_metrics?.fixedLastXDays}`,
+      `Frequency: ${report.inputs.frequency}`,
       "MTTR: " + secondsToReadable(report.secret_scanning_metrics?.mttr.mttr),
       "MTTD: " + secondsToReadable(report.secret_scanning_metrics?.mttd.mttd),
     ])

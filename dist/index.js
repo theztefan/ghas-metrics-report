@@ -10976,7 +10976,7 @@ const run = async () => {
         const dependabotRes = await (0, utils_1.DependabotAlerts)(inputs.org, inputs.repo);
         core.debug(`[🔎] Dependabot alerts: ` + dependabotRes.length);
         core.info(`[✅] Dependabot alerts fetched`);
-        const dependabotAlertsMetrics = (0, utils_1.AlertsMetrics)(dependabotRes, "fixed_at", "fixed", false);
+        const dependabotAlertsMetrics = (0, utils_1.AlertsMetrics)(dependabotRes, inputs.frequency, "fixed_at", "fixed", false);
         (0, utils_1.PrintAlertsMetrics)("Dependabot", dependabotAlertsMetrics);
         core.debug(`[🔎] Dependabot - MTTR: ` + dependabotAlertsMetrics.mttr.mttr);
         //core.debug(`[🔎] Dependabot - MTTD: ` + dependabotAlertsMetrics.mttd.mttd);
@@ -10989,7 +10989,7 @@ const run = async () => {
         core.debug(`[🔎] Code Scanning alerts: ` + codeScanningRes.length);
         core.info(`[✅] Code Scanning alerts fetched`);
         await (0, utils_1.GetCommitDate)(inputs.org, inputs.repo, codeScanningRes, "most_recent_instance.commit_sha");
-        const codeScanningAlertsMetrics = (0, utils_1.AlertsMetrics)(codeScanningRes, "fixed_at", "fixed", true, "commitDate", "created_at");
+        const codeScanningAlertsMetrics = (0, utils_1.AlertsMetrics)(codeScanningRes, inputs.frequency, "fixed_at", "fixed", true, "commitDate", "created_at");
         (0, utils_1.PrintAlertsMetrics)("Code Scanning", codeScanningAlertsMetrics);
         core.debug(`[🔎] Code Scanning - MTTR: ` + codeScanningAlertsMetrics.mttr.mttr);
         core.debug(`[🔎] Code Scanning - MTTD: ` + codeScanningAlertsMetrics.mttd?.mttd);
@@ -11002,10 +11002,10 @@ const run = async () => {
         core.debug(`[🔎] Secret Scanning alerts ` + secretScanningRes.length);
         core.debug(`[✅] Secret Scanning alerts fetched`);
         await (0, utils_1.GetCommitDate)(inputs.org, inputs.repo, secretScanningRes, "commitsSha");
-        const secretScanningAlertsMetrics = (0, utils_1.AlertsMetrics)(secretScanningRes, "resolved_at", "resolved", true, "commitDate", "created_at");
+        const secretScanningAlertsMetrics = (0, utils_1.AlertsMetrics)(secretScanningRes, inputs.frequency, "resolved_at", "resolved", true, "commitDate", "created_at");
         (0, utils_1.PrintAlertsMetrics)("Secret Scanning", secretScanningAlertsMetrics);
         core.debug(`[🔎] Secret Scanning - MTTR: ` + secretScanningAlertsMetrics.mttr.mttr);
-        core.debug(`[🔎] Code Scanning - MTTD: ` + secretScanningAlertsMetrics.mttd?.mttd);
+        core.debug(`[🔎] Secret Scanning - MTTD: ` + secretScanningAlertsMetrics.mttd?.mttd);
         core.info(`[✅] Secret scanning metrics calculated`);
         output.secret_scanning_metrics = secretScanningAlertsMetrics;
     }
@@ -11055,19 +11055,31 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CalculateMTTD = exports.CalculateMTTR = exports.PrintAlertsMetrics = exports.AlertsMetrics = void 0;
 const core = __importStar(__nccwpck_require__(2186));
-const AlertsMetrics = (alerts, fixedDateField, state, calculateMTTD, introducedDateField, detectedDateField) => {
+const AlertsMetrics = (alerts, frequency, fixedDateField, state, calculateMTTD, introducedDateField, detectedDateField) => {
     const todayDate = new Date();
     todayDate.setHours(0, 0, 0, 0);
     const today = todayDate.getDate();
-    const yesterdayDate = new Date();
-    yesterdayDate.setHours(0, 0, 0, 0);
-    const yesterday = yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-    const lastWeekDate = new Date();
-    lastWeekDate.setHours(0, 0, 0, 0);
-    const lastWeek = lastWeekDate.setDate(lastWeekDate.getDate() - 7);
     const fixedAlerts = alerts.filter((a) => a.state === state);
-    const fixedAlertsYesterday = fixedAlerts.filter((a) => FilterBetweenDates(a[fixedDateField], yesterday, today));
-    const fixedAlertsLastWeek = fixedAlerts.filter((a) => FilterBetweenDates(a[fixedDateField], lastWeek, today));
+    let fixedLastXDays = [];
+    if (frequency === "daily") {
+        const yesterdayDate = new Date();
+        yesterdayDate.setHours(0, 0, 0, 0);
+        const yesterday = yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+        fixedLastXDays = fixedAlerts.filter((a) => FilterBetweenDates(a[fixedDateField], yesterday, today));
+    }
+    else if (frequency === "weekly") {
+        const lastWeekDate = new Date();
+        lastWeekDate.setHours(0, 0, 0, 0);
+        const lastWeek = lastWeekDate.setDate(lastWeekDate.getDate() - 7);
+        fixedLastXDays = fixedAlerts.filter((a) => FilterBetweenDates(a[fixedDateField], lastWeek, today));
+    }
+    else if (frequency === "monthly") {
+        const lastMonthDate = new Date();
+        lastMonthDate.setHours(0, 0, 0, 0);
+        const lastMonth = lastMonthDate.setMonth(lastMonthDate.getMonth() - 1);
+        core.debug(`last Month: ` + lastMonth);
+        fixedLastXDays = fixedAlerts.filter((a) => FilterBetweenDates(a.dismissed_at, lastMonth, today));
+    }
     //get Top 10 by criticality
     const openAlerts = alerts.filter((a) => a.state === "open");
     const top10Alerts = openAlerts.sort(compareAlertSeverity).slice(0, 10);
@@ -11078,8 +11090,7 @@ const AlertsMetrics = (alerts, fixedDateField, state, calculateMTTD, introducedD
         mttd = (0, exports.CalculateMTTD)(alerts, introducedDateField, detectedDateField);
     }
     const result = {
-        fixedYesterday: fixedAlertsYesterday.length,
-        fixedLastWeek: fixedAlertsLastWeek.length,
+        fixedLastXDays: fixedLastXDays.length,
         openVulnerabilities: alerts.filter((a) => a.state === "open").length,
         top10: top10Alerts,
         mttr: mttr,
@@ -11510,8 +11521,8 @@ function prepareSummary(report) {
         .addHeading("Dependabot")
         .addList([
         `Open Alerts: ${report.dependabot_metrics?.openVulnerabilities}`,
-        `Fixed Yesterday: ${report.dependabot_metrics?.fixedYesterday}`,
-        `Fixed in the past 7 days: ${report.dependabot_metrics?.fixedLastWeek}`,
+        `Fixed in the past X days: ${report.dependabot_metrics?.fixedLastXDays}`,
+        `Frequency: ${report.inputs.frequency}`,
         "MTTR: " + secondsToReadable(report.dependabot_metrics?.mttr.mttr),
     ])
         .addBreak()
@@ -11533,8 +11544,8 @@ function prepareSummary(report) {
         .addHeading("Code Scanning")
         .addList([
         `Open Alerts: ${report.code_scanning_metrics?.openVulnerabilities}`,
-        `Fixed Yesterday: ${report.code_scanning_metrics?.fixedYesterday}`,
-        `Fixed in the past 7 days: ${report.code_scanning_metrics?.fixedLastWeek}`,
+        `Fixed in the past X days: ${report.code_scanning_metrics?.fixedLastXDays}`,
+        `Frequency: ${report.inputs.frequency}`,
         "MTTR: " + secondsToReadable(report.code_scanning_metrics?.mttr.mttr),
         "MTTD: " + secondsToReadable(report.code_scanning_metrics?.mttd.mttd),
     ])
@@ -11554,8 +11565,8 @@ function prepareSummary(report) {
         .addHeading("Secret Scanning")
         .addList([
         `Open Alerts: ${report.secret_scanning_metrics?.openVulnerabilities}`,
-        `Fixed Yesterday: ${report.secret_scanning_metrics?.fixedYesterday}`,
-        `Fixed in the past 7 days: ${report.secret_scanning_metrics?.fixedLastWeek}`,
+        `Fixed in the past X days: ${report.secret_scanning_metrics?.fixedLastXDays}`,
+        `Frequency: ${report.inputs.frequency}`,
         "MTTR: " + secondsToReadable(report.secret_scanning_metrics?.mttr.mttr),
         "MTTD: " + secondsToReadable(report.secret_scanning_metrics?.mttd.mttd),
     ])
@@ -11706,13 +11717,18 @@ const inputs = async () => {
             .toLowerCase()
             .split(",", 3);
         //TODO: Stricter validation. Why are values not in ghasFeatures type union still accepted?
+        const frequency = core.getInput("frequency", {
+            required: true,
+        });
         core.debug(`The following repo was inputted: ${repo}`);
         core.debug(`The following org was inputted: ${org}`);
         core.debug(`The following features was inputted: ${features}`);
+        core.debug(`The following frequency was inputted: ${frequency}`);
         return {
             repo,
             org,
             features,
+            frequency,
         };
     }
     catch (e) {
