@@ -11,6 +11,7 @@ import {
   CalculateMTTR,
 } from "./AlertMetrics";
 import { syncWriteFile, preparePdfAndWriteToFile } from "./files";
+import { secondsToReadable, createUrlLink } from "./Utils";
 
 export {
   inputs,
@@ -25,4 +26,6 @@ export {
   preparePdf,
   GetCommitDate,
   preparePdfAndWriteToFile,
+  secondsToReadable,
+  createUrlLink,
 };

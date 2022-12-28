@@ -1,10 +1,5 @@
 import * as core from "@actions/core";
-import {
-  CodeScanningAlert,
-  DependancyAlert,
-  Report,
-  SecretScanningAlert,
-} from "../types/common/main";
+import { Report } from "../types/common/main";
 import { SummaryTableRow } from "@actions/core/lib/summary";
 import jsPDF from "jspdf";
 import autoTable, { RowInput } from "jspdf-autotable";
@@ -13,27 +8,24 @@ export function prepareSummary(report: Report): void {
   core.summary.addHeading("GHAS Metrics Summary");
   core.summary.addBreak();
 
-  const dependabotTop10rows: SummaryTableRow[] =
-    report.dependabot_metrics?.top10.map(
-      (a: DependancyAlert) =>
-        [
-          a.security_vulnerability?.package.name,
-          a.security_vulnerability?.severity,
-          a.security_vulnerability?.vulnerable_version_range,
-          a.security_vulnerability?.first_patched_version?.identifier,
-          a.security_advisory?.cve_id,
-          a.security_advisory?.cvss?.vector_string,
-          createUrlLink(a.html_url, "Link"),
-        ] as SummaryTableRow
-    );
-
-  //replace occurences of null with empty string
-  dependabotTop10rows.forEach((row) => {
-    row.forEach((cell, index) => {
-      if (cell === null || cell == undefined) {
-        row[index] = "";
-      }
-    });
+  report.features.forEach((feature) => {
+    core.summary
+      .addBreak()
+      .addHeading(feature.name)
+      .addList([
+        `Open Alerts: ${feature.metrics?.openVulnerabilities}`,
+        `Fixed in the past X days: ${feature.metrics?.fixedLastXDays}`,
+        `Frequency: ${report.inputs.frequency}`,
+        "MTTR: " + secondsToReadable(feature.metrics?.mttr.mttr),
+        "MTTD: " + secondsToReadable(feature.metrics?.mttd.mttd),
+      ])
+      .addHeading(feature.name + " - Top 10", 2)
+      .addTable([
+        feature.attributes.map((attribute) => {
+          return { data: attribute, header: true };
+        }),
+        ...[feature.summaryTop10()],
+      ] as SummaryTableRow[]);
   });
 
   const codeScanningTop10rows: SummaryTableRow[] =

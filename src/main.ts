@@ -1,19 +1,15 @@
 import * as core from "@actions/core";
 import {
   inputs as getInput,
-  DependabotAlerts,
-  CodeScanningAlerts,
-  SecretScanningAlerts,
-  AlertsMetrics,
   PrintAlertsMetrics,
   syncWriteFile as writeReportToFile,
   preparePdfAndWriteToFile as writeReportToPdf,
   prepareSummary,
   preparePdf,
-  GetCommitDate,
 } from "./utils";
-import { Report } from "./types/common/main";
+import { Alert, AlertsMetrics, Report } from "./types/common/main";
 import { randomUUID } from "crypto";
+import { Context } from "./context/Context";
 
 const run = async (): Promise<void> => {
   // get inputs
@@ -25,90 +21,40 @@ const run = async (): Promise<void> => {
     id: id,
     created_at: new Date().toISOString(),
     inputs: inputs,
-    dependabot_metrics: null,
-    code_scanning_metrics: null,
-    secret_scanning_metrics: null,
+    features: [],
   } as Report;
 
   for (const feature of inputs.features) {
-    core.info(`[🔎] Fetching ${feature} alerts`);
-    let alerts;
-    if (feature === "dependabot") {
-      alerts = await DependabotAlerts(
-        inputs.org as string,
-        inputs.repo as string
-      );
-    } else if (feature === "code-scanning") {
-      alerts = await CodeScanningAlerts(
-        inputs.org as string,
-        inputs.repo as string
-      );
-    } else if (feature === "secret-scanning") {
-      alerts = await SecretScanningAlerts(
-        inputs.org as string,
-        inputs.repo as string
-      );
-    }
+    const context = new Context(feature);
+    core.info(`[🔎] Fetching ${context.prettyName} alerts`);
 
-    core.debug(`[🔎] ${feature} alerts: ` + alerts.length);
-    core.info(`[✅] ${feature} alerts fetched`);
+    const alerts: Alert[] = await context.alerts(
+      inputs.org as string,
+      inputs.repo as string
+    );
 
-    let metrics;
-    if (feature === "dependabot") {
-      metrics = AlertsMetrics(
-        alerts,
-        inputs.frequency,
-        "fixed_at",
-        "fixed",
-        false
-      );
+    core.debug(`[🔎] ${context.prettyName} alerts: ` + alerts.length);
+    core.info(`[✅] ${context.prettyName} alerts fetched`);
 
-      output.dependabot_metrics = metrics;
-    } else if (feature === "code-scanning") {
-      await GetCommitDate(
-        inputs.org as string,
-        inputs.repo as string,
-        alerts,
-        "most_recent_instance.commit_sha"
-      );
+    const metrics: AlertsMetrics = await context.alertsMetrics(
+      inputs.frequency,
+      alerts,
+      inputs.org as string,
+      inputs.repo as string
+    );
 
-      metrics = AlertsMetrics(
-        alerts,
-        inputs.frequency,
-        "fixed_at",
-        "fixed",
-        true,
-        "commitDate",
-        "created_at"
-      );
+    PrintAlertsMetrics(`${context.prettyName}`, metrics);
 
-      output.code_scanning_metrics = metrics;
-    } else if (feature === "secret-scanning") {
-      await GetCommitDate(
-        inputs.org as string,
-        inputs.repo as string,
-        alerts,
-        "commitsSha"
-      );
+    core.debug(
+      `[🔎] ${context.prettyName} - MTTR: ` + JSON.stringify(metrics.mttr.mttr)
+    );
+    core.debug(
+      `[🔎] ${context.prettyName} - MTTD: ` + JSON.stringify(metrics.mttd?.mttd)
+    );
 
-      metrics = AlertsMetrics(
-        alerts,
-        inputs.frequency,
-        "resolved_at",
-        "resolved",
-        true,
-        "commitDate",
-        "created_at"
-      );
+    core.info(`[✅] ${context.prettyName} metrics calculated`);
 
-      output.secret_scanning_metrics = metrics;
-    }
-
-    PrintAlertsMetrics(`${feature}`, metrics);
-    core.debug(`[🔎] ${feature} - MTTR: ` + JSON.stringify(metrics.mttr.mttr));
-    core.debug(`[🔎] ${feature} - MTTD: ` + JSON.stringify(metrics.mttd?.mttd));
-
-    core.info(`[✅] ${feature} metrics calculated`);
+    output.features.push(context.feature);
   }
 
   // prepare output

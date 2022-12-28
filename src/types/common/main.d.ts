@@ -1,3 +1,5 @@
+import { Feature } from "../../context/Feature";
+
 // Inputs from configuration options
 type inputsReturned = {
   team?: string;
@@ -68,13 +70,13 @@ export interface SecretScanningAlert extends Alert {
   secret_type: string;
   secret_type_display_name: string;
   secret: string;
-  resolution: unknown;
+  resolution: string;
   resolved_by: unknown;
-  resolved_at: unknown;
-  resolution_comment: unknown;
+  resolved_at: string;
+  resolution_comment: string;
   push_protection_bypassed: boolean;
   push_protection_bypassed_by: unknown;
-  push_protection_bypassed_at: unknown;
+  push_protection_bypassed_at: string;
   commitsSha?: string[];
 }
 
@@ -99,7 +101,7 @@ export interface SecurityAdvisory {
   references: Reference[];
   published_at: string;
   updated_at: string;
-  withdrawn_at: unknown;
+  withdrawn_at: string;
   vulnerabilities: Vulnerability[];
   cvss: Cvss;
   cwes: Cwe[];
@@ -131,7 +133,7 @@ export interface FirstPatchedVersion {
 }
 
 export interface Cvss {
-  vector_string: unknown;
+  vector_string: string;
   score: number;
 }
 
@@ -188,7 +190,7 @@ export interface Rule {
 
 export interface Tool {
   name: string;
-  guid: unknown;
+  guid: string;
   version: string;
 }
 
@@ -201,7 +203,7 @@ export interface MostRecentInstance {
   commit_sha: string;
   message: Message;
   location: Location;
-  classifications: unknown[];
+  classifications: string[];
 }
 
 export interface Message {
@@ -229,7 +231,5 @@ export interface Report {
   id: string;
   created_at: string;
   inputs: inputsReturned;
-  dependabot_metrics: AlertsMetrics | null;
-  code_scanning_metrics: AlertsMetrics | null;
-  secret_scanning_metrics: AlertsMetrics | null;
+  features: Feature[];
 }
