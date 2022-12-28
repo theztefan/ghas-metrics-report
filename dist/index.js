@@ -11536,6 +11536,7 @@ function prepareSummary(report) {
         `Fixed Yesterday: ${report.code_scanning_metrics?.fixedYesterday}`,
         `Fixed in the past 7 days: ${report.code_scanning_metrics?.fixedLastWeek}`,
         "MTTR: " + secondsToReadable(report.code_scanning_metrics?.mttr.mttr),
+        "MTTD: " + secondsToReadable(report.code_scanning_metrics?.mttd.mttd),
     ])
         .addHeading("Code Scanning - Top 10", 2)
         .addTable([
@@ -11556,6 +11557,7 @@ function prepareSummary(report) {
         `Fixed Yesterday: ${report.secret_scanning_metrics?.fixedYesterday}`,
         `Fixed in the past 7 days: ${report.secret_scanning_metrics?.fixedLastWeek}`,
         "MTTR: " + secondsToReadable(report.secret_scanning_metrics?.mttr.mttr),
+        "MTTD: " + secondsToReadable(report.secret_scanning_metrics?.mttd.mttd),
     ])
         .addHeading("Secret Scanning - Top 10", 2)
         .addTable([
