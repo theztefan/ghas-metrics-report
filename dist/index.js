@@ -41847,7 +41847,7 @@ const inputs_inputs = async () => {
 
 // EXTERNAL MODULE: ./node_modules/@octokit/action/dist-node/index.js
 var dist_node = __nccwpck_require__(1231);
-;// CONCATENATED MODULE: ./src/utils/CommitUtils.ts
+;// CONCATENATED MODULE: ./src/github/Commit.ts
 
 
 const GetCommitDate = async (owner, repository, alerts, commitShaField) => {
@@ -41887,90 +41887,6 @@ const GetCommitData = async (owner, repository, commitSha) => {
     });
     return commitData;
 };
-
-// EXTERNAL MODULE: ./node_modules/jspdf/dist/jspdf.node.min.js
-var jspdf_node_min = __nccwpck_require__(9089);
-// EXTERNAL MODULE: ./node_modules/jspdf-autotable/dist/jspdf.plugin.autotable.js
-var jspdf_plugin_autotable = __nccwpck_require__(5285);
-var jspdf_plugin_autotable_default = /*#__PURE__*/__nccwpck_require__.n(jspdf_plugin_autotable);
-;// CONCATENATED MODULE: ./src/utils/Summary.ts
-
-
-
-function prepareSummary() {
-    core.summary.addHeading("GHAS Metrics Summary");
-    core.summary.addBreak();
-}
-function addSummaryHeader(title) {
-    core.summary.addHeading(title, 2);
-}
-function addSummarySection(name, heading, list, tableHeaders, tableBody) {
-    core.summary.addHeading(name)
-        .addList(list)
-        .addHeading(heading, 2)
-        .addTable([
-        tableHeaders.map((attribute) => {
-            return { data: attribute, header: true };
-        }),
-        ...tableBody,
-    ])
-        .addBreak();
-}
-let position;
-let pdf;
-function preparePDF() {
-    pdf = new jspdf_node_min["default"]();
-    position = 10;
-    pdf.text("GHAS Metrics Summary", 10, position);
-}
-function getPDF() {
-    return pdf;
-}
-function addPDFSectionBreak() {
-    position += 100;
-}
-function addPDFHeader(title) {
-    position += 10;
-    pdf.text(title, 10, position);
-}
-function addPDFSection(name, heading, list, tableHeaders, tableBody) {
-    position += 10;
-    pdf.text(name, 10, position);
-    list.forEach((entry) => {
-        pdf.text(entry, 10, position);
-        position += 10;
-    });
-    pdf.text(heading, 10, position);
-    position += 10;
-    jspdf_plugin_autotable_default()(pdf, {
-        head: [
-            tableHeaders.map((attribute) => {
-                return { content: attribute, styles: { halign: "center" } };
-            }),
-        ],
-        body: tableBody,
-        startY: position,
-        theme: "grid",
-        styles: {
-            cellPadding: 2,
-            fontSize: 8,
-            overflow: "linebreak",
-            halign: "left",
-            valign: "middle",
-            cellWidth: "wrap",
-        },
-        columnStyles: {
-            0: { cellWidth: 50 },
-            1: { cellWidth: 20 },
-            2: { cellWidth: 50 },
-            3: { cellWidth: 20 },
-            4: { cellWidth: 20 },
-            5: { cellWidth: 20 },
-            6: { cellWidth: 20 },
-        },
-    });
-    return pdf;
-}
 
 ;// CONCATENATED MODULE: ./src/utils/AlertMetrics.ts
 
@@ -42095,30 +42011,6 @@ function isCodeScanningAlert(alert) {
     return "rule" in alert && "severity" in alert.rule;
 }
 
-// EXTERNAL MODULE: external "fs"
-var external_fs_ = __nccwpck_require__(7147);
-// EXTERNAL MODULE: external "path"
-var external_path_ = __nccwpck_require__(1017);
-;// CONCATENATED MODULE: ./src/utils/files.ts
-
-
-
-const syncWriteFile = (filename, data) => {
-    const outputFilename = (0,external_path_.join)(process.env.GITHUB_WORKSPACE, filename);
-    (0,external_fs_.writeFileSync)(outputFilename, data, {
-        flag: "w",
-    });
-    core.debug(`[📝] File ${outputFilename} written`);
-    return;
-};
-const preparePdfAndWriteToFile = (filename, report) => {
-    //const outputFilename = join(__dirname, filename);
-    const outputFilename = (0,external_path_.join)(process.env.GITHUB_WORKSPACE, filename);
-    report.save(outputFilename);
-    core.debug(`[📝] File ${outputFilename} written`);
-    return;
-};
-
 ;// CONCATENATED MODULE: ./src/utils/Utils.ts
 function secondsToReadable(seconds) {
     seconds = Number(seconds);
@@ -42137,8 +42029,6 @@ function createUrlLink(url, text) {
 }
 
 ;// CONCATENATED MODULE: ./src/utils/index.ts
-
-
 
 
 
@@ -42188,7 +42078,6 @@ class SecretScanning {
         "SecretType",
         "Found at",
         "Push Protection Bypass",
-        "Patched version",
         "Link",
     ];
     async alerts(org, repo) {
@@ -42204,7 +42093,7 @@ class SecretScanning {
             a.secret_type_display_name,
             a.created_at,
             a.push_protection_bypassed ? "True" : "False",
-            createUrlLink(a.html_url, "Link"),
+            a.html_url,
         ]);
     }
 }
@@ -42262,7 +42151,7 @@ class Dependabot {
             a.security_vulnerability?.first_patched_version?.identifier || "",
             a.security_advisory?.cve_id || "",
             a.security_advisory?.cvss?.vector_string || "",
-            createUrlLink(a.html_url, "Link"),
+            a.html_url,
         ]);
     }
 }
@@ -42317,7 +42206,7 @@ class CodeScanning {
             a.rule?.severity || "",
             a.tool?.name || "",
             a.most_recent_instance?.location.path || "",
-            createUrlLink(a.html_url, "Link"),
+            a.html_url,
         ]);
     }
 }
@@ -42390,7 +42279,126 @@ const getRepository = async (owner, repo) => {
     return response.data;
 };
 
+// EXTERNAL MODULE: external "fs"
+var external_fs_ = __nccwpck_require__(7147);
+// EXTERNAL MODULE: external "path"
+var external_path_ = __nccwpck_require__(1017);
+;// CONCATENATED MODULE: ./src/report/JSONReport.ts
+
+
+class JSONReport {
+    static write(filename, data) {
+        const outputFilename = (0,external_path_.join)(process.env.GITHUB_WORKSPACE, filename);
+        (0,external_fs_.writeFileSync)(outputFilename, data, {
+            flag: "w",
+        });
+        return;
+    }
+}
+
+// EXTERNAL MODULE: ./node_modules/jspdf/dist/jspdf.node.min.js
+var jspdf_node_min = __nccwpck_require__(9089);
+// EXTERNAL MODULE: ./node_modules/jspdf-autotable/dist/jspdf.plugin.autotable.js
+var jspdf_plugin_autotable = __nccwpck_require__(5285);
+var jspdf_plugin_autotable_default = /*#__PURE__*/__nccwpck_require__.n(jspdf_plugin_autotable);
+;// CONCATENATED MODULE: ./src/report/PDFReport.ts
+
+
+
+class PDFReport {
+    pdf;
+    position;
+    jumpAndUsePosition() {
+        this.position += 10;
+        return this.position;
+    }
+    prepare() {
+        this.position = 20;
+        this.pdf = new jspdf_node_min["default"]();
+        this.pdf.setFontSize(30);
+        this.pdf.text("GHAS Metrics Summary", 50, this.position, {
+            lineHeightFactor: 2,
+        });
+        this.position = 30;
+    }
+    addHeader(title) {
+        this.pdf.setFontSize(20);
+        this.pdf.text(title, 60, this.jumpAndUsePosition());
+    }
+    addSection(name, heading, list, tableHeaders, tableBody) {
+        console.log("aaaaaa", this.pdf.getNumberOfPages(), this.position);
+        if (this.pdf.getNumberOfPages() !== 1)
+            this.position = 20;
+        this.pdf.setFontSize(20);
+        this.pdf.text(name, 10, this.jumpAndUsePosition());
+        this.pdf.setFontSize(10);
+        list.forEach((entry, index) => this.pdf.text(entry, index % 2 === 0 ? 10 : 80, index % 2 === 0 ? this.jumpAndUsePosition() : this.position));
+        this.pdf.setFontSize(15);
+        this.pdf.text(heading, 10, this.jumpAndUsePosition());
+        const cellWidth = Math.ceil(178 / tableHeaders.length);
+        jspdf_plugin_autotable_default()(this.pdf, {
+            head: [
+                tableHeaders.map((attribute) => {
+                    return { content: attribute, styles: { halign: "center" } };
+                }),
+            ],
+            body: tableBody,
+            startY: this.jumpAndUsePosition(),
+            theme: "grid",
+            styles: {
+                fontSize: 6,
+            },
+            columnStyles: {
+                0: { cellWidth },
+                1: { cellWidth },
+                2: { cellWidth },
+                3: { cellWidth },
+                4: { cellWidth },
+                5: { cellWidth },
+                6: { cellWidth },
+            },
+        });
+        this.pdf.addPage();
+    }
+    write(filename) {
+        this.pdf.deletePage(this.pdf.getNumberOfPages());
+        const outputFilename = (0,external_path_.join)(process.env.GITHUB_WORKSPACE, filename);
+        this.pdf.save(outputFilename);
+        return;
+    }
+}
+
+;// CONCATENATED MODULE: ./src/report/SummaryReport.ts
+
+class SummaryReport {
+    prepare() {
+        core.summary.addHeading("GHAS Metrics Summary");
+        core.summary.addBreak();
+    }
+    addHeader(title) {
+        core.summary.addHeading(title, 2);
+    }
+    addSection(name, heading, list, tableHeaders, tableBody) {
+        core.summary.addHeading(name)
+            .addList(list)
+            .addHeading(heading, 2)
+            .addTable([
+            tableHeaders.map((attribute) => {
+                return { data: attribute, header: true };
+            }),
+            ...tableBody,
+        ])
+            .addBreak();
+    }
+    write() {
+        core.summary.write();
+    }
+}
+
 ;// CONCATENATED MODULE: ./src/main.ts
+
+
+
 
 
 
@@ -42446,12 +42454,6 @@ const run = async () => {
             features: features,
         });
     }
-    core.setOutput("report-json", JSON.stringify(output, null, 2));
-    core.info(`[✅] Report written output 'report-json' variable`);
-    if (inputs.outputFormat.includes("json")) {
-        syncWriteFile("ghas-report.json", JSON.stringify(output, null, 2));
-        core.info(`[✅] JSON Report written to file`);
-    }
     const sections = new Map();
     output.repositories.forEach((repository) => {
         sections.set(`${repository.owner}/${repository.name}`, []);
@@ -42469,27 +42471,34 @@ const run = async () => {
             tableBody: feature.summaryTop10(),
         }));
     });
-    if (inputs.outputFormat.includes("pdf")) {
-        preparePDF();
-        sections.forEach((content, key) => {
-            addPDFHeader(`Repository ${key}`);
-            content.forEach((section) => {
-                addPDFSection(section.name, section.heading, section.list, section.tableHeaders, section.tableBody);
-                addPDFSectionBreak();
-            });
-        });
-        preparePdfAndWriteToFile("ghas-report.pdf", getPDF());
-        core.info(`[✅] PDF Report written to file`);
-    }
     if (process.env.RUN_USING_ACT !== "true") {
-        prepareSummary();
-        sections.forEach((content, key) => {
-            addSummaryHeader(`Repository ${key}`);
-            content.forEach((section) => addSummarySection(section.name, section.heading, section.list, section.tableHeaders, section.tableBody));
-        });
-        core.summary.write();
-        core.info(`[✅] Report written to summary`);
+        inputs.outputFormat.push("html", "github-output");
     }
+    let report;
+    inputs.outputFormat.forEach((format) => {
+        switch (format) {
+            case "json":
+                JSONReport.write("ghas-report.json", JSON.stringify(output, null, 2));
+                break;
+            case "pdf" || 0:
+                report = format === "pdf" ? new PDFReport() : new SummaryReport();
+                report.prepare();
+                sections.forEach((content, key) => {
+                    report.addHeader(`Repository ${key}`);
+                    content.forEach((section) => report.addSection(section.name, section.heading, section.list, section.tableHeaders, section.tableBody));
+                });
+                report.write("ghas-report.pdf");
+                break;
+            case "github-output":
+                core.setOutput("report-json", JSON.stringify(output, null, 2));
+                core.info(`[✅] Report written output 'report-json' variable`);
+                break;
+            default:
+                core.warning(`[⚠️] Unknown output format ${format}`);
+                break;
+        }
+        core.info(`[✅] ${format.toUpperCase()} Report written`);
+    });
     return;
 };
 run();

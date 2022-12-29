@@ -5,7 +5,7 @@ import {
   ghasFeatures,
   reportFrequency,
 } from "../types/common/main";
-import { AlertsMetrics, createUrlLink, GetCommitDate } from "../utils";
+import { AlertsMetrics, GetCommitDate } from "../utils";
 import { Feature } from "./Feature";
 import { CodeScanningAlerts } from "../github/CodeScanningAlerts";
 
@@ -52,7 +52,7 @@ export class CodeScanning implements Feature {
       a.rule?.severity || "",
       a.tool?.name || "",
       a.most_recent_instance?.location.path || "",
-      createUrlLink(a.html_url, "Link"),
+      a.html_url,
     ]);
   }
 }

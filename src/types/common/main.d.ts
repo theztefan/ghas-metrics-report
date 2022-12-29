@@ -12,7 +12,7 @@ type inputsReturned = {
 
 type ghasFeatures = "secret-scanning" | "dependabot" | "code-scanning";
 type reportFrequency = "weekly" | "monthly" | "daily";
-type outputFormat = "json" | "pdf" | "html";
+type outputFormat = "json" | "pdf" | "html" | "github-output";
 
 interface MTTRMetrics {
   mttr: number;
@@ -226,7 +226,7 @@ export interface SecretScanningLocationDetail {
   commit_sha: string;
 }
 
-export interface Report {
+export interface ReportType {
   id: string;
   created_at: string;
   inputs: inputsReturned;
