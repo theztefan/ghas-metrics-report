@@ -1,3 +1,5 @@
 name: "CodeQL Config"
 
 debug: true
+paths-ignore:
+  - dist/*
