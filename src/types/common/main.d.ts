@@ -2,6 +2,7 @@ import { Feature } from "../../context/Feature";
 
 // Inputs from configuration options
 type inputsReturned = {
+  team?: string;
   repo?: string;
   org?: string;
   features: ghasFeatures[];
@@ -184,7 +185,6 @@ export interface Rule {
   description: string;
   name: string;
   tags: string[];
-  security_severity_level: string;
 }
 
 export interface Tool {
@@ -230,5 +230,9 @@ export interface Report {
   id: string;
   created_at: string;
   inputs: inputsReturned;
-  features: Feature[];
+  repositories: {
+    features: Feature[];
+    owner: string;
+    name: string;
+  }[];
 }

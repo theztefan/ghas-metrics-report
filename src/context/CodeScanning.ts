@@ -2,16 +2,13 @@ import {
   Alert,
   AlertsMetrics as AlertsMetricsType,
   CodeScanningAlert,
+  DependencyOrCodeAlert,
   ghasFeatures,
   reportFrequency,
 } from "../types/common/main";
-import {
-  AlertsMetrics,
-  CodeScanningAlerts,
-  createUrlLink,
-  GetCommitDate,
-} from "../utils";
+import { AlertsMetrics, createUrlLink, GetCommitDate } from "../utils";
 import { Feature } from "./Feature";
+import { CodeScanningAlerts } from "../github/CodeScanningAlerts";
 
 export class CodeScanning implements Feature {
   name: ghasFeatures = "code-scanning";
@@ -25,13 +22,13 @@ export class CodeScanning implements Feature {
     "Link",
   ];
 
-  async alerts(org: string, repo: string): Promise<Alert[]> {
+  async alerts(org: string, repo: string): Promise<CodeScanningAlert[]> {
     return await CodeScanningAlerts(org, repo);
   }
 
   async alertsMetrics(
     frequency: reportFrequency,
-    alerts: Alert[],
+    alerts: DependencyOrCodeAlert[],
     org: string,
     repo: string
   ): Promise<AlertsMetricsType> {
@@ -58,5 +55,12 @@ export class CodeScanning implements Feature {
       a.most_recent_instance?.location.path || "",
       createUrlLink(a.html_url, "Link"),
     ]);
+  }
+
+  printable(): { prettyName: string; metrics: AlertsMetricsType } {
+    return {
+      prettyName: this.prettyName,
+      metrics: this.metrics,
+    };
   }
 }

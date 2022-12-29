@@ -6,7 +6,33 @@ import autoTable, { RowInput } from "jspdf-autotable";
 export function prepareSummary(): void {
   core.summary.addHeading("GHAS Metrics Summary");
   core.summary.addBreak();
+}
+  
+export function addHeader(title: string): void {
+  core.summary.addHeading(title, 2);
+}
 
+export function addSummarySection(
+  name: string,
+  heading: string,
+  list: string[],
+  tableHeaders: string[],
+  tableBody: unknown[]
+): void {
+  core.summary
+    .addHeading(name)
+    .addList(list)
+    .addHeading(heading, 2)
+    .addTable([
+      tableHeaders.map((attribute) => {
+        return { data: attribute, header: true };
+      }),
+      ...tableBody,
+    ] as SummaryTableRow[])
+    .addBreak();
+}
+
+export function preparePdf(report: jsPDF): void {
   report.features.forEach((feature) => {
     core.summary
       .addHeading(feature.name)
@@ -317,42 +343,4 @@ export function preparePdf(report: Report): jsPDF {
     },
   });
   return pdf;
-}
-
-function createUrlLink(url: string | null, text: string): string {
-  return `<a target=_blank href="${url}">${text}</a>`;
-}
-
-function secondsToReadable(seconds: number): string {
-  seconds = Number(seconds);
-  const d = Math.floor(seconds / (3600 * 24));
-  const h = Math.floor((seconds % (3600 * 24)) / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = Math.floor(seconds % 60);
-
-  const dDisplay = d > 0 ? d + (d == 1 ? " day, " : " days, ") : "";
-  const hDisplay = h > 0 ? h + (h == 1 ? " hour, " : " hours, ") : "";
-  const mDisplay = m > 0 ? m + (m == 1 ? " minute, " : " minutes, ") : "";
-  const sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
-  return dDisplay + hDisplay + mDisplay + sDisplay;
-}
-
-export function addSummarySection(
-  name: string,
-  heading: string,
-  list: string[],
-  tableHeaders: string[],
-  tableBody: unknown[]
-): void {
-  core.summary
-    .addHeading(name)
-    .addList(list)
-    .addHeading(heading, 2)
-    .addTable([
-      tableHeaders.map((attribute) => {
-        return { data: attribute, header: true };
-      }),
-      ...tableBody,
-    ] as SummaryTableRow[])
-    .addBreak();
 }

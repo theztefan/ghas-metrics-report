@@ -9,7 +9,7 @@ import {
   DependencyOrCodeAlert,
   Alert,
 } from "../types/common/main";
-import { SecretScanningAlerts } from "./SecretScanningAlerts";
+import { SecretScanningAlerts } from "../github/SecretScanningAlerts";
 
 export const AlertsMetrics = (
   alerts: Alert[],
@@ -38,16 +38,17 @@ export const AlertsMetrics = (
   }
 
   core.debug(`past date: ` + pastDate);
-  fixedLastXDays = fixedAlerts.filter((a) =>
-    !(a instanceof SecretScanningAlerts)
-      ? FilterBetweenDates(
-          (a as DependencyOrCodeAlert).dismissed_at,
-          pastDate,
-          todayDate
-        )
-      : (fixedLastXDays = fixedAlerts.filter((a) =>
-          FilterBetweenDates(a[fixedDateField], pastDate, todayDate)
-        ))
+  fixedLastXDays = fixedAlerts.filter(
+    (a: CodeScanningAlert | DependencyOrCodeAlert) =>
+      !isCodeScanningAlert(a)
+        ? FilterBetweenDates(
+            (a as DependencyOrCodeAlert).dismissed_at,
+            pastDate,
+            todayDate
+          )
+        : (fixedLastXDays = fixedAlerts.filter((a) =>
+            FilterBetweenDates(a[fixedDateField], pastDate, todayDate)
+          ))
   );
 
   //get Top 10 by criticality
@@ -192,4 +193,10 @@ function compareAlertSeverity(a: Alert, b: Alert) {
 
 function isDependancyAlert(alert: Alert): alert is DependancyAlert {
   return "security_advisory" in alert;
+}
+
+function isCodeScanningAlert(
+  alert: CodeScanningAlert | DependencyOrCodeAlert
+): alert is CodeScanningAlert {
+  return "rule" in alert && "severity" in alert.rule;
 }

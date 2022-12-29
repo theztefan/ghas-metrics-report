@@ -1,12 +1,13 @@
 import {
-  Alert,
   AlertsMetrics as AlertsMetricsType,
   DependancyAlert,
+  DependencyOrCodeAlert,
   ghasFeatures,
   reportFrequency,
 } from "../types/common/main";
-import { AlertsMetrics, createUrlLink, DependabotAlerts } from "../utils";
+import { AlertsMetrics, createUrlLink } from "../utils";
 import { Feature } from "./Feature";
+import { DependabotAlerts } from "../github/DependabotAlerts";
 
 export class Dependabot implements Feature {
   name: ghasFeatures = "dependabot";
@@ -22,13 +23,13 @@ export class Dependabot implements Feature {
     "Link",
   ];
 
-  async alerts(org: string, repo: string): Promise<Alert[]> {
+  async alerts(org: string, repo: string): Promise<DependencyOrCodeAlert[]> {
     return await DependabotAlerts(org, repo);
   }
 
   async alertsMetrics(
     frequency: reportFrequency,
-    alerts: Alert[]
+    alerts: DependencyOrCodeAlert[]
   ): Promise<AlertsMetricsType> {
     this.metrics = AlertsMetrics(alerts, frequency, "fixed_at", "fixed", false);
 
@@ -45,5 +46,12 @@ export class Dependabot implements Feature {
       a.security_advisory?.cvss?.vector_string || "",
       createUrlLink(a.html_url, "Link"),
     ]);
+  }
+
+  printable(): { prettyName: string; metrics: AlertsMetricsType } {
+    return {
+      prettyName: this.prettyName,
+      metrics: this.metrics,
+    };
   }
 }

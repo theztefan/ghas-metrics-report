@@ -1,16 +1,11 @@
+import { SecretScanningAlerts } from "../github/SecretScanningAlerts";
 import {
-  Alert,
   AlertsMetrics as AlertsMetricsType,
   ghasFeatures,
   reportFrequency,
   SecretScanningAlert,
 } from "../types/common/main";
-import {
-  AlertsMetrics,
-  createUrlLink,
-  GetCommitDate,
-  SecretScanningAlerts,
-} from "../utils";
+import { AlertsMetrics, createUrlLink, GetCommitDate } from "../utils";
 import { Feature } from "./Feature";
 
 export class SecretScanning implements Feature {
@@ -25,13 +20,13 @@ export class SecretScanning implements Feature {
     "Link",
   ];
 
-  async alerts(org: string, repo: string): Promise<Alert[]> {
+  async alerts(org: string, repo: string): Promise<SecretScanningAlert[]> {
     return await SecretScanningAlerts(org, repo);
   }
 
   async alertsMetrics(
     frequency: reportFrequency,
-    alerts: Alert[],
+    alerts: SecretScanningAlert[],
     org: string,
     repo: string
   ): Promise<AlertsMetricsType> {
@@ -57,5 +52,12 @@ export class SecretScanning implements Feature {
       (a.push_protection_bypassed as boolean) ? "True" : "False",
       createUrlLink(a.html_url, "Link"),
     ]);
+  }
+
+  printable(): { prettyName: string; metrics: AlertsMetricsType } {
+    return {
+      prettyName: this.prettyName,
+      metrics: this.metrics,
+    };
   }
 }
