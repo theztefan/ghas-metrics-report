@@ -131,7 +131,8 @@ const run = async (): Promise<void> => {
       case "json":
         JSONReport.write("ghas-report.json", JSON.stringify(output, null, 2));
         break;
-      case "pdf" || "html":
+      case "pdf":
+      case "html":
         report = format === "pdf" ? new PDFReport() : new SummaryReport();
         report.prepare();
 

@@ -23,6 +23,11 @@ export class PDFReport implements Report {
   }
 
   addHeader(title: string): void {
+    if (this.pdf.getNumberOfPages() !== 1) {
+      this.pdf.addPage();
+      this.position = 20;
+    }
+
     this.pdf.setFontSize(20);
     this.pdf.text(title, 60, this.jumpAndUsePosition());
   }
@@ -34,8 +39,7 @@ export class PDFReport implements Report {
     tableHeaders: string[],
     tableBody: unknown[]
   ): void {
-    console.log("aaaaaa", this.pdf.getNumberOfPages(), this.position);
-    if (this.pdf.getNumberOfPages() !== 1) this.position = 20;
+    if (this.pdf.getNumberOfPages() !== 1) this.position = 30;
 
     this.pdf.setFontSize(20);
     this.pdf.text(name, 10, this.jumpAndUsePosition());

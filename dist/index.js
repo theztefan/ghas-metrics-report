@@ -42322,13 +42322,16 @@ class PDFReport {
         this.position = 30;
     }
     addHeader(title) {
+        if (this.pdf.getNumberOfPages() !== 1) {
+            this.pdf.addPage();
+            this.position = 20;
+        }
         this.pdf.setFontSize(20);
         this.pdf.text(title, 60, this.jumpAndUsePosition());
     }
     addSection(name, heading, list, tableHeaders, tableBody) {
-        console.log("aaaaaa", this.pdf.getNumberOfPages(), this.position);
         if (this.pdf.getNumberOfPages() !== 1)
-            this.position = 20;
+            this.position = 30;
         this.pdf.setFontSize(20);
         this.pdf.text(name, 10, this.jumpAndUsePosition());
         this.pdf.setFontSize(10);
@@ -42480,7 +42483,8 @@ const run = async () => {
             case "json":
                 JSONReport.write("ghas-report.json", JSON.stringify(output, null, 2));
                 break;
-            case "pdf" || 0:
+            case "pdf":
+            case "html":
                 report = format === "pdf" ? new PDFReport() : new SummaryReport();
                 report.prepare();
                 sections.forEach((content, key) => {
