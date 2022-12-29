@@ -16,7 +16,6 @@ export class SecretScanning implements Feature {
     "SecretType",
     "Found at",
     "Push Protection Bypass",
-    "Patched version",
     "Link",
   ];
 
