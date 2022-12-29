@@ -19,5 +19,4 @@ export interface Feature {
     repo?: string
   ): Promise<AlertsMetricsType>;
   summaryTop10(): string[][];
-  printable(): { prettyName: string; metrics: AlertsMetricsType };
 }

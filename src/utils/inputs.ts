@@ -32,9 +32,11 @@ export const inputs = async (): Promise<inputsReturned> => {
         required: true,
       })) as reportFrequency;
 
-    const outputFormatString = core.getInput("output-format", {
-      required: true,
-    });
+    const outputFormatString =
+      (process.env.OUTPUT_FORMAT as string) ||
+      core.getInput("output-format", {
+        required: true,
+      });
     const outputFormat: outputFormat[] = outputFormatString
       .replace(/\s/g, "")
       .toLowerCase()

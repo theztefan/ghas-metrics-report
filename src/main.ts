@@ -14,7 +14,12 @@ import {
   addPDFHeader,
   getPDF,
 } from "./utils";
-import { Alert, AlertsMetrics, Report } from "./types/common/main";
+import {
+  Alert,
+  AlertsMetrics,
+  Report,
+  ReportContent,
+} from "./types/common/main";
 import { randomUUID } from "crypto";
 import { Context } from "./context/Context";
 import {
@@ -22,6 +27,7 @@ import {
   getRepositoriesForOrg,
   getRepositoriesForTeamAsAdmin,
 } from "./github/Repositories";
+import { Feature } from "./context/Feature";
 
 const run = async (): Promise<void> => {
   // get inputs
@@ -91,7 +97,7 @@ const run = async (): Promise<void> => {
 
       core.info(`[✅] ${context.prettyName} metrics calculated`);
 
-      features.push(context.feature.printable());
+      features.push(context.feature);
     }
 
     output.repositories.push({
@@ -109,35 +115,43 @@ const run = async (): Promise<void> => {
     core.info(`[✅] JSON Report written to file`);
   }
 
-  const sections: Map<
-    string,
-    [string, string, string[], string[], string[][]]
-  > = new Map();
+  const sections: Map<string, ReportContent[]> = new Map();
   output.repositories.forEach((repository) => {
-    repository.features.forEach((feature) =>
-      sections.set(`${repository.owner}/${repository.name}`, [
-        feature.prettyName,
-        `${feature.prettyName} - top 10`,
-        [
+    sections.set(`${repository.owner}/${repository.name}`, []);
+
+    repository.features.forEach((feature: Feature) =>
+      sections.get(`${repository.owner}/${repository.name}`).push({
+        name: feature.prettyName,
+        heading: `${feature.prettyName} - top 10`,
+        list: [
           `Open Alerts: ${feature.metrics?.openVulnerabilities}`,
           `Fixed in the past X days: ${feature.metrics?.fixedLastXDays}`,
           `Frequency: ${inputs.frequency}`,
           "MTTR: " + secondsToReadable(feature.metrics?.mttr.mttr),
           "MTTD: " + secondsToReadable(feature.metrics?.mttd?.mttd) || "N/A",
         ],
-        feature.attributes,
-        feature.summaryTop10(),
-      ])
+        tableHeaders: feature.attributes,
+        tableBody: feature.summaryTop10(),
+      })
     );
   });
 
   if (inputs.outputFormat.includes("pdf")) {
     preparePDF();
 
-    sections.forEach((section, key) => {
+    sections.forEach((content, key) => {
       addPDFHeader(`Repository ${key}`);
-      addPDFSection(...section);
-      addPDFSectionBreak();
+
+      content.forEach((section) => {
+        addPDFSection(
+          section.name,
+          section.heading,
+          section.list,
+          section.tableHeaders,
+          section.tableBody
+        );
+        addPDFSectionBreak();
+      });
     });
 
     writeReportToPdf("ghas-report.pdf", getPDF());
@@ -147,9 +161,17 @@ const run = async (): Promise<void> => {
   if (process.env.RUN_USING_ACT !== "true") {
     prepareSummary();
 
-    sections.forEach((section, key) => {
+    sections.forEach((content, key) => {
       addSummaryHeader(`Repository ${key}`);
-      addSummarySection(...section);
+      content.forEach((section) =>
+        addSummarySection(
+          section.name,
+          section.heading,
+          section.list,
+          section.tableHeaders,
+          section.tableBody
+        )
+      );
     });
 
     core.summary.write();

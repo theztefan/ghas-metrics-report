@@ -47,11 +47,4 @@ export class Dependabot implements Feature {
       createUrlLink(a.html_url, "Link"),
     ]);
   }
-
-  printable(): { prettyName: string; metrics: AlertsMetricsType } {
-    return {
-      prettyName: this.prettyName,
-      metrics: this.metrics,
-    };
-  }
 }

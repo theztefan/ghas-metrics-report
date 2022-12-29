@@ -123,4 +123,5 @@ out
 .yarn/install-state.gz
 .pnp.*
 
-output.json
+ghas-report.json
+ghas-report.pdf

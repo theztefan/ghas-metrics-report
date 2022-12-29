@@ -61,8 +61,9 @@ export function addPDFSection(
   tableHeaders: string[],
   tableBody: unknown[]
 ): jsPDF {
+  console.log("aaaaaa", position);
   position += 10;
-  pdf.text(name, 10, this.position);
+  pdf.text(name, 10, position);
 
   list.forEach((entry) => {
     pdf.text(entry, 10, position);
