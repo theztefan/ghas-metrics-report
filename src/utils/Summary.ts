@@ -61,7 +61,6 @@ export function addPDFSection(
   tableHeaders: string[],
   tableBody: unknown[]
 ): jsPDF {
-  console.log("aaaaaa", position);
   position += 10;
   pdf.text(name, 10, position);
 
@@ -90,15 +89,15 @@ export function addPDFSection(
       valign: "middle",
       cellWidth: "wrap",
     },
-    // columnStyles: {
-    //   0: { cellWidth: 50 },
-    //   1: { cellWidth: 20 },
-    //   2: { cellWidth: 50 },
-    //   3: { cellWidth: 20 },
-    //   4: { cellWidth: 20 },
-    //   5: { cellWidth: 20 },
-    //   6: { cellWidth: 20 },
-    // },
+    columnStyles: {
+      0: { cellWidth: 50 },
+      1: { cellWidth: 20 },
+      2: { cellWidth: 50 },
+      3: { cellWidth: 20 },
+      4: { cellWidth: 20 },
+      5: { cellWidth: 20 },
+      6: { cellWidth: 20 },
+    },
   });
 
   return pdf;

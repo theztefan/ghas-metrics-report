@@ -41813,9 +41813,10 @@ const inputs_inputs = async () => {
             core.getInput("frequency", {
                 required: true,
             }));
-        const outputFormatString = core.getInput("output-format", {
-            required: true,
-        });
+        const outputFormatString = process.env.OUTPUT_FORMAT ||
+            core.getInput("output-format", {
+                required: true,
+            });
         const outputFormat = outputFormatString
             .replace(/\s/g, "")
             .toLowerCase()
@@ -41934,7 +41935,7 @@ function addPDFHeader(title) {
 }
 function addPDFSection(name, heading, list, tableHeaders, tableBody) {
     position += 10;
-    pdf.text(name, 10, this.position);
+    pdf.text(name, 10, position);
     list.forEach((entry) => {
         pdf.text(entry, 10, position);
         position += 10;
@@ -41958,15 +41959,15 @@ function addPDFSection(name, heading, list, tableHeaders, tableBody) {
             valign: "middle",
             cellWidth: "wrap",
         },
-        // columnStyles: {
-        //   0: { cellWidth: 50 },
-        //   1: { cellWidth: 20 },
-        //   2: { cellWidth: 50 },
-        //   3: { cellWidth: 20 },
-        //   4: { cellWidth: 20 },
-        //   5: { cellWidth: 20 },
-        //   6: { cellWidth: 20 },
-        // },
+        columnStyles: {
+            0: { cellWidth: 50 },
+            1: { cellWidth: 20 },
+            2: { cellWidth: 50 },
+            3: { cellWidth: 20 },
+            4: { cellWidth: 20 },
+            5: { cellWidth: 20 },
+            6: { cellWidth: 20 },
+        },
     });
     return pdf;
 }
@@ -42206,12 +42207,6 @@ class SecretScanning {
             createUrlLink(a.html_url, "Link"),
         ]);
     }
-    printable() {
-        return {
-            prettyName: this.prettyName,
-            metrics: this.metrics,
-        };
-    }
 }
 
 ;// CONCATENATED MODULE: ./src/github/DependabotAlerts.ts
@@ -42270,12 +42265,6 @@ class Dependabot {
             createUrlLink(a.html_url, "Link"),
         ]);
     }
-    printable() {
-        return {
-            prettyName: this.prettyName,
-            metrics: this.metrics,
-        };
-    }
 }
 
 ;// CONCATENATED MODULE: ./src/github/CodeScanningAlerts.ts
@@ -42330,12 +42319,6 @@ class CodeScanning {
             a.most_recent_instance?.location.path || "",
             createUrlLink(a.html_url, "Link"),
         ]);
-    }
-    printable() {
-        return {
-            prettyName: this.prettyName,
-            metrics: this.metrics,
-        };
     }
 }
 
@@ -42455,7 +42438,7 @@ const run = async () => {
             core.debug(`[🔎] ${context.prettyName} - MTTD: ` +
                 JSON.stringify(metrics.mttd?.mttd));
             core.info(`[✅] ${context.prettyName} metrics calculated`);
-            features.push(context.feature.printable());
+            features.push(context.feature);
         }
         output.repositories.push({
             owner: inputs.org,
@@ -42471,35 +42454,38 @@ const run = async () => {
     }
     const sections = new Map();
     output.repositories.forEach((repository) => {
-        repository.features.forEach((feature) => sections.set(`${repository.owner}/${repository.name}`, [
-            feature.prettyName,
-            `${feature.prettyName} - top 10`,
-            [
+        sections.set(`${repository.owner}/${repository.name}`, []);
+        repository.features.forEach((feature) => sections.get(`${repository.owner}/${repository.name}`).push({
+            name: feature.prettyName,
+            heading: `${feature.prettyName} - top 10`,
+            list: [
                 `Open Alerts: ${feature.metrics?.openVulnerabilities}`,
                 `Fixed in the past X days: ${feature.metrics?.fixedLastXDays}`,
                 `Frequency: ${inputs.frequency}`,
                 "MTTR: " + secondsToReadable(feature.metrics?.mttr.mttr),
                 "MTTD: " + secondsToReadable(feature.metrics?.mttd?.mttd) || 0,
             ],
-            feature.attributes,
-            feature.summaryTop10(),
-        ]));
+            tableHeaders: feature.attributes,
+            tableBody: feature.summaryTop10(),
+        }));
     });
     if (inputs.outputFormat.includes("pdf")) {
         preparePDF();
-        sections.forEach((section, key) => {
+        sections.forEach((content, key) => {
             addPDFHeader(`Repository ${key}`);
-            addPDFSection(...section);
-            addPDFSectionBreak();
+            content.forEach((section) => {
+                addPDFSection(section.name, section.heading, section.list, section.tableHeaders, section.tableBody);
+                addPDFSectionBreak();
+            });
         });
         preparePdfAndWriteToFile("ghas-report.pdf", getPDF());
         core.info(`[✅] PDF Report written to file`);
     }
     if (process.env.RUN_USING_ACT !== "true") {
         prepareSummary();
-        sections.forEach((section, key) => {
+        sections.forEach((content, key) => {
             addSummaryHeader(`Repository ${key}`);
-            addSummarySection(...section);
+            content.forEach((section) => addSummarySection(section.name, section.heading, section.list, section.tableHeaders, section.tableBody));
         });
         core.summary.write();
         core.info(`[✅] Report written to summary`);
