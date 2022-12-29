@@ -1,7 +1,15 @@
 import { inputs } from "./inputs";
 import { GetCommitDate } from "./CommitUtils";
-import { preparePdf } from "./Summary";
-import { prepareSummary, addSummarySection } from "./Summary";
+import {
+  preparePDF,
+  addPDFSectionBreak,
+  addPDFHeader,
+  addPDFSection,
+  getPDF,
+  prepareSummary,
+  addSummaryHeader,
+  addSummarySection,
+} from "./Summary";
 import {
   AlertsMetrics,
   PrintAlertsMetrics,
@@ -17,8 +25,13 @@ export {
   CalculateMTTR,
   syncWriteFile,
   prepareSummary,
-  preparePdf,
+  addSummaryHeader,
   addSummarySection,
+  preparePDF,
+  addPDFSectionBreak,
+  addPDFHeader,
+  addPDFSection,
+  getPDF,
   GetCommitDate,
   preparePdfAndWriteToFile,
   secondsToReadable,

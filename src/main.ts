@@ -5,14 +5,18 @@ import {
   syncWriteFile as writeReportToFile,
   preparePdfAndWriteToFile as writeReportToPdf,
   prepareSummary,
-  preparePdf,
+  preparePDF,
+  addPDFSection,
+  addPDFSectionBreak,
   secondsToReadable,
+  addSummaryHeader,
+  addSummarySection,
+  addPDFHeader,
+  getPDF,
 } from "./utils";
 import { Alert, AlertsMetrics, Report } from "./types/common/main";
 import { randomUUID } from "crypto";
 import { Context } from "./context/Context";
-import * as fs from "fs";
-import { addHeader, addSummarySection } from "./utils/Summary";
 import {
   getRepository,
   getRepositoriesForOrg,
@@ -105,32 +109,47 @@ const run = async (): Promise<void> => {
     core.info(`[✅] JSON Report written to file`);
   }
 
+  const sections: Map<
+    string,
+    [string, string, string[], string[], string[][]]
+  > = new Map();
+  output.repositories.forEach((repository) => {
+    repository.features.forEach((feature) =>
+      sections.set(`${repository.owner}/${repository.name}`, [
+        feature.prettyName,
+        `${feature.prettyName} - top 10`,
+        [
+          `Open Alerts: ${feature.metrics?.openVulnerabilities}`,
+          `Fixed in the past X days: ${feature.metrics?.fixedLastXDays}`,
+          `Frequency: ${inputs.frequency}`,
+          "MTTR: " + secondsToReadable(feature.metrics?.mttr.mttr),
+          "MTTD: " + secondsToReadable(feature.metrics?.mttd?.mttd) || "N/A",
+        ],
+        feature.attributes,
+        feature.summaryTop10(),
+      ])
+    );
+  });
+
   if (inputs.outputFormat.includes("pdf")) {
-    writeReportToPdf("ghas-report.pdf", preparePdf(output));
+    preparePDF();
+
+    sections.forEach((section, key) => {
+      addPDFHeader(`Repository ${key}`);
+      addPDFSection(...section);
+      addPDFSectionBreak();
+    });
+
+    writeReportToPdf("ghas-report.pdf", getPDF());
     core.info(`[✅] PDF Report written to file`);
   }
 
   if (process.env.RUN_USING_ACT !== "true") {
     prepareSummary();
 
-    output.repositories.forEach((repository) => {
-      addHeader(`Repository ${repository.owner}/${repository.name}`);
-  
-      repository.features.forEach((feature) =>
-        addSummarySection(
-          feature.prettyName,
-          `${feature.prettyName} - top 10`,
-          [
-            `Open Alerts: ${feature.metrics?.openVulnerabilities}`,
-            `Fixed in the past X days: ${feature.metrics?.fixedLastXDays}`,
-            `Frequency: ${inputs.frequency}`,
-            "MTTR: " + secondsToReadable(feature.metrics?.mttr.mttr),
-            "MTTD: " + secondsToReadable(feature.metrics?.mttd?.mttd) || "N/A",
-          ],
-          feature.attributes,
-          feature.summaryTop10()
-        )
-      );
+    sections.forEach((section, key) => {
+      addSummaryHeader(`Repository ${key}`);
+      addSummarySection(...section);
     });
 
     core.summary.write();
