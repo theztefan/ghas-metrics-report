@@ -4,12 +4,13 @@ import { CodeScanningAlerts } from "./CodeScanningAlerts";
 import { SecretScanningAlerts } from "./SecretScanningAlerts";
 import { GetCommitDate } from "./CommitUtils";
 import { prepareSummary } from "./Summary";
+import { preparePdf } from "./Summary";
 import {
   AlertsMetrics,
   PrintAlertsMetrics,
   CalculateMTTR,
 } from "./AlertMetrics";
-import { syncWriteFile } from "./files";
+import { syncWriteFile, preparePdfAndWriteToFile } from "./files";
 
 export {
   inputs,
@@ -21,5 +22,7 @@ export {
   CalculateMTTR,
   syncWriteFile,
   prepareSummary,
+  preparePdf,
   GetCommitDate,
+  preparePdfAndWriteToFile,
 };
