@@ -19,8 +19,8 @@ The report will include the following metrics for Dependabot, Code Scanning and 
 
 This Action can be executed as a script with `npx`. In order to do that:
 1. copy `.env.sample` to a new `.env` file and replace the variables with the desired values.
-2. Keep both GITHUB_ACTION and LOCAL variables as `true`
-3. The output will be written to `output.json` file
+2. Keep both GITHUB_ACTION and RUN_USING_ACT variables as `true`
+3. The output will be written to `json` or `pdf` files
 
 ## Usage
 
