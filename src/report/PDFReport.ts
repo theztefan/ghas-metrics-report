@@ -29,7 +29,7 @@ export class PDFReport implements Report {
     }
 
     this.pdf.setFontSize(20);
-    this.pdf.text(title, 60, this.jumpAndUsePosition());
+    this.pdf.text(title, 10, this.jumpAndUsePosition());
   }
 
   addSection(
