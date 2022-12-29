@@ -4,15 +4,15 @@ import { Octokit } from "@octokit/action";
 export const GetCommitDate = async (
   owner: string,
   repository: string,
-  alerts: any[],
+  alerts: unknown[],
   commitShaField: string
-): Promise<any[]> => {
+): Promise<unknown[]> => {
   try {
     for (const alert of alerts) {
-      const commitsSha = commitShaField
+      const commitsSha: string[] | string = commitShaField
         .split(".")
         .filter((s) => s)
-        .reduce((acc, val) => acc && acc[val], alert);
+        .reduce((acc, val) => acc && acc[val], alert) as string[] | string;
 
       if (commitsSha instanceof Array) {
         for (const commitSha of commitsSha) {
@@ -40,7 +40,7 @@ export const GetCommitData = async (
   owner: string,
   repository: string,
   commitSha: string
-): Promise<any> => {
+): Promise<{ commit: { author: { date: string } } }> => {
   const octokit = new Octokit();
 
   const { data: commitData } = await octokit.request(

@@ -3,65 +3,52 @@ import {
   DependancyAlert,
   CodeScanningAlert,
   reportFrequency,
+  AlertsMetrics as AlertsMetricsType,
+  MTTRMetrics,
+  MTTDMetrics,
+  DependencyOrCodeAlert,
+  Alert,
 } from "../types/common/main";
 
-// Metrics
-interface AlertsMetrics {
-  fixedLastXDays: number;
-  openVulnerabilities: number;
-  top10: any[];
-  mttr: MTTRMetrics;
-  mttd?: MTTDMetrics;
-}
-interface MTTRMetrics {
-  mttr: number;
-  count: number;
-}
-interface MTTDMetrics {
-  mttd: number;
-}
-
 export const AlertsMetrics = (
-  alerts: any[],
+  alerts: Alert[],
   frequency: reportFrequency,
   fixedDateField: string,
   state: string,
   calculateMTTD: boolean,
   introducedDateField?: string,
   detectedDateField?: string
-): AlertsMetrics => {
-  const todayDate = new Date();
+): AlertsMetricsType => {
+  const todayDate: Date = new Date();
   todayDate.setHours(0, 0, 0, 0);
-  const today = todayDate.getDate();
 
   const fixedAlerts = alerts.filter((a) => a.state === state);
 
   let fixedLastXDays = [];
 
+  const pastDate = new Date();
+  pastDate.setHours(0, 0, 0, 0);
   if (frequency === "daily") {
-    const yesterdayDate = new Date();
-    yesterdayDate.setHours(0, 0, 0, 0);
-    const yesterday = yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-    fixedLastXDays = fixedAlerts.filter((a) =>
-      FilterBetweenDates(a[fixedDateField], yesterday, today)
-    );
+    pastDate.setDate(pastDate.getDate() - 1);
   } else if (frequency === "weekly") {
-    const lastWeekDate = new Date();
-    lastWeekDate.setHours(0, 0, 0, 0);
-    const lastWeek = lastWeekDate.setDate(lastWeekDate.getDate() - 7);
-
-    fixedLastXDays = fixedAlerts.filter((a) =>
-      FilterBetweenDates(a[fixedDateField], lastWeek, today)
-    );
+    pastDate.setDate(pastDate.getDate() - 7);
   } else if (frequency === "monthly") {
-    const lastMonthDate = new Date();
-    lastMonthDate.setHours(0, 0, 0, 0);
-    const lastMonth = lastMonthDate.setMonth(lastMonthDate.getMonth() - 1);
-    core.debug(`last Month: ` + lastMonth);
-    fixedLastXDays = fixedAlerts.filter((a) =>
-      FilterBetweenDates(a.dismissed_at, lastMonth, today)
-    );
+    pastDate.setMonth(pastDate.getMonth() - 1);
   }
+
+  core.debug(`past date: ` + pastDate);
+  fixedLastXDays = fixedAlerts.filter(
+    (a: CodeScanningAlert | DependencyOrCodeAlert) =>
+      !isCodeScanningAlert(a)
+        ? FilterBetweenDates(
+            (a as DependencyOrCodeAlert).dismissed_at,
+            pastDate,
+            todayDate
+          )
+        : (fixedLastXDays = fixedAlerts.filter((a) =>
+            FilterBetweenDates(a[fixedDateField], pastDate, todayDate)
+          ))
+  );
 
   //get Top 10 by criticality
   const openAlerts = alerts.filter((a) => a.state === "open");
@@ -72,10 +59,14 @@ export const AlertsMetrics = (
 
   let mttd = undefined;
   if (calculateMTTD) {
-    mttd = CalculateMTTD(alerts, introducedDateField!, detectedDateField!);
+    mttd = CalculateMTTD(
+      alerts as DependencyOrCodeAlert[],
+      introducedDateField,
+      detectedDateField
+    );
   }
 
-  const result: AlertsMetrics = {
+  const result: AlertsMetricsType = {
     fixedLastXDays: fixedLastXDays.length,
     openVulnerabilities: alerts.filter((a) => a.state === "open").length,
     top10: top10Alerts,
@@ -88,18 +79,18 @@ export const AlertsMetrics = (
 
 export const PrintAlertsMetrics = (
   category: string,
-  alertsMetrics: AlertsMetrics
+  alertsMetrics: AlertsMetricsType
 ): void => {
   for (const metric in alertsMetrics) {
     core.debug(
       `[🔎] ${category} - ${metric}: ` +
-        alertsMetrics[metric as keyof AlertsMetrics]
+        alertsMetrics[metric as keyof AlertsMetricsType]
     );
   }
 };
 
 export const CalculateMTTR = (
-  alerts: any[],
+  alerts: Alert[],
   dateField: string,
   state: string
 ): MTTRMetrics => {
@@ -124,7 +115,7 @@ export const CalculateMTTR = (
 };
 
 export const CalculateMTTD = (
-  alerts: any[],
+  alerts: DependencyOrCodeAlert[],
   introducedDateField: string,
   detectedDateField: string
 ): MTTDMetrics => {
@@ -160,14 +151,14 @@ export const CalculateMTTD = (
 
 const FilterBetweenDates = (
   stringDate: string,
-  minDate: number,
-  maxDate: number
+  minDate: Date,
+  maxDate: Date
 ): boolean => {
   const date: number = Date.parse(stringDate);
-  return date >= minDate && date < maxDate;
+  return date >= minDate.getTime() && date < maxDate.getTime();
 };
 
-function compareAlertSeverity(a: any, b: any) {
+function compareAlertSeverity(a: Alert, b: Alert) {
   //critical, high, medium, low, warning, note, error
   const weight: { [key: string]: number } = {
     critical: 7,
@@ -183,14 +174,12 @@ function compareAlertSeverity(a: any, b: any) {
   let severity1 = "none";
   let severity2 = "none";
 
-  // different comparisons depending on alert type alerts
-  if (isDependancyAlert(a) && isDependancyAlert(b)) {
-    severity1 = a.security_advisory.severity.toLowerCase();
-    severity2 = b.security_advisory.severity.toLowerCase();
-  } else if (isCodeScanningAlert(a) && isCodeScanningAlert(b)) {
-    severity1 = a.rule.severity.toLowerCase();
-    severity2 = b.rule.severity.toLowerCase();
-  }
+  severity1 = isDependancyAlert(a)
+    ? a.security_advisory.severity.toLowerCase()
+    : (a as CodeScanningAlert).rule?.severity.toLowerCase();
+  severity2 = isDependancyAlert(b)
+    ? b.security_advisory.severity.toLowerCase()
+    : (b as CodeScanningAlert).rule?.severity.toLowerCase();
 
   if (weight[severity1] < weight[severity2]) {
     comparison = 1;
@@ -201,11 +190,12 @@ function compareAlertSeverity(a: any, b: any) {
   return comparison;
 }
 
-function isDependancyAlert(alert: DependancyAlert): alert is DependancyAlert {
+function isDependancyAlert(alert: Alert): alert is DependancyAlert {
   return "security_advisory" in alert;
 }
+
 function isCodeScanningAlert(
-  alert: CodeScanningAlert
+  alert: CodeScanningAlert | DependencyOrCodeAlert
 ): alert is CodeScanningAlert {
   return "rule" in alert && "severity" in alert.rule;
 }

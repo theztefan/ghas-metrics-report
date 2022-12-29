@@ -1,19 +1,33 @@
 import * as core from "@actions/core";
 import {
   inputs as getInput,
-  DependabotAlerts,
-  CodeScanningAlerts,
-  SecretScanningAlerts,
-  AlertsMetrics,
   PrintAlertsMetrics,
   syncWriteFile as writeReportToFile,
   preparePdfAndWriteToFile as writeReportToPdf,
   prepareSummary,
-  preparePdf,
-  GetCommitDate,
+  preparePDF,
+  addPDFSection,
+  addPDFSectionBreak,
+  secondsToReadable,
+  addSummaryHeader,
+  addSummarySection,
+  addPDFHeader,
+  getPDF,
 } from "./utils";
-import { Report } from "./types/common/main";
+import {
+  Alert,
+  AlertsMetrics,
+  Report,
+  ReportContent,
+} from "./types/common/main";
 import { randomUUID } from "crypto";
+import { Context } from "./context/Context";
+import {
+  getRepository,
+  getRepositoriesForOrg,
+  getRepositoriesForTeamAsAdmin,
+} from "./github/Repositories";
+import { Feature } from "./context/Feature";
 
 const run = async (): Promise<void> => {
   // get inputs
@@ -21,107 +35,78 @@ const run = async (): Promise<void> => {
   core.debug(`[✅] Inputs parsed]`);
 
   const id = randomUUID();
+
+  const repositories = [];
+  if (inputs.team) {
+    core.info(
+      `[🔎] Fetching repositories for team ${inputs.team} in org ${inputs.org}`
+    );
+    repositories.push(
+      ...(await getRepositoriesForTeamAsAdmin(inputs.org, inputs.team))
+    );
+  } else if (inputs.repo) {
+    core.info(`[🔎] Fetching repository ${inputs.repo} in org ${inputs.org}`);
+    repositories.push(await getRepository(inputs.org, inputs.repo));
+  } else {
+    core.info(`[🔎] Fetching repositories for org ${inputs.org}`);
+    repositories.push(...(await getRepositoriesForOrg(inputs.org)));
+  }
+
+  core.info(`[✅] Repositories fetched`);
+  core.info(`[🔎] Found ${repositories.length} repositories`);
+
   const output: Report = {
     id: id,
     created_at: new Date().toISOString(),
     inputs: inputs,
-    dependabot_metrics: null,
-    code_scanning_metrics: null,
-    secret_scanning_metrics: null,
-  };
+    repositories: [],
+  } as Report;
 
-  // get dependabot alerts
-  if (inputs.features.includes("dependabot")) {
-    const dependabotRes = await DependabotAlerts(inputs.org, inputs.repo);
-    core.debug(`[🔎] Dependabot alerts: ` + dependabotRes.length);
-    core.info(`[✅] Dependabot alerts fetched`);
+  for (const repository of repositories) {
+    core.info(`[🔎] Fetching alerts for repository ${repository.name}`);
+    const features = [];
+    for (const feature of inputs.features) {
+      const context = new Context(feature);
+      core.info(`[🔎] Fetching ${context.prettyName} alerts`);
 
-    const dependabotAlertsMetrics = AlertsMetrics(
-      dependabotRes,
-      inputs.frequency,
-      "fixed_at",
-      "fixed",
-      false
-    );
-    PrintAlertsMetrics("Dependabot", dependabotAlertsMetrics);
-    core.debug(`[🔎] Dependabot - MTTR: ` + dependabotAlertsMetrics.mttr.mttr);
-    core.info(`[✅] Dependabot metrics calculated`);
-    output.dependabot_metrics = dependabotAlertsMetrics;
+      const alerts: Alert[] = await context.alerts(
+        inputs.org as string,
+        repository.name
+      );
+
+      core.debug(`[🔎] ${context.prettyName} alerts: ` + alerts.length);
+      core.info(`[✅] ${context.prettyName} alerts fetched`);
+
+      const metrics: AlertsMetrics = await context.alertsMetrics(
+        inputs.frequency,
+        alerts,
+        inputs.org as string,
+        repository.name
+      );
+
+      PrintAlertsMetrics(`${context.prettyName}`, metrics);
+
+      core.debug(
+        `[🔎] ${context.prettyName} - MTTR: ` +
+          JSON.stringify(metrics.mttr.mttr)
+      );
+      core.debug(
+        `[🔎] ${context.prettyName} - MTTD: ` +
+          JSON.stringify(metrics.mttd?.mttd)
+      );
+
+      core.info(`[✅] ${context.prettyName} metrics calculated`);
+
+      features.push(context.feature);
+    }
+
+    output.repositories.push({
+      owner: inputs.org,
+      name: repository.name,
+      features: features,
+    });
   }
 
-  // get code scanning alerts
-  if (inputs.features.includes("code-scanning")) {
-    const codeScanningRes = await CodeScanningAlerts(inputs.org, inputs.repo);
-    core.debug(`[🔎] Code Scanning alerts: ` + codeScanningRes.length);
-    core.info(`[✅] Code Scanning alerts fetched`);
-
-    await GetCommitDate(
-      inputs.org,
-      inputs.repo,
-      codeScanningRes,
-      "most_recent_instance.commit_sha"
-    );
-
-    const codeScanningAlertsMetrics = AlertsMetrics(
-      codeScanningRes,
-      inputs.frequency,
-      "fixed_at",
-      "fixed",
-      true,
-      "commitDate",
-      "created_at"
-    );
-    PrintAlertsMetrics("Code Scanning", codeScanningAlertsMetrics);
-    core.debug(
-      `[🔎] Code Scanning - MTTR: ` + codeScanningAlertsMetrics.mttr.mttr
-    );
-    core.debug(
-      `[🔎] Code Scanning - MTTD: ` + codeScanningAlertsMetrics.mttd?.mttd
-    );
-
-    core.info(`[✅] Code Scanning metrics calculated`);
-
-    output.code_scanning_metrics = codeScanningAlertsMetrics;
-  }
-
-  // get secret scanning alerts
-  if (inputs.features.includes("secret-scanning")) {
-    const secretScanningRes = await SecretScanningAlerts(
-      inputs.org,
-      inputs.repo
-    );
-    core.debug(`[🔎] Secret Scanning alerts ` + secretScanningRes.length);
-    core.debug(`[✅] Secret Scanning alerts fetched`);
-
-    await GetCommitDate(
-      inputs.org,
-      inputs.repo,
-      secretScanningRes,
-      "commitsSha"
-    );
-
-    const secretScanningAlertsMetrics = AlertsMetrics(
-      secretScanningRes,
-      inputs.frequency,
-      "resolved_at",
-      "resolved",
-      true,
-      "commitDate",
-      "created_at"
-    );
-    PrintAlertsMetrics("Secret Scanning", secretScanningAlertsMetrics);
-    core.debug(
-      `[🔎] Secret Scanning - MTTR: ` + secretScanningAlertsMetrics.mttr.mttr
-    );
-    core.debug(
-      `[🔎] Secret Scanning - MTTD: ` + secretScanningAlertsMetrics.mttd?.mttd
-    );
-
-    core.info(`[✅] Secret scanning metrics calculated`);
-    output.secret_scanning_metrics = secretScanningAlertsMetrics;
-  }
-
-  // prepare output
   core.setOutput("report-json", JSON.stringify(output, null, 2));
   core.info(`[✅] Report written output 'report-json' variable`);
 
@@ -130,13 +115,65 @@ const run = async (): Promise<void> => {
     core.info(`[✅] JSON Report written to file`);
   }
 
+  const sections: Map<string, ReportContent[]> = new Map();
+  output.repositories.forEach((repository) => {
+    sections.set(`${repository.owner}/${repository.name}`, []);
+
+    repository.features.forEach((feature: Feature) =>
+      sections.get(`${repository.owner}/${repository.name}`).push({
+        name: feature.prettyName,
+        heading: `${feature.prettyName} - top 10`,
+        list: [
+          `Open Alerts: ${feature.metrics?.openVulnerabilities}`,
+          `Fixed in the past X days: ${feature.metrics?.fixedLastXDays}`,
+          `Frequency: ${inputs.frequency}`,
+          "MTTR: " + secondsToReadable(feature.metrics?.mttr.mttr),
+          "MTTD: " + secondsToReadable(feature.metrics?.mttd?.mttd) || "N/A",
+        ],
+        tableHeaders: feature.attributes,
+        tableBody: feature.summaryTop10(),
+      })
+    );
+  });
+
   if (inputs.outputFormat.includes("pdf")) {
-    writeReportToPdf("ghas-report.pdf", preparePdf(output));
+    preparePDF();
+
+    sections.forEach((content, key) => {
+      addPDFHeader(`Repository ${key}`);
+
+      content.forEach((section) => {
+        addPDFSection(
+          section.name,
+          section.heading,
+          section.list,
+          section.tableHeaders,
+          section.tableBody
+        );
+        addPDFSectionBreak();
+      });
+    });
+
+    writeReportToPdf("ghas-report.pdf", getPDF());
     core.info(`[✅] PDF Report written to file`);
   }
 
   if (process.env.RUN_USING_ACT !== "true") {
-    prepareSummary(output);
+    prepareSummary();
+
+    sections.forEach((content, key) => {
+      addSummaryHeader(`Repository ${key}`);
+      content.forEach((section) =>
+        addSummarySection(
+          section.name,
+          section.heading,
+          section.list,
+          section.tableHeaders,
+          section.tableBody
+        )
+      );
+    });
+
     core.summary.write();
     core.info(`[✅] Report written to summary`);
   }

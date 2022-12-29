@@ -122,3 +122,6 @@ out
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+ghas-report.json
+ghas-report.pdf

@@ -1,7 +1,10 @@
+import { Feature } from "../../context/Feature";
+
 // Inputs from configuration options
 type inputsReturned = {
-  repo: string;
-  org: string;
+  team?: string;
+  repo?: string;
+  org?: string;
   features: ghasFeatures[];
   frequency: reportFrequency;
   outputFormat: outputFormat[];
@@ -11,22 +14,70 @@ type ghasFeatures = "secret-scanning" | "dependabot" | "code-scanning";
 type reportFrequency = "weekly" | "monthly" | "daily";
 type outputFormat = "json" | "pdf" | "html";
 
-// Dependabot alerts
-export interface DependancyAlert {
+interface MTTRMetrics {
+  mttr: number;
+  count: number;
+}
+interface MTTDMetrics {
+  mttd: number;
+}
+
+export interface AlertsMetrics {
+  fixedLastXDays: number;
+  openVulnerabilities: number;
+  top10: Alert[];
+  mttr: MTTRMetrics;
+  mttd?: MTTDMetrics;
+}
+
+// Base alerts
+export interface Alert {
   number: number;
+  created_at: string;
+  updated_at: string;
+  url: string;
   state: string;
+  html_url: string;
+}
+
+// Common to Dependabot and Code Scanning alerts
+export interface DependencyOrCodeAlert extends Alert {
+  dismissed_by: DismissedBy;
+  dismissed_at: string;
+  dismissed_reason: string;
+  dismissed_comment: string;
+  fixed_at: string;
+}
+
+// Dependabot alerts
+export interface DependancyAlert extends DependencyOrCodeAlert {
   dependency: Dependency;
   security_advisory: SecurityAdvisory;
   security_vulnerability: SecurityVulnerability;
-  url: string;
-  html_url: string;
-  created_at: string;
-  updated_at: string;
-  dismissed_at: any;
-  dismissed_by: any;
-  dismissed_reason: any;
-  dismissed_comment: any;
-  fixed_at: any;
+}
+
+// Code scanning alerts
+export interface CodeScanningAlert extends Alert {
+  rule: Rule;
+  tool: Tool;
+  most_recent_instance: MostRecentInstance;
+  instances_url: string;
+}
+
+// Secret Scaning
+export interface SecretScanningAlert extends Alert {
+  locations_url: string;
+  secret_type: string;
+  secret_type_display_name: string;
+  secret: string;
+  resolution: string;
+  resolved_by: unknown;
+  resolved_at: string;
+  resolution_comment: string;
+  push_protection_bypassed: boolean;
+  push_protection_bypassed_by: unknown;
+  push_protection_bypassed_at: string;
+  commitsSha?: string[];
 }
 
 export interface Dependency {
@@ -50,7 +101,7 @@ export interface SecurityAdvisory {
   references: Reference[];
   published_at: string;
   updated_at: string;
-  withdrawn_at: any;
+  withdrawn_at: string;
   vulnerabilities: Vulnerability[];
   cvss: Cvss;
   cwes: Cwe[];
@@ -82,7 +133,7 @@ export interface FirstPatchedVersion {
 }
 
 export interface Cvss {
-  vector_string: any;
+  vector_string: string;
   score: number;
 }
 
@@ -105,25 +156,6 @@ export interface Package3 {
 
 export interface FirstPatchedVersion2 {
   identifier: string;
-}
-
-// Code scanning alerts
-export interface CodeScanningAlert {
-  number: number;
-  created_at: string;
-  updated_at: string;
-  url: string;
-  html_url: string;
-  state: string;
-  fixed_at: any;
-  dismissed_by: DismissedBy;
-  dismissed_at: string;
-  dismissed_reason: string;
-  dismissed_comment: string;
-  rule: Rule;
-  tool: Tool;
-  most_recent_instance: MostRecentInstance;
-  instances_url: string;
 }
 
 export interface DismissedBy {
@@ -153,12 +185,11 @@ export interface Rule {
   description: string;
   name: string;
   tags: string[];
-  security_severity_level: string;
 }
 
 export interface Tool {
   name: string;
-  guid: any;
+  guid: string;
   version: string;
 }
 
@@ -171,7 +202,7 @@ export interface MostRecentInstance {
   commit_sha: string;
   message: Message;
   location: Location;
-  classifications: any[];
+  classifications: string[];
 }
 
 export interface Message {
@@ -184,28 +215,6 @@ export interface Location {
   end_line: number;
   start_column: number;
   end_column: number;
-}
-
-// Secret Scaning
-export interface SecretScanningAlert {
-  number: number;
-  created_at: string;
-  updated_at: string;
-  url: string;
-  html_url: string;
-  locations_url: string;
-  state: string;
-  secret_type: string;
-  secret_type_display_name: string;
-  secret: string;
-  resolution: any;
-  resolved_by: any;
-  resolved_at: any;
-  resolution_comment: any;
-  push_protection_bypassed: boolean;
-  push_protection_bypassed_by: any;
-  push_protection_bypassed_at: any;
-  commitsSha?: string[];
 }
 
 export interface SecretScanningLocation {
@@ -221,7 +230,17 @@ export interface Report {
   id: string;
   created_at: string;
   inputs: inputsReturned;
-  dependabot_metrics: alertMettics;
-  code_scanning_metrics: alertMettics;
-  secret_scanning_metrics: alertMettics;
+  repositories: {
+    features: Feature[];
+    owner: string;
+    name: string;
+  }[];
+}
+
+export interface ReportContent {
+  name: string;
+  heading: string;
+  list: string[];
+  tableHeaders: string[];
+  tableBody: unknown[];
 }

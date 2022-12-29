@@ -2,12 +2,14 @@ name: "Github Advanced Sceurity Metrics Report"
 author: "theztefan"
 description: "A GitHub Action to generate a report of the Advanced Security Metrics for a given repository"
 inputs:
+  team:
+    description: "The team to generate the report for. Provide it to run the action on all repositories the team is an admin of."
+    required: false
   repo:
-    description: "The repository to generate the report for"
-    required: true
-    default: srdemo-demo
+    description: "The repository to generate the report for. Provide it to run the action on a repository level for a given org."
+    required: false
   org:
-    description: "The organisation to generate the report for"
+    description: "The organisation to generate the report for. If you only provide org, the action will run on an organisation level."
     required: true
     default: advanced-security-demo
   features:
