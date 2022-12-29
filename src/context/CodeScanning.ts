@@ -1,5 +1,4 @@
 import {
-  Alert,
   AlertsMetrics as AlertsMetricsType,
   CodeScanningAlert,
   DependencyOrCodeAlert,

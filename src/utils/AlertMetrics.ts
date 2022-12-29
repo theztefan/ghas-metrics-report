@@ -9,7 +9,6 @@ import {
   DependencyOrCodeAlert,
   Alert,
 } from "../types/common/main";
-import { SecretScanningAlerts } from "../github/SecretScanningAlerts";
 
 export const AlertsMetrics = (
   alerts: Alert[],
