@@ -77,18 +77,6 @@ export const AlertsMetrics = (
   return result;
 };
 
-export const PrintAlertsMetrics = (
-  category: string,
-  alertsMetrics: AlertsMetricsType
-): void => {
-  for (const metric in alertsMetrics) {
-    core.debug(
-      `[🔎] ${category} - ${metric}: ` +
-        alertsMetrics[metric as keyof AlertsMetricsType]
-    );
-  }
-};
-
 export const CalculateMTTR = (
   alerts: Alert[],
   dateField: string,

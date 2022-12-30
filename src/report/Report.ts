@@ -8,5 +8,5 @@ export interface Report {
     tableHeaders: string[],
     tableBody: unknown[]
   ): void;
-  write(filename?: string): void;
+  write(): void;
 }

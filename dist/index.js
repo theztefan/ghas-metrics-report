@@ -41928,12 +41928,6 @@ const AlertsMetrics = (alerts, frequency, fixedDateField, state, calculateMTTD, 
     };
     return result;
 };
-const PrintAlertsMetrics = (category, alertsMetrics) => {
-    for (const metric in alertsMetrics) {
-        core.debug(`[🔎] ${category} - ${metric}: ` +
-            alertsMetrics[metric]);
-    }
-};
 const CalculateMTTR = (alerts, dateField, state) => {
     let alert_count = 0;
     let total_time_to_remediate_seconds = 0;
@@ -42308,9 +42302,14 @@ var jspdf_plugin_autotable_default = /*#__PURE__*/__nccwpck_require__.n(jspdf_pl
 class PDFReport {
     pdf;
     position;
+    filename = "ghas-report.pdf";
     jumpAndUsePosition() {
         this.position += 10;
         return this.position;
+    }
+    setFontAndWriteText(text, fontSize, xPosition, yPosition = this.jumpAndUsePosition()) {
+        this.pdf.setFontSize(fontSize);
+        this.pdf.text(text, xPosition, yPosition);
     }
     prepare() {
         this.position = 20;
@@ -42326,18 +42325,15 @@ class PDFReport {
             this.pdf.addPage();
             this.position = 20;
         }
-        this.pdf.setFontSize(20);
-        this.pdf.text(title, 10, this.jumpAndUsePosition());
+        this.setFontAndWriteText(title, 20, 10);
     }
     addSection(name, heading, list, tableHeaders, tableBody) {
         if (this.pdf.getNumberOfPages() !== 1)
             this.position = 30;
-        this.pdf.setFontSize(20);
-        this.pdf.text(name, 10, this.jumpAndUsePosition());
+        this.setFontAndWriteText(name, 20, 10);
         this.pdf.setFontSize(10);
         list.forEach((entry, index) => this.pdf.text(entry, index % 2 === 0 ? 10 : 80, index % 2 === 0 ? this.jumpAndUsePosition() : this.position));
-        this.pdf.setFontSize(15);
-        this.pdf.text(heading, 10, this.jumpAndUsePosition());
+        this.setFontAndWriteText(heading, 15, 10);
         const cellWidth = Math.ceil(178 / tableHeaders.length);
         jspdf_plugin_autotable_default()(this.pdf, {
             head: [
@@ -42363,9 +42359,9 @@ class PDFReport {
         });
         this.pdf.addPage();
     }
-    write(filename) {
+    write() {
         this.pdf.deletePage(this.pdf.getNumberOfPages());
-        const outputFilename = (0,external_path_.join)(process.env.GITHUB_WORKSPACE, filename);
+        const outputFilename = (0,external_path_.join)(process.env.GITHUB_WORKSPACE, this.filename);
         this.pdf.save(outputFilename);
         return;
     }
@@ -42443,7 +42439,6 @@ const run = async () => {
             core.debug(`[🔎] ${context.prettyName} alerts: ` + alerts.length);
             core.info(`[✅] ${context.prettyName} alerts fetched`);
             const metrics = await context.alertsMetrics(inputs.frequency, alerts, inputs.org, repository.name);
-            PrintAlertsMetrics(`${context.prettyName}`, metrics);
             core.debug(`[🔎] ${context.prettyName} - MTTR: ` +
                 JSON.stringify(metrics.mttr.mttr));
             core.debug(`[🔎] ${context.prettyName} - MTTD: ` +
@@ -42491,7 +42486,7 @@ const run = async () => {
                     report.addHeader(`Repository ${key}`);
                     content.forEach((section) => report.addSection(section.name, section.heading, section.list, section.tableHeaders, section.tableBody));
                 });
-                report.write("ghas-report.pdf");
+                report.write();
                 break;
             case "github-output":
                 core.setOutput("report-json", JSON.stringify(output, null, 2));

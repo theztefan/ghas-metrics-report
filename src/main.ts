@@ -1,9 +1,5 @@
 import * as core from "@actions/core";
-import {
-  inputs as getInput,
-  PrintAlertsMetrics,
-  secondsToReadable,
-} from "./utils";
+import { inputs as getInput, secondsToReadable } from "./utils";
 import {
   Alert,
   AlertsMetrics,
@@ -77,8 +73,6 @@ const run = async (): Promise<void> => {
         repository.name
       );
 
-      PrintAlertsMetrics(`${context.prettyName}`, metrics);
-
       core.debug(
         `[🔎] ${context.prettyName} - MTTR: ` +
           JSON.stringify(metrics.mttr.mttr)
@@ -150,7 +144,7 @@ const run = async (): Promise<void> => {
           );
         });
 
-        report.write("ghas-report.pdf");
+        report.write();
         break;
       case "github-output":
         core.setOutput("report-json", JSON.stringify(output, null, 2));

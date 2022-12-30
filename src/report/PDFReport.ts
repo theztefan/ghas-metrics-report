@@ -6,10 +6,21 @@ import { join } from "path";
 export class PDFReport implements Report {
   private pdf: jsPDF;
   private position: number;
+  private filename = "ghas-report.pdf";
 
   private jumpAndUsePosition() {
     this.position += 10;
     return this.position;
+  }
+
+  private setFontAndWriteText(
+    text: string,
+    fontSize: number,
+    xPosition,
+    yPosition = this.jumpAndUsePosition()
+  ) {
+    this.pdf.setFontSize(fontSize);
+    this.pdf.text(text, xPosition, yPosition);
   }
 
   prepare(): void {
@@ -28,8 +39,7 @@ export class PDFReport implements Report {
       this.position = 20;
     }
 
-    this.pdf.setFontSize(20);
-    this.pdf.text(title, 10, this.jumpAndUsePosition());
+    this.setFontAndWriteText(title, 20, 10);
   }
 
   addSection(
@@ -41,8 +51,7 @@ export class PDFReport implements Report {
   ): void {
     if (this.pdf.getNumberOfPages() !== 1) this.position = 30;
 
-    this.pdf.setFontSize(20);
-    this.pdf.text(name, 10, this.jumpAndUsePosition());
+    this.setFontAndWriteText(name, 20, 10);
 
     this.pdf.setFontSize(10);
     list.forEach((entry, index: number) =>
@@ -53,8 +62,7 @@ export class PDFReport implements Report {
       )
     );
 
-    this.pdf.setFontSize(15);
-    this.pdf.text(heading, 10, this.jumpAndUsePosition());
+    this.setFontAndWriteText(heading, 15, 10);
 
     const cellWidth = Math.ceil(178 / tableHeaders.length);
 
@@ -84,11 +92,11 @@ export class PDFReport implements Report {
     this.pdf.addPage();
   }
 
-  write(filename: string): void {
+  write(): void {
     this.pdf.deletePage(this.pdf.getNumberOfPages());
     const outputFilename = join(
       process.env.GITHUB_WORKSPACE as string,
-      filename
+      this.filename
     );
     this.pdf.save(outputFilename);
     return;
