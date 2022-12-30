@@ -35,7 +35,6 @@ export class PDFReport implements Report {
 
   addHeader(title: string): void {
     if (this.pdf.getNumberOfPages() !== 1) {
-      this.pdf.addPage();
       this.position = 20;
     }
 
