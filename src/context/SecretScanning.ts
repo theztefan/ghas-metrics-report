@@ -7,8 +7,9 @@ import {
 } from "../types/common/main";
 import { AlertsMetrics, GetCommitDate } from "../utils";
 import { Feature } from "./Feature";
+import { Printable } from "./Printable";
 
-export class SecretScanning implements Feature {
+export class SecretScanning extends Printable implements Feature {
   name: ghasFeatures = "secret-scanning";
   prettyName = "Secret Scanning";
   metrics: AlertsMetricsType;

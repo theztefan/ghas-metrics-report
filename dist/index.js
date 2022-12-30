@@ -42061,10 +42061,21 @@ const SecretScanningAlerts = async (owner, repository) => {
     return res;
 };
 
+;// CONCATENATED MODULE: ./src/context/Printable.ts
+class Printable {
+    printable(prettyName, metrics) {
+        return {
+            prettyName: prettyName,
+            metrics: metrics,
+        };
+    }
+}
+
 ;// CONCATENATED MODULE: ./src/context/SecretScanning.ts
 
 
-class SecretScanning {
+
+class SecretScanning extends Printable {
     name = "secret-scanning";
     prettyName = "Secret Scanning";
     metrics;
@@ -42117,7 +42128,8 @@ const DependabotAlerts = async (owner, repository) => {
 ;// CONCATENATED MODULE: ./src/context/Dependabot.ts
 
 
-class Dependabot {
+
+class Dependabot extends Printable {
     name = "dependabot";
     prettyName = "Dependabot";
     metrics;
@@ -42175,7 +42187,8 @@ const CodeScanningAlerts = async (owner, repository) => {
 ;// CONCATENATED MODULE: ./src/context/CodeScanning.ts
 
 
-class CodeScanning {
+
+class CodeScanning extends Printable {
     name = "code-scanning";
     prettyName = "Code Scanning";
     metrics;
@@ -42322,7 +42335,6 @@ class PDFReport {
     }
     addHeader(title) {
         if (this.pdf.getNumberOfPages() !== 1) {
-            this.pdf.addPage();
             this.position = 20;
         }
         this.setFontAndWriteText(title, 20, 10);
@@ -42444,7 +42456,8 @@ const run = async () => {
             core.debug(`[🔎] ${context.prettyName} - MTTD: ` +
                 JSON.stringify(metrics.mttd?.mttd));
             core.info(`[✅] ${context.prettyName} metrics calculated`);
-            features.push(context.feature);
+            if (context.feature.metrics.openVulnerabilities > 0)
+                features.push(context.feature);
         }
         output.repositories.push({
             owner: inputs.org,
@@ -42452,44 +42465,46 @@ const run = async () => {
             features: features,
         });
     }
-    const sections = new Map();
-    output.repositories.forEach((repository) => {
-        sections.set(`${repository.owner}/${repository.name}`, []);
-        repository.features.forEach((feature) => sections.get(`${repository.owner}/${repository.name}`).push({
-            name: feature.prettyName,
-            heading: `${feature.prettyName} - top 10`,
-            list: [
-                `Open Alerts: ${feature.metrics?.openVulnerabilities}`,
-                `Fixed in the past X days: ${feature.metrics?.fixedLastXDays}`,
-                `Frequency: ${inputs.frequency}`,
-                "MTTR: " + secondsToReadable(feature.metrics?.mttr.mttr),
-                "MTTD: " + secondsToReadable(feature.metrics?.mttd?.mttd) || 0,
-            ],
-            tableHeaders: feature.attributes,
-            tableBody: feature.summaryTop10(),
-        }));
-    });
     if (process.env.RUN_USING_ACT !== "true") {
         inputs.outputFormat.push("html", "github-output");
     }
-    let report;
     inputs.outputFormat.forEach((format) => {
+        const outputWithoutMetadata = {
+            ...output,
+            repositories: output.repositories.map((repository) => ({
+                ...repository,
+                features: repository.features.map((feature) => feature.printable(feature.prettyName, feature.metrics)),
+            })),
+        };
         switch (format) {
             case "json":
-                JSONReport.write("ghas-report.json", JSON.stringify(output, null, 2));
+                JSONReport.write("ghas-report.json", JSON.stringify(outputWithoutMetadata, null, 2));
                 break;
             case "pdf":
-            case "html":
-                report = format === "pdf" ? new PDFReport() : new SummaryReport();
+            case "html": {
+                const report = format === "pdf" ? new PDFReport() : new SummaryReport();
                 report.prepare();
-                sections.forEach((content, key) => {
-                    report.addHeader(`Repository ${key}`);
-                    content.forEach((section) => report.addSection(section.name, section.heading, section.list, section.tableHeaders, section.tableBody));
+                output.repositories.forEach((repository) => {
+                    if (repository.features.length === 0)
+                        return;
+                    report.addHeader(`Repository ${repository.owner}/${repository.name}`);
+                    repository.features.forEach((feature) => {
+                        const list = [
+                            `Open Alerts: ${feature.metrics?.openVulnerabilities}`,
+                            `Fixed in the past X days: ${feature.metrics?.fixedLastXDays}`,
+                            `Frequency: ${inputs.frequency}`,
+                            "MTTR: " + secondsToReadable(feature.metrics?.mttr.mttr),
+                            "MTTD: " + secondsToReadable(feature.metrics?.mttd?.mttd) ||
+                                0,
+                        ];
+                        report.addSection(feature.prettyName, `${feature.prettyName} - top 10`, list, feature.attributes, feature.summaryTop10());
+                    });
                 });
                 report.write();
                 break;
+            }
             case "github-output":
-                core.setOutput("report-json", JSON.stringify(output, null, 2));
+                core.setOutput("report-json", JSON.stringify(outputWithoutMetadata, null, 2));
                 core.info(`[✅] Report written output 'report-json' variable`);
                 break;
             default:

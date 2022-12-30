@@ -8,8 +8,9 @@ import {
 import { AlertsMetrics } from "../utils";
 import { Feature } from "./Feature";
 import { DependabotAlerts } from "../github/DependabotAlerts";
+import { Printable } from "./Printable";
 
-export class Dependabot implements Feature {
+export class Dependabot extends Printable implements Feature {
   name: ghasFeatures = "dependabot";
   prettyName = "Dependabot";
   metrics: AlertsMetricsType;

@@ -8,8 +8,8 @@ import {
 import { AlertsMetrics, GetCommitDate } from "../utils";
 import { Feature } from "./Feature";
 import { CodeScanningAlerts } from "../github/CodeScanningAlerts";
-
-export class CodeScanning implements Feature {
+import { Printable } from "./Printable";
+export class CodeScanning extends Printable implements Feature {
   name: ghasFeatures = "code-scanning";
   prettyName = "Code Scanning";
   metrics: AlertsMetricsType;
