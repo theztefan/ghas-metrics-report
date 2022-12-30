@@ -236,11 +236,3 @@ export interface ReportType {
     name: string;
   }[];
 }
-
-export interface ReportContent {
-  name: string;
-  heading: string;
-  list: string[];
-  tableHeaders: string[];
-  tableBody: unknown[];
-}
