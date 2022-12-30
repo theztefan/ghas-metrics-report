@@ -1,23 +1,9 @@
 import * as core from "@actions/core";
-import {
-  inputs as getInput,
-  PrintAlertsMetrics,
-  syncWriteFile as writeReportToFile,
-  preparePdfAndWriteToFile as writeReportToPdf,
-  prepareSummary,
-  preparePDF,
-  addPDFSection,
-  addPDFSectionBreak,
-  secondsToReadable,
-  addSummaryHeader,
-  addSummarySection,
-  addPDFHeader,
-  getPDF,
-} from "./utils";
+import { inputs as getInput, secondsToReadable } from "./utils";
 import {
   Alert,
   AlertsMetrics,
-  Report,
+  ReportType,
   ReportContent,
 } from "./types/common/main";
 import { randomUUID } from "crypto";
@@ -28,6 +14,9 @@ import {
   getRepositoriesForTeamAsAdmin,
 } from "./github/Repositories";
 import { Feature } from "./context/Feature";
+import { JSONReport } from "./report/JSONReport";
+import { PDFReport } from "./report/PDFReport";
+import { SummaryReport } from "./report/SummaryReport";
 
 const run = async (): Promise<void> => {
   // get inputs
@@ -55,12 +44,12 @@ const run = async (): Promise<void> => {
   core.info(`[✅] Repositories fetched`);
   core.info(`[🔎] Found ${repositories.length} repositories`);
 
-  const output: Report = {
+  const output: ReportType = {
     id: id,
     created_at: new Date().toISOString(),
     inputs: inputs,
     repositories: [],
-  } as Report;
+  } as ReportType;
 
   for (const repository of repositories) {
     core.info(`[🔎] Fetching alerts for repository ${repository.name}`);
@@ -84,8 +73,6 @@ const run = async (): Promise<void> => {
         repository.name
       );
 
-      PrintAlertsMetrics(`${context.prettyName}`, metrics);
-
       core.debug(
         `[🔎] ${context.prettyName} - MTTR: ` +
           JSON.stringify(metrics.mttr.mttr)
@@ -105,14 +92,6 @@ const run = async (): Promise<void> => {
       name: repository.name,
       features: features,
     });
-  }
-
-  core.setOutput("report-json", JSON.stringify(output, null, 2));
-  core.info(`[✅] Report written output 'report-json' variable`);
-
-  if (inputs.outputFormat.includes("json")) {
-    writeReportToFile("ghas-report.json", JSON.stringify(output, null, 2));
-    core.info(`[✅] JSON Report written to file`);
   }
 
   const sections: Map<string, ReportContent[]> = new Map();
@@ -136,47 +115,47 @@ const run = async (): Promise<void> => {
     );
   });
 
-  if (inputs.outputFormat.includes("pdf")) {
-    preparePDF();
-
-    sections.forEach((content, key) => {
-      addPDFHeader(`Repository ${key}`);
-
-      content.forEach((section) => {
-        addPDFSection(
-          section.name,
-          section.heading,
-          section.list,
-          section.tableHeaders,
-          section.tableBody
-        );
-        addPDFSectionBreak();
-      });
-    });
-
-    writeReportToPdf("ghas-report.pdf", getPDF());
-    core.info(`[✅] PDF Report written to file`);
-  }
-
   if (process.env.RUN_USING_ACT !== "true") {
-    prepareSummary();
-
-    sections.forEach((content, key) => {
-      addSummaryHeader(`Repository ${key}`);
-      content.forEach((section) =>
-        addSummarySection(
-          section.name,
-          section.heading,
-          section.list,
-          section.tableHeaders,
-          section.tableBody
-        )
-      );
-    });
-
-    core.summary.write();
-    core.info(`[✅] Report written to summary`);
+    inputs.outputFormat.push("html", "github-output");
   }
+
+  let report;
+  inputs.outputFormat.forEach((format) => {
+    switch (format) {
+      case "json":
+        JSONReport.write("ghas-report.json", JSON.stringify(output, null, 2));
+        break;
+      case "pdf":
+      case "html":
+        report = format === "pdf" ? new PDFReport() : new SummaryReport();
+        report.prepare();
+
+        sections.forEach((content, key) => {
+          report.addHeader(`Repository ${key}`);
+
+          content.forEach((section) =>
+            report.addSection(
+              section.name,
+              section.heading,
+              section.list,
+              section.tableHeaders,
+              section.tableBody
+            )
+          );
+        });
+
+        report.write();
+        break;
+      case "github-output":
+        core.setOutput("report-json", JSON.stringify(output, null, 2));
+        core.info(`[✅] Report written output 'report-json' variable`);
+        break;
+      default:
+        core.warning(`[⚠️] Unknown output format ${format}`);
+        break;
+    }
+    core.info(`[✅] ${format.toUpperCase()} Report written`);
+  });
 
   return;
 };

@@ -5,7 +5,7 @@ import {
   reportFrequency,
   SecretScanningAlert,
 } from "../types/common/main";
-import { AlertsMetrics, createUrlLink, GetCommitDate } from "../utils";
+import { AlertsMetrics, GetCommitDate } from "../utils";
 import { Feature } from "./Feature";
 
 export class SecretScanning implements Feature {
@@ -16,7 +16,6 @@ export class SecretScanning implements Feature {
     "SecretType",
     "Found at",
     "Push Protection Bypass",
-    "Patched version",
     "Link",
   ];
 
@@ -50,7 +49,7 @@ export class SecretScanning implements Feature {
       a.secret_type_display_name,
       a.created_at,
       (a.push_protection_bypassed as boolean) ? "True" : "False",
-      createUrlLink(a.html_url, "Link"),
+      a.html_url,
     ]);
   }
 }

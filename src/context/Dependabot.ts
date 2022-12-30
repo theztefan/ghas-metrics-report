@@ -5,7 +5,7 @@ import {
   ghasFeatures,
   reportFrequency,
 } from "../types/common/main";
-import { AlertsMetrics, createUrlLink } from "../utils";
+import { AlertsMetrics } from "../utils";
 import { Feature } from "./Feature";
 import { DependabotAlerts } from "../github/DependabotAlerts";
 
@@ -44,7 +44,7 @@ export class Dependabot implements Feature {
       a.security_vulnerability?.first_patched_version?.identifier || "",
       a.security_advisory?.cve_id || "",
       a.security_advisory?.cvss?.vector_string || "",
-      createUrlLink(a.html_url, "Link"),
+      a.html_url,
     ]);
   }
 }
