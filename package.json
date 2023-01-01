@@ -29,7 +29,7 @@
   "devDependencies": {
     "@octokit/types": "^8.0.0",
     "@tsconfig/node18": "^1.0.1",
-    "@types/jest": "^29.2.4",
+    "@types/jest": "^29.2.5",
     "@types/json-schema": "^7.0.11",
     "@types/node": "^18.11.15",
     "@typescript-eslint/eslint-plugin": "^5.46.1",
