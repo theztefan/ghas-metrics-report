@@ -101,7 +101,7 @@ The action will output:
 
 ![Sample report output](ghas-metrics-report-sample-summary.png)
 
-## Contrubting
+## Contributing
 
 - Create an issue to the repo with suggestions and bugs
 - Raise a pull request :)
