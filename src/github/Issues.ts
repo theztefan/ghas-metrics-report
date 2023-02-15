@@ -1,4 +1,3 @@
-import * as core from "@actions/core";
 import { Octokit } from "@octokit/action";
 import { Issue } from "../types/common/main";
 
@@ -10,7 +9,7 @@ export class Issues {
     const all_issues = await this.getAllIssues(issues[0].owner, issues[0].repo);
 
     issues = issues.filter((issue) => {
-        return !all_issues.find((i) => i.title === issue.title);
+      return !all_issues.find((i) => i.title === issue.title);
     });
 
     // itterate over alerts
@@ -29,7 +28,7 @@ export class Issues {
   }
 
   // async function to create issue
-  async createIssue(issue: Issue) {
+  async createIssue(issue: Issue): Promise<number> {
     // create issue
     const octokit = new Octokit();
     const issue_report = await octokit.rest.issues.create({
@@ -38,17 +37,16 @@ export class Issues {
       title: issue.title,
       body: issue.body,
     });
+    return issue_report.data.number;
   }
-
 
   async getAllIssues(org: string, repo: string): Promise<any[]> {
     const octokit = new Octokit();
     const res = await octokit.rest.issues.listForRepo({
-        owner: org,
-        repo: repo,
-        state: "open",
+      owner: org,
+      repo: repo,
+      state: "open",
     });
     return res.data;
   }
-
 }
