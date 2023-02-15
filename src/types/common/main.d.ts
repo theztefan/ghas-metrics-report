@@ -239,7 +239,6 @@ export interface ReportType {
   }[];
 }
 
-
 export interface Issue {
   owner: string;
   repo: string;

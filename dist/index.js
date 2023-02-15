@@ -41895,6 +41895,7 @@ const AlertsMetrics = (alerts, frequency, fixedDateField, state, calculateMTTD, 
     todayDate.setHours(0, 0, 0, 0);
     const fixedAlerts = alerts.filter((a) => a.state === state);
     let fixedLastXDays = [];
+    let openedLastXDays = [];
     const pastDate = new Date();
     pastDate.setHours(0, 0, 0, 0);
     if (frequency === "daily") {
@@ -41913,6 +41914,9 @@ const AlertsMetrics = (alerts, frequency, fixedDateField, state, calculateMTTD, 
     //get Top 10 by criticality
     const openAlerts = alerts.filter((a) => a.state === "open");
     const top10Alerts = openAlerts.sort(compareAlertSeverity).slice(0, 10);
+    openedLastXDays = openAlerts.filter((a) => {
+        return FilterBetweenDates(a.created_at, pastDate, todayDate);
+    });
     //get MTTR
     const mttr = CalculateMTTR(alerts, fixedDateField, state);
     let mttd = undefined;
@@ -41921,8 +41925,10 @@ const AlertsMetrics = (alerts, frequency, fixedDateField, state, calculateMTTD, 
     }
     const result = {
         fixedLastXDays: fixedLastXDays.length,
+        openedLastXDays: openedLastXDays.length,
         openVulnerabilities: alerts.filter((a) => a.state === "open").length,
         top10: top10Alerts,
+        newOpenAlerts: openedLastXDays,
         mttr: mttr,
         mttd: mttd,
     };
@@ -42003,6 +42009,9 @@ function isDependancyAlert(alert) {
 }
 function isCodeScanningAlert(alert) {
     return "rule" in alert && "severity" in alert.rule;
+}
+function isSecretScanningAlert(alert) {
+    return "secret_type_display_name" in alert;
 }
 
 ;// CONCATENATED MODULE: ./src/utils/Utils.ts
@@ -42406,7 +42415,43 @@ class SummaryReport {
     }
 }
 
+;// CONCATENATED MODULE: ./src/github/Issues.ts
+
+// export class to Issues class
+class Issues {
+    // async function to itterate over alerts and create issues
+    async createIssues(issues) {
+        const res = [];
+        // itterate over alerts
+        for (const issue of issues) {
+            // create issue
+            const octokit = new dist_node/* Octokit */.v();
+            const issue_result = await octokit.rest.issues.create({
+                owner: issue.owner,
+                repo: issue.repo,
+                title: issue.title,
+                body: issue.body,
+            });
+            res.push(issue_result.data.number);
+        }
+        return res;
+    }
+    // async function to create issue
+    async createIssue(issue) {
+        // create issue
+        const octokit = new dist_node/* Octokit */.v();
+        const issue_report = await octokit.rest.issues.create({
+            owner: issue.owner,
+            repo: issue.repo,
+            title: issue.title,
+            body: issue.body,
+        });
+    }
+}
+
 ;// CONCATENATED MODULE: ./src/main.ts
+
+
 
 
 
@@ -42468,7 +42513,7 @@ const run = async () => {
     if (process.env.RUN_USING_ACT !== "true") {
         inputs.outputFormat.push("html", "github-output");
     }
-    inputs.outputFormat.forEach((format) => {
+    inputs.outputFormat.forEach(async (format) => {
         const outputWithoutMetadata = {
             ...output,
             repositories: output.repositories.map((repository) => ({
@@ -42477,11 +42522,11 @@ const run = async () => {
             })),
         };
         switch (format) {
-            case "json":
+            case "json": {
                 JSONReport.write("ghas-report.json", JSON.stringify(outputWithoutMetadata, null, 2));
                 break;
-            case "pdf":
-            case "html": {
+            }
+            case "pdf": {
                 const report = format === "pdf" ? new PDFReport() : new SummaryReport();
                 report.prepare();
                 output.repositories.forEach((repository) => {
@@ -42503,13 +42548,49 @@ const run = async () => {
                 report.write();
                 break;
             }
-            case "github-output":
+            case "github-output": {
                 core.setOutput("report-json", JSON.stringify(outputWithoutMetadata, null, 2));
                 core.info(`[✅] Report written output 'report-json' variable`);
                 break;
-            default:
+            }
+            case "issues": {
+                const issues = [];
+                output.repositories.forEach((repository) => {
+                    if (repository.features.length === 0)
+                        return;
+                    repository.features.forEach((feature) => {
+                        feature.metrics.newOpenAlerts.forEach((alert) => {
+                            let title = "";
+                            if (isDependancyAlert(alert)) {
+                                title = alert.security_advisory.summary;
+                            }
+                            else if (isCodeScanningAlert(alert)) {
+                                title = alert.rule.description;
+                            }
+                            else if (isSecretScanningAlert(alert)) {
+                                title = alert.secret_type_display_name;
+                            }
+                            const issue = {
+                                owner: repository.owner,
+                                repo: repository.name,
+                                title: feature.prettyName + " - " + title,
+                                body: alert.html_url,
+                                labels: feature.prettyName,
+                            };
+                            issues.push(issue);
+                        });
+                    });
+                });
+                const github_issues = new Issues();
+                const issue_ids = await github_issues.createIssues(issues);
+                core.setOutput("created-issues-ids", JSON.stringify(outputWithoutMetadata, null, 2));
+                core.info(`[✅] Issues created: ${JSON.stringify(issue_ids, null, 2)}`);
+                break;
+            }
+            default: {
                 core.warning(`[⚠️] Unknown output format ${format}`);
                 break;
+            }
         }
         core.info(`[✅] ${format.toUpperCase()} Report written`);
     });

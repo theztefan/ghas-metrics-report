@@ -59,7 +59,6 @@ export const AlertsMetrics = (
   openedLastXDays = openAlerts.filter(
     (a: CodeScanningAlert | DependencyOrCodeAlert | SecretScanningAlert) => {
       return FilterBetweenDates(a.created_at, pastDate, todayDate);
-
     }
   );
 
@@ -199,6 +198,8 @@ export function isCodeScanningAlert(
   return "rule" in alert && "severity" in alert.rule;
 }
 
-export function isSecretScanningAlert(alert: SecretScanningAlert |  Alert): alert is SecretScanningAlert {
+export function isSecretScanningAlert(
+  alert: SecretScanningAlert | Alert
+): alert is SecretScanningAlert {
   return "secret_type_display_name" in alert;
 }

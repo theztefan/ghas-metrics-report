@@ -1,5 +1,9 @@
 import * as core from "@actions/core";
-import { AlertsMetrics as AlertsMetricsUtils, inputs as getInput, secondsToReadable } from "./utils";
+import {
+  AlertsMetrics as AlertsMetricsUtils,
+  inputs as getInput,
+  secondsToReadable,
+} from "./utils";
 import { Alert, AlertsMetrics, Issue, ReportType } from "./types/common/main";
 import { randomUUID } from "crypto";
 import { Context } from "./context/Context";
@@ -12,7 +16,11 @@ import { JSONReport } from "./report/JSONReport";
 import { PDFReport } from "./report/PDFReport";
 import { SummaryReport } from "./report/SummaryReport";
 import { Issues } from "./github/Issues";
-import { isCodeScanningAlert, isDependancyAlert, isSecretScanningAlert } from "./utils/AlertMetrics";
+import {
+  isCodeScanningAlert,
+  isDependancyAlert,
+  isSecretScanningAlert,
+} from "./utils/AlertMetrics";
 
 const run = async (): Promise<void> => {
   // get inputs
@@ -107,14 +115,14 @@ const run = async (): Promise<void> => {
     };
 
     switch (format) {
-      case "json":
+      case "json": {
         JSONReport.write(
           "ghas-report.json",
           JSON.stringify(outputWithoutMetadata, null, 2)
         );
         break;
-      case "pdf":
-      case "html": {
+      }
+      case "pdf": {
         const report = format === "pdf" ? new PDFReport() : new SummaryReport();
         report.prepare();
 
@@ -145,28 +153,28 @@ const run = async (): Promise<void> => {
         report.write();
         break;
       }
-      case "github-output":
+      case "github-output": {
         core.setOutput(
           "report-json",
           JSON.stringify(outputWithoutMetadata, null, 2)
         );
         core.info(`[✅] Report written output 'report-json' variable`);
         break;
-      case "issues":
-        let issues: Issue[] = [];
+      }
+      case "issues": {
+        const issues: Issue[] = [];
         output.repositories.forEach((repository) => {
           if (repository.features.length === 0) return;
 
           repository.features.forEach((feature) => {
             feature.metrics.newOpenAlerts.forEach((alert) => {
-              let title : String = ""
-              if(isDependancyAlert(alert)){
-                title = alert.security_advisory.summary
-              }
-              else if(isCodeScanningAlert(alert)){
-                title = alert.rule.description
-              }else if (isSecretScanningAlert(alert)) {
-                title = alert.secret_type_display_name
+              let title = "";
+              if (isDependancyAlert(alert)) {
+                title = alert.security_advisory.summary;
+              } else if (isCodeScanningAlert(alert)) {
+                title = alert.rule.description;
+              } else if (isSecretScanningAlert(alert)) {
+                title = alert.secret_type_display_name;
               }
               const issue: Issue = {
                 owner: repository.owner,
@@ -176,22 +184,23 @@ const run = async (): Promise<void> => {
                 labels: feature.prettyName,
               };
               issues.push(issue);
-              
             });
           });
         });
 
-        let github_issues = new Issues();
-        let issue_ids = await github_issues.createIssues(issues);
+        const github_issues = new Issues();
+        const issue_ids = await github_issues.createIssues(issues);
         core.setOutput(
           "created-issues-ids",
-          JSON.stringify(outputWithoutMetadata, null, 2)
+          JSON.stringify(issue_ids, null, 2)
         );
         core.info(`[✅] Issues created: ${JSON.stringify(issue_ids, null, 2)}`);
         break;
-      default:
+      }
+      default: {
         core.warning(`[⚠️] Unknown output format ${format}`);
         break;
+      }
     }
     core.info(`[✅] ${format.toUpperCase()} Report written`);
   });
