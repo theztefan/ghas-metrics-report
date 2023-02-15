@@ -27,6 +27,8 @@ jobs:
           repo: "ghas-metrics-report"
           org: "theztefan"
           features: "dependabot, code-scanning, secret-scanning"
+          frequency: "daily"
+          output-format: "json, pdf, issues"
       - name: upload GHAS metrics report
         uses: actions/upload-artifact@v3
         with:

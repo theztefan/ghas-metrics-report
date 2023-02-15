@@ -8,6 +8,7 @@ import {
   MTTDMetrics,
   DependencyOrCodeAlert,
   Alert,
+  SecretScanningAlert,
 } from "../types/common/main";
 
 export const AlertsMetrics = (
@@ -25,6 +26,7 @@ export const AlertsMetrics = (
   const fixedAlerts = alerts.filter((a) => a.state === state);
 
   let fixedLastXDays = [];
+  let openedLastXDays = [];
 
   const pastDate = new Date();
   pastDate.setHours(0, 0, 0, 0);
@@ -54,6 +56,13 @@ export const AlertsMetrics = (
   const openAlerts = alerts.filter((a) => a.state === "open");
   const top10Alerts = openAlerts.sort(compareAlertSeverity).slice(0, 10);
 
+  openedLastXDays = openAlerts.filter(
+    (a: CodeScanningAlert | DependencyOrCodeAlert | SecretScanningAlert) => {
+      return FilterBetweenDates(a.created_at, pastDate, todayDate);
+
+    }
+  );
+
   //get MTTR
   const mttr = CalculateMTTR(alerts, fixedDateField, state);
 
@@ -68,8 +77,10 @@ export const AlertsMetrics = (
 
   const result: AlertsMetricsType = {
     fixedLastXDays: fixedLastXDays.length,
+    openedLastXDays: openedLastXDays.length,
     openVulnerabilities: alerts.filter((a) => a.state === "open").length,
     top10: top10Alerts,
+    newOpenAlerts: openedLastXDays,
     mttr: mttr,
     mttd: mttd,
   };
@@ -178,12 +189,16 @@ function compareAlertSeverity(a: Alert, b: Alert) {
   return comparison;
 }
 
-function isDependancyAlert(alert: Alert): alert is DependancyAlert {
+export function isDependancyAlert(alert: Alert): alert is DependancyAlert {
   return "security_advisory" in alert;
 }
 
-function isCodeScanningAlert(
-  alert: CodeScanningAlert | DependencyOrCodeAlert
+export function isCodeScanningAlert(
+  alert: CodeScanningAlert | DependencyOrCodeAlert | Alert
 ): alert is CodeScanningAlert {
   return "rule" in alert && "severity" in alert.rule;
+}
+
+export function isSecretScanningAlert(alert: SecretScanningAlert |  Alert): alert is SecretScanningAlert {
+  return "secret_type_display_name" in alert;
 }
