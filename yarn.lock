@@ -709,7 +709,9 @@
     universal-user-agent "^6.0.0"
 
 "@octokit/endpoint@^6.0.1":
-  version "7.0.0"
+  version "6.0.12"
+  resolved "https://registry.npmjs.org/@octokit/endpoint/-/endpoint-6.0.12.tgz"
+  integrity sha512-lF3puPwkQWGfkMClXb4k/eUT/nZKQfxinRWJrdZaJO85Dqwo/G0yOC434Jr2ojwafWJMYqFGFa5ms4jJUgujdA==
   dependencies:
     "@octokit/types" "^6.0.3"
     is-plain-object "^5.0.0"
@@ -787,6 +789,14 @@
     "@octokit/types" "^8.0.0"
     deprecation "^2.3.1"
 
+"@octokit/plugin-retry@4.1.1":
+  version "4.1.1"
+  resolved "https://registry.npmjs.org/@octokit/plugin-retry/-/plugin-retry-4.1.1.tgz"
+  integrity sha512-iR7rg5KRSl6L6RELTQQ3CYeNgeBJyuAmP95odzcQ/zyefnRT/Peo8rWeky4z7V/+/oPWqOL4I5Z+V8KtjpHCJw==
+  dependencies:
+    "@octokit/types" "^9.0.0"
+    bottleneck "^2.15.3"
+
 "@octokit/plugin-throttling@5.0.1":
   version "5.0.1"
   resolved "https://registry.npmjs.org/@octokit/plugin-throttling/-/plugin-throttling-5.0.1.tgz"
@@ -805,7 +815,9 @@
     once "^1.4.0"
 
 "@octokit/request-error@^2.1.0":
-  version "3.0.0"
+  version "2.1.0"
+  resolved "https://registry.npmjs.org/@octokit/request-error/-/request-error-2.1.0.tgz"
+  integrity sha512-1VIvgXxs9WHSjicsRwq8PlR2LR2x6DwsJAaFgzdi0JfJoGSO8mYI/cHJQ+9FbN21aa+DrgNLnwObmyeSC8Rmpg==
   dependencies:
     "@octokit/types" "^6.0.3"
     deprecation "^2.0.0"

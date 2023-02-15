@@ -1,5 +1,35 @@
 import { Octokit } from "@octokit/action";
 import { Issue } from "../types/common/main";
+import  { Octokit as Core } from "@octokit/core";
+import { throttling } from "@octokit/plugin-throttling";
+import { retry } from "@octokit/plugin-retry";
+
+
+// export const PluggedOctokit = Octokit.plugin(retry, throttling);
+// export const octokit = new PluggedOctokit({
+//   throttle: {
+//     onRateLimit: (retryAfter, options) => {
+//       octokit.log.warn(
+//         `Request quota exhausted for request ${options.method} ${options.url}`
+//       );
+//     },
+//     onAbuseLimit: (retryAfter, options) => {
+//       // does not retry, only logs a warning
+//       octokit.log.warn(
+//         `Abuse detected for request ${options.method} ${options.url}`
+//       );
+//     },
+//     onSecondaryRateLimit: (retryAfter, options) => {
+//       octokit.log.warn(
+//         `Secondary rate limit for request ${options.method} ${options.url}`
+//       );
+//     },
+
+//   },
+//   retry: {
+//     doNotRetry: [403, 404, 422],
+//   },
+// });
 
 // export class to Issues class
 export class Issues {
@@ -22,6 +52,12 @@ export class Issues {
         title: issue.title,
         body: issue.body,
       });
+      await octokit.rest.issues.addLabels({
+        owner: issue.owner,
+        repo: issue.repo,
+        issue_number: issue_result.data.number,
+        labels: issue.labels,
+      });
       res.push(issue_result.data.number);
     }
     return res;
@@ -31,6 +67,7 @@ export class Issues {
   async createIssue(issue: Issue): Promise<number> {
     // create issue
     const octokit = new Octokit();
+    
     const issue_report = await octokit.rest.issues.create({
       owner: issue.owner,
       repo: issue.repo,

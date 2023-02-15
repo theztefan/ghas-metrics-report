@@ -181,7 +181,7 @@ const run = async (): Promise<void> => {
                 repo: repository.name,
                 title: feature.prettyName + " - " + title,
                 body: alert.html_url,
-                labels: feature.prettyName,
+                labels: ["GHAS", feature.prettyName]
               };
               issues.push(issue);
             });

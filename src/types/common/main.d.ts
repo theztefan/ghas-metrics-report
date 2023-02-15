@@ -244,5 +244,5 @@ export interface Issue {
   repo: string;
   title: string;
   body: string;
-  labels: string;
+  labels: string[];
 }
