@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import { SummaryTableRow } from "@actions/core/lib/summary";
+import { stringify } from "querystring";
 import { Report } from "./Report";
 
 export class SummaryReport implements Report {
@@ -34,5 +35,9 @@ export class SummaryReport implements Report {
 
   write(): void {
     core.summary.write();
+  }
+
+  stringify(): string {
+    return core.summary.stringify();
   }
 }

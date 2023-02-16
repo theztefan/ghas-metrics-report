@@ -12,7 +12,7 @@ type inputsReturned = {
 
 type ghasFeatures = "secret-scanning" | "dependabot" | "code-scanning";
 type reportFrequency = "weekly" | "monthly" | "daily";
-type outputFormat = "json" | "pdf" | "html" | "github-output" | "issues";
+type outputFormat = "json" | "pdf" | "github-output" | "issues";
 
 interface MTTRMetrics {
   mttr: number;

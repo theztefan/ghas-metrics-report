@@ -1,9 +1,8 @@
 import { Octokit } from "@octokit/action";
 import { Issue } from "../types/common/main";
-import  { Octokit as Core } from "@octokit/core";
+import { Octokit as Core } from "@octokit/core";
 import { throttling } from "@octokit/plugin-throttling";
 import { retry } from "@octokit/plugin-retry";
-
 
 // export const PluggedOctokit = Octokit.plugin(retry, throttling);
 // export const octokit = new PluggedOctokit({
@@ -67,7 +66,7 @@ export class Issues {
   async createIssue(issue: Issue): Promise<number> {
     // create issue
     const octokit = new Octokit();
-    
+
     const issue_report = await octokit.rest.issues.create({
       owner: issue.owner,
       repo: issue.repo,

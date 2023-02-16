@@ -100,7 +100,7 @@ const run = async (): Promise<void> => {
   }
 
   if (process.env.RUN_USING_ACT !== "true") {
-    inputs.outputFormat.push("html", "github-output");
+    inputs.outputFormat.push("github-output");
   }
 
   inputs.outputFormat.forEach(async (format) => {
@@ -165,7 +165,6 @@ const run = async (): Promise<void> => {
         const issues: Issue[] = [];
         output.repositories.forEach((repository) => {
           if (repository.features.length === 0) return;
-
           repository.features.forEach((feature) => {
             feature.metrics.newOpenAlerts.forEach((alert) => {
               let title = "";
@@ -181,7 +180,7 @@ const run = async (): Promise<void> => {
                 repo: repository.name,
                 title: feature.prettyName + " - " + title,
                 body: alert.html_url,
-                labels: ["GHAS", feature.prettyName]
+                labels: ["GHAS", feature.prettyName],
               };
               issues.push(issue);
             });

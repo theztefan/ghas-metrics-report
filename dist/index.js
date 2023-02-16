@@ -42509,6 +42509,30 @@ class SummaryReport {
 
 ;// CONCATENATED MODULE: ./src/github/Issues.ts
 
+// export const PluggedOctokit = Octokit.plugin(retry, throttling);
+// export const octokit = new PluggedOctokit({
+//   throttle: {
+//     onRateLimit: (retryAfter, options) => {
+//       octokit.log.warn(
+//         `Request quota exhausted for request ${options.method} ${options.url}`
+//       );
+//     },
+//     onAbuseLimit: (retryAfter, options) => {
+//       // does not retry, only logs a warning
+//       octokit.log.warn(
+//         `Abuse detected for request ${options.method} ${options.url}`
+//       );
+//     },
+//     onSecondaryRateLimit: (retryAfter, options) => {
+//       octokit.log.warn(
+//         `Secondary rate limit for request ${options.method} ${options.url}`
+//       );
+//     },
+//   },
+//   retry: {
+//     doNotRetry: [403, 404, 422],
+//   },
+// });
 // export class to Issues class
 class Issues {
     // async function to itterate over alerts and create issues excluding matching issues
@@ -42527,6 +42551,12 @@ class Issues {
                 repo: issue.repo,
                 title: issue.title,
                 body: issue.body,
+            });
+            await octokit.rest.issues.addLabels({
+                owner: issue.owner,
+                repo: issue.repo,
+                issue_number: issue_result.data.number,
+                labels: issue.labels,
             });
             res.push(issue_result.data.number);
         }
@@ -42681,7 +42711,7 @@ const run = async () => {
                                 repo: repository.name,
                                 title: feature.prettyName + " - " + title,
                                 body: alert.html_url,
-                                labels: feature.prettyName,
+                                labels: ["GHAS", feature.prettyName],
                             };
                             issues.push(issue);
                         });
