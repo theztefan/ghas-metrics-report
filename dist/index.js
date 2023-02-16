@@ -42663,6 +42663,7 @@ const run = async () => {
             const list = [
                 `Open Alerts: ${feature.metrics?.openVulnerabilities}`,
                 `Fixed in the past X days: ${feature.metrics?.fixedLastXDays}`,
+                `Opened in the past X days: ${feature.metrics?.openedLastXDays}`,
                 `Frequency: ${inputs.frequency}`,
                 "MTTR: " + secondsToReadable(feature.metrics?.mttr.mttr),
                 "MTTD: " + secondsToReadable(feature.metrics?.mttd?.mttd) || 0,
@@ -42696,6 +42697,7 @@ const run = async () => {
                         const list = [
                             `Open Alerts: ${feature.metrics?.openVulnerabilities}`,
                             `Fixed in the past X days: ${feature.metrics?.fixedLastXDays}`,
+                            `Opened in the past X days: ${feature.metrics?.openedLastXDays}`,
                             `Frequency: ${inputs.frequency}`,
                             "MTTR: " + secondsToReadable(feature.metrics?.mttr.mttr),
                             "MTTD: " + secondsToReadable(feature.metrics?.mttd?.mttd) ||

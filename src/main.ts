@@ -235,7 +235,10 @@ const run = async (): Promise<void> => {
             });
           });
         });
-
+        if (issues.length === 0) {
+          core.info(`[✅] No issues to create`);
+          break;
+        }
         const issue_ids = await github_issues.createIssues(issues);
 
         core.setOutput(
