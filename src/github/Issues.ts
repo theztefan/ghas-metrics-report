@@ -3,7 +3,7 @@ import { Issue } from "../types/common/main";
 import { Octokit as Core } from "@octokit/core";
 import { throttling } from "@octokit/plugin-throttling";
 import { retry } from "@octokit/plugin-retry";
-
+import { MyOctokit } from "./MyOctokit";
 // export const PluggedOctokit = Octokit.plugin(retry, throttling);
 // export const octokit = new PluggedOctokit({
 //   throttle: {
@@ -44,7 +44,7 @@ export class Issues {
     // itterate over alerts
     for (const issue of issues) {
       // create issue
-      const octokit = new Octokit();
+      const octokit = new MyOctokit();
       const issue_result = await octokit.rest.issues.create({
         owner: issue.owner,
         repo: issue.repo,
@@ -65,7 +65,7 @@ export class Issues {
   // async function to create issue
   async createIssue(issue: Issue): Promise<number> {
     // create issue
-    const octokit = new Octokit();
+    const octokit = new MyOctokit();
 
     const issue_report = await octokit.rest.issues.create({
       owner: issue.owner,
@@ -77,7 +77,7 @@ export class Issues {
   }
 
   async getAllIssues(org: string, repo: string): Promise<any[]> {
-    const octokit = new Octokit();
+    const octokit = new MyOctokit();
     const res = await octokit.rest.issues.listForRepo({
       owner: org,
       repo: repo,

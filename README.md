@@ -15,7 +15,7 @@ The report will include the following metrics for Dependabot, Code Scanning and 
 - Fixed alerts in the past X days _(X is the frequency of the report)_
 - Opened in the past X days _(X is the frequency of the report)_
 - Total MTTR (Mean Time To Remediate)
-- Total MTTD (Mean Time To Detect) for Code Scanning and Secret Scanning  _(Note: This is experimental. It hasn't been worked out properly, yet!)_
+- Total MTTD (Mean Time To Detect) for Code Scanning and Secret Scanning _(Note: This is experimental. It hasn't been worked out properly, yet!)_
 
 ## Development
 
