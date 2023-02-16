@@ -78639,6 +78639,33 @@ WebPRiffParser dominikhlbg@gmail.com
             ),
           })),
         };
+        // Always write Summary Report
+        const summaryReport = new SummaryReport();
+        summaryReport.prepare();
+        output.repositories.forEach((repository) => {
+          if (repository.features.length === 0) return;
+          summaryReport.addHeader(
+            `Repository ${repository.owner}/${repository.name}`
+          );
+          repository.features.forEach((feature) => {
+            const list = [
+              `Open Alerts: ${feature.metrics?.openVulnerabilities}`,
+              `Fixed in the past X days: ${feature.metrics?.fixedLastXDays}`,
+              `Frequency: ${inputs.frequency}`,
+              "MTTR: " + secondsToReadable(feature.metrics?.mttr.mttr),
+              "MTTD: " + secondsToReadable(feature.metrics?.mttd?.mttd) || 0,
+            ];
+            summaryReport.addSection(
+              feature.prettyName,
+              `${feature.prettyName} - top 10`,
+              list,
+              feature.attributes,
+              feature.summaryTop10()
+            );
+          });
+        });
+        summaryReport.write();
+        // Write other reports
         switch (format) {
           case "json": {
             JSONReport.write(
@@ -78687,8 +78714,21 @@ WebPRiffParser dominikhlbg@gmail.com
           }
           case "issues": {
             const issues = [];
+            const github_issues = new Issues();
             output.repositories.forEach((repository) => {
               if (repository.features.length === 0) return;
+              // Create an issue for the Summary Report
+              const summaryReportIssue = {
+                owner: inputs.org,
+                repo: repository.name,
+                title:
+                  "GHAS Summary Report" +
+                  " - " +
+                  new Date(Date.now()).toDateString(),
+                body: summaryReport.stringify(),
+                labels: ["GHAS", "Summary Report"],
+              };
+              issues.push(summaryReportIssue);
               repository.features.forEach((feature) => {
                 feature.metrics.newOpenAlerts.forEach((alert) => {
                   let title = "";
@@ -78703,14 +78743,13 @@ WebPRiffParser dominikhlbg@gmail.com
                     owner: repository.owner,
                     repo: repository.name,
                     title: feature.prettyName + " - " + title,
-                    body: alert.html_url,
+                    body: "Tracking issue for:\n" + alert.html_url,
                     labels: ["GHAS", feature.prettyName],
                   };
                   issues.push(issue);
                 });
               });
             });
-            const github_issues = new Issues();
             const issue_ids = await github_issues.createIssues(issues);
             core.setOutput(
               "created-issues-ids",

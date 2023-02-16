@@ -103,49 +103,49 @@ const run = async (): Promise<void> => {
     inputs.outputFormat.push("github-output");
   }
 
-  inputs.outputFormat.forEach(async (format) => {
-    const outputWithoutMetadata = {
-      ...output,
-      repositories: output.repositories.map((repository) => ({
-        ...repository,
-        features: repository.features.map((feature) =>
-          feature.printable(feature.prettyName, feature.metrics)
-        ),
-      })),
-    };
+  // Always write Summary Report
+  const summaryReport = new SummaryReport();
+  summaryReport.prepare();
 
-    // Always write Summary Report
-    const summaryReport = new SummaryReport();
-    summaryReport.prepare();
+  output.repositories.forEach((repository) => {
+    if (repository.features.length === 0) return;
 
-    output.repositories.forEach((repository) => {
-      if (repository.features.length === 0) return;
+    summaryReport.addHeader(
+      `Repository ${repository.owner}/${repository.name}`
+    );
 
-      summaryReport.addHeader(
-        `Repository ${repository.owner}/${repository.name}`
+    repository.features.forEach((feature) => {
+      const list = [
+        `Open Alerts: ${feature.metrics?.openVulnerabilities}`,
+        `Fixed in the past X days: ${feature.metrics?.fixedLastXDays}`,
+        `Frequency: ${inputs.frequency}`,
+        "MTTR: " + secondsToReadable(feature.metrics?.mttr.mttr),
+        "MTTD: " + secondsToReadable(feature.metrics?.mttd?.mttd) || "N/A",
+      ];
+      summaryReport.addSection(
+        feature.prettyName,
+        `${feature.prettyName} - top 10`,
+        list,
+        feature.attributes,
+        feature.summaryTop10()
       );
-
-      repository.features.forEach((feature) => {
-        const list = [
-          `Open Alerts: ${feature.metrics?.openVulnerabilities}`,
-          `Fixed in the past X days: ${feature.metrics?.fixedLastXDays}`,
-          `Frequency: ${inputs.frequency}`,
-          "MTTR: " + secondsToReadable(feature.metrics?.mttr.mttr),
-          "MTTD: " + secondsToReadable(feature.metrics?.mttd?.mttd) || "N/A",
-        ];
-        summaryReport.addSection(
-          feature.prettyName,
-          `${feature.prettyName} - top 10`,
-          list,
-          feature.attributes,
-          feature.summaryTop10()
-        );
-      });
     });
+  });
 
-    summaryReport.write();
+  summaryReport.write();
+  core.info(`[✅] Actions Summary Report written`);
 
-    // Write other reports
+  const outputWithoutMetadata = {
+    ...output,
+    repositories: output.repositories.map((repository) => ({
+      ...repository,
+      features: repository.features.map((feature) =>
+        feature.printable(feature.prettyName, feature.metrics)
+      ),
+    })),
+  };
+
+  inputs.outputFormat.forEach(async (format) => {
     switch (format) {
       case "json": {
         JSONReport.write(
@@ -203,7 +203,10 @@ const run = async (): Promise<void> => {
           const summaryReportIssue: Issue = {
             owner: inputs.org,
             repo: repository.name,
-            title: "GHAS Summary Report",
+            title:
+              "GHAS Summary Report" +
+              " - " +
+              new Date(Date.now()).toDateString(),
             body: summaryReport.stringify(),
             labels: ["GHAS", "Summary Report"],
           };
