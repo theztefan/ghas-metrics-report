@@ -6,14 +6,15 @@ A GitHub Action for generating scheduled reports for GitHub Advanced Security al
 
 The action is currently intended to be used on a repository level. The way to setup is adding a new Actions workflow file that runs this action on a scheduled interval once a day.
 
-This action will generate GHAS Metric report for the previous day. The report is generated in the form of a JSON file which we upload as an Action run artifact. Additionally it prints the summarized report as an Action run Summary.
+This action will generate GHAS Metric report for the previous day. The report is generated in the form of a JSON or PDF file which we upload as an Action run artifact. The report can also be reported in a new Issue in a repository along with separate Issues for the opened GHAS alerts.
+Additionally it prints the summarized report as an Action run Summary.
 
 The report will include the following metrics for Dependabot, Code Scanning and Secret scanning:
 
 - Open alerts
 - Fixed alerts in the past X days _(X is the frequency of the report)_
 - Total MTTR (Mean Time To Remediate)
-- Total MTTD (Mean Time To Detect) for Code Scanning and Secret Scanning
+- Total MTTD (Mean Time To Detect) for Code Scanning and Secret Scanning  _(Note: This is experimental. It hasn't been worked out properly, yet!)_
 
 ## Development
 
@@ -90,13 +91,17 @@ Currently the action supports the following configuration options:
 - `org` - The name of the organization to generate the report for. This is a required field.
 - `features` - A comma separated list of features to generate the report for. This is a required field. The supported values are: `dependabot`, `code-scanning` and `secret-scanning`.
 - `frequency` - Used to calculate the `Fixed alerts in the past X days`. Possible values are `daily`, `weekly`, `monthly`.
-- `ouput-format` - The format of the report. A comma separated list of values for the output format. Supported currentl: `json` and `pdf`. Default is `json, pdf`.
+- `ouput-format` - The format of the report. A comma separated list of values for the output format. Supported currently: `json`, `pdf`, `issues`, `github-output`. Default is `json, pdf`.
+
+_⚠️ Warning ⚠️: `issues` output is inteded to be used only on single `Repository` scope. It will most probablly hit API rate limits when used on `Organization` level._
 
 ### Output
 
 The action will output:
 
 - The report in JSON format in `report-json` variable. You can use `${{ steps.generate-report.outputs.report-json }}` in subsequent jobs to process the report.
+- The report in PDF format will generate a PDF file.
+- THe `issues` output will create Issues for each new open alert in the given `frequency` to the repository.
 - Summarized report as an Action run Summary.
 - It is also generate the report in the defined `output-format` as an artifact. You can upload these using `actions/upload-artifact@v3` as shown in the example workflow.
 
