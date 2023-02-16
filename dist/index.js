@@ -77829,6 +77829,9 @@ WebPRiffParser dominikhlbg@gmail.com
     const inputs_inputs = async () => {
       try {
         // get the inputs
+        const baseUrl =
+          process.env.GITHUB_URL ||
+          core.getInput("server-url", { required: false });
         const team =
           process.env.TEAM || core.getInput("team", { required: false });
         const repo =
@@ -77855,6 +77858,7 @@ WebPRiffParser dominikhlbg@gmail.com
           .replace(/\s/g, "")
           .toLowerCase()
           .split(",", 3);
+        core.debug(`The following base url was inputted: ${baseUrl}`);
         core.debug(`The following team was inputted: ${team}`);
         core.debug(`The following repo was inputted: ${repo}`);
         core.debug(`The following org was inputted: ${org}`);
@@ -77881,7 +77885,15 @@ WebPRiffParser dominikhlbg@gmail.com
     };
 
     // EXTERNAL MODULE: ./node_modules/@octokit/action/dist-node/index.js
-    var dist_node = __nccwpck_require__(1231); // CONCATENATED MODULE: ./src/github/Commit.ts
+    var dist_node = __nccwpck_require__(1231); // CONCATENATED MODULE: ./src/github/MyOctokit.ts
+    class MyOctokit extends dist_node /* Octokit */.v {
+      constructor() {
+        super({
+          baseUrl: "https://api.github.com",
+        });
+      }
+    } // CONCATENATED MODULE: ./src/github/Commit.ts
+
     const GetCommitDate = async (owner, repository, alerts, commitShaField) => {
       try {
         for (const alert of alerts) {
@@ -77918,7 +77930,7 @@ WebPRiffParser dominikhlbg@gmail.com
       return alerts;
     };
     const GetCommitData = async (owner, repository, commitSha) => {
-      const octokit = new dist_node /* Octokit */.v();
+      const octokit = new MyOctokit();
       const { data: commitData } = await octokit.request(
         "GET /repos/{owner}/{repo}/commits/{commitSha}",
         {
@@ -78091,7 +78103,7 @@ WebPRiffParser dominikhlbg@gmail.com
     const SecretScanningAlerts = async (owner, repository) => {
       let res = [];
       try {
-        const octokit = new dist_node /* Octokit */.v();
+        const octokit = new MyOctokit();
         const iterator = await octokit.paginate(
           "GET /repos/{owner}/{repo}/secret-scanning/alerts",
           {
@@ -78166,7 +78178,7 @@ WebPRiffParser dominikhlbg@gmail.com
     const DependabotAlerts = async (owner, repository) => {
       let res = [];
       try {
-        const octokit = new dist_node /* Octokit */.v();
+        const octokit = new MyOctokit();
         const iterator = await octokit.paginate(
           "GET /repos/{owner}/{repo}/dependabot/alerts",
           {
@@ -78227,7 +78239,7 @@ WebPRiffParser dominikhlbg@gmail.com
     const CodeScanningAlerts = async (owner, repository) => {
       let res = [];
       try {
-        const octokit = new dist_node /* Octokit */.v();
+        const octokit = new MyOctokit();
         const iterator = await octokit.paginate(
           "GET /repos/{owner}/{repo}/code-scanning/alerts",
           {
@@ -78324,14 +78336,14 @@ WebPRiffParser dominikhlbg@gmail.com
     } // CONCATENATED MODULE: ./src/github/Repositories.ts
 
     const getRepositoriesForOrg = async (org) => {
-      const octokit = new dist_node /* Octokit */.v();
+      const octokit = new MyOctokit();
       const repos = await octokit.paginate(`GET /orgs/${org}/repos`, {
         per_page: 100,
       });
       return repos;
     };
     const getRepositoriesForTeamAsAdmin = async (org, teamSlug) => {
-      const octokit = new dist_node /* Octokit */.v();
+      const octokit = new MyOctokit();
       //get team id from slug
       const team = await octokit.rest.teams.getByName({
         org: org,
@@ -78343,7 +78355,7 @@ WebPRiffParser dominikhlbg@gmail.com
       return repos.filter((repo) => repo.permissions?.admin);
     };
     const getRepository = async (owner, repo) => {
-      const octokit = new dist_node /* Octokit */.v();
+      const octokit = new MyOctokit();
       const response = await octokit.rest.repos.get({
         owner: owner,
         repo: repo,
@@ -78523,7 +78535,7 @@ WebPRiffParser dominikhlbg@gmail.com
         // itterate over alerts
         for (const issue of issues) {
           // create issue
-          const octokit = new dist_node /* Octokit */.v();
+          const octokit = new MyOctokit();
           const issue_result = await octokit.rest.issues.create({
             owner: issue.owner,
             repo: issue.repo,
@@ -78543,7 +78555,7 @@ WebPRiffParser dominikhlbg@gmail.com
       // async function to create issue
       async createIssue(issue) {
         // create issue
-        const octokit = new dist_node /* Octokit */.v();
+        const octokit = new MyOctokit();
         const issue_report = await octokit.rest.issues.create({
           owner: issue.owner,
           repo: issue.repo,
@@ -78553,7 +78565,7 @@ WebPRiffParser dominikhlbg@gmail.com
         return issue_report.data.number;
       }
       async getAllIssues(org, repo) {
-        const octokit = new dist_node /* Octokit */.v();
+        const octokit = new MyOctokit();
         const res = await octokit.rest.issues.listForRepo({
           owner: org,
           repo: repo,
