@@ -37,7 +37,7 @@ Invoking GHAS Metrics Report action is as simple as:
   - name: Generate GHAS Metrics Report
         uses: theztefan/ghas-metric-report
         env:
-          GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           repo: "Repo-name"
           org: "Organization-name"
@@ -56,12 +56,8 @@ on:
 jobs:
   ghas-metrics-report:
     name: GitHub Advanced Security - Metrics Report Action
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
-      - name: Git Checkout
-        uses: actions/checkout@v3
-        with:
-          path: ghas-metrics-report
       - name: Get Token
         id: get_workflow_token
         uses: peter-murray/workflow-application-token-action@v2
@@ -73,10 +69,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
         with:
-          repo: "ghas-metrics-report"
-          org: "advanced-security-demo"
+          repo: ${{ github.event.repository.name }}
+          org: ${{ github.repository_owner }}
           features: "dependabot, code-scanning, secret-scanning"
-          frequency: "weekly"
+          frequency: "daily"
+          output-format: "json, pdf, issues, github-output"
       - name: Upload GHAS metrics report as artifact
         uses: actions/upload-artifact@v3
         with:
@@ -107,6 +104,47 @@ The action will output:
 - It is also generate the report in the defined `output-format` as an artifact. You can upload these using `actions/upload-artifact@v3` as shown in the example workflow.
 
 ![Sample report output](ghas-metrics-report-sample-summary.png)
+
+### GitHub Enterprise Server support
+
+You can use this action with GitHub Enterprise Server by setting the `GITHUB_API_URL` environment variable to the URL of your GitHub Enterprise Server instance. For example, if your GitHub Enterprise Server instance is at `https://github.example.com`, you would set `GITHUB_API_URL` to `https://github.example.com/api/v3`.
+
+```yaml
+name: "GitHub Advanced Security - Metrics Report Action"
+on:
+  schedule:
+    - cron: "30 5 * * *" # Run every day at 5.30
+
+jobs:
+  ghas-metrics-report:
+    name: GitHub Advanced Security - Metrics Report Action
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Token
+        id: get_workflow_token
+        uses: peter-murray/workflow-application-token-action@v2
+        with:
+          application_id: ${{ secrets.APPLICATION_ID }}
+          application_private_key: ${{ secrets.APPLICATION_PRIVATE_KEY }}
+      - name: Generate GHAS Metrics Report
+        uses: theztefan/ghas-metrics-report
+        env:
+          GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
+          GITHUB_API_URL: "https://github.example.com/api/v3"
+        with:
+          repo: ${{ github.event.repository.name }}
+          org: ${{ github.repository_owner }}
+          features: "dependabot, code-scanning, secret-scanning"
+          frequency: "daily"
+          output-format: "json, pdf, issues, github-output"
+      - name: Upload GHAS metrics report as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ghas-metrics-report
+          path: ${{ github.workspace }}/ghas-report.*
+```
+
+⚠️ Important ⚠️: The dependabot REST API is not supported on GitHub Enterprise Server bellow version 3.8.0. If you are using a version of GitHub Enterprise Server bellow 3.8.0, you will need to remove `dependabot` from the `features` input.
 
 ## Contrubting
 

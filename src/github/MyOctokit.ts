@@ -4,7 +4,7 @@ import { throttling } from "@octokit/plugin-throttling";
 export class MyOctokit extends Octokit {
   constructor() {
     super({
-      baseUrl: process.env.GITHUB_URL ?? "https://api.github.com",
+      baseUrl: process.env.GITHUB_API_URL ?? "https://api.github.com",
       auth: process.env.GITHUB_TOKEN,
       throttle: {
         onRateLimit: (retryAfter, options, octokit) => {
