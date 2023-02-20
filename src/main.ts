@@ -155,6 +155,7 @@ const run = async (): Promise<void> => {
         );
         break;
       }
+      case "summary":
       case "pdf": {
         const report = format === "pdf" ? new PDFReport() : new SummaryReport();
         report.prepare();
