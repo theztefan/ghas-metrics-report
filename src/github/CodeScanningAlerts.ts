@@ -1,6 +1,7 @@
 import * as core from "@actions/core";
 import { Octokit } from "@octokit/action";
 import { CodeScanningAlert } from "../types/common/main";
+import { MyOctokit } from "./MyOctokit";
 
 export const CodeScanningAlerts = async (
   owner: string,
@@ -8,7 +9,7 @@ export const CodeScanningAlerts = async (
 ): Promise<CodeScanningAlert[]> => {
   let res: Array<CodeScanningAlert> = [];
   try {
-    const octokit = new Octokit();
+    const octokit = new MyOctokit();
     const iterator = await octokit.paginate(
       "GET /repos/{owner}/{repo}/code-scanning/alerts",
       {

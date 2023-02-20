@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import { Octokit } from "@octokit/action";
+import { MyOctokit } from "./MyOctokit";
 import {
   SecretScanningAlert,
   SecretScanningLocation,
@@ -11,7 +12,7 @@ export const SecretScanningAlerts = async (
 ): Promise<SecretScanningAlert[]> => {
   let res: Array<SecretScanningAlert> = [];
   try {
-    const octokit = new Octokit();
+    const octokit = new MyOctokit();
     const iterator = await octokit.paginate(
       "GET /repos/{owner}/{repo}/secret-scanning/alerts",
       {

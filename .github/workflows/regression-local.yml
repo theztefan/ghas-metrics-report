@@ -17,11 +17,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RUN_USING_ACT: "true"
         with:
-          repo: "elc-demo"
-          org: "thez-org"
+          repo: "hm-demo"
+          org: "advanced-security-demo"
           features: "dependabot, code-scanning, secret-scanning"
-          frequency: "monthly"
-          output-format: "json, pdf"
+          frequency: "daily"
+          output-format: "json, pdf, issues"
       # - name: upload GHAS metrics report
       #   uses: actions/upload-artifact@v3
       #   with:

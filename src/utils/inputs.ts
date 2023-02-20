@@ -11,6 +11,9 @@ dotenv.config();
 export const inputs = async (): Promise<inputsReturned> => {
   try {
     // get the inputs
+    const baseUrl: string =
+      (process.env.GITHUB_API_URL as string) || "https://api.github.com";
+
     const team: string =
       (process.env.TEAM as string) ||
       core.getInput("team", { required: false });
@@ -42,6 +45,7 @@ export const inputs = async (): Promise<inputsReturned> => {
       .toLowerCase()
       .split(",", 3) as outputFormat[];
 
+    core.debug(`The following base url was inputted: ${baseUrl}`);
     core.debug(`The following team was inputted: ${team}`);
     core.debug(`The following repo was inputted: ${repo}`);
     core.debug(`The following org was inputted: ${org}`);

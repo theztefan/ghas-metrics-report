@@ -21,12 +21,14 @@ inputs:
     required: true
     default: weekly
   output-format:
-    description: "The output format of the report. Can be json or pdf"
+    description: "The output format of the report. Can be json, pdf or Issues"
     required: true
-    default: json, pdf
+    default: json, pdf, issues
 outputs:
   report-json:
     description: "GHAS Metrics Report"
+  created-issues-ids:
+    description: "The IDs of the GitHub Issues created by the action"
 runs:
   using: "node16"
   main: "dist/index.js"

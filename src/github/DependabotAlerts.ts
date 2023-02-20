@@ -1,6 +1,7 @@
 import * as core from "@actions/core";
 import { Octokit } from "@octokit/action";
 import { DependancyAlert } from "../types/common/main";
+import { MyOctokit } from "./MyOctokit";
 
 export const DependabotAlerts = async (
   owner: string,
@@ -8,7 +9,7 @@ export const DependabotAlerts = async (
 ): Promise<DependancyAlert[]> => {
   let res: Array<DependancyAlert> = [];
   try {
-    const octokit = new Octokit();
+    const octokit = new MyOctokit();
     const iterator = await octokit.paginate(
       "GET /repos/{owner}/{repo}/dependabot/alerts",
       {

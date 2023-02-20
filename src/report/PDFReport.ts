@@ -2,8 +2,9 @@ import { Report } from "./Report";
 import jsPDF from "jspdf";
 import autoTable, { RowInput } from "jspdf-autotable";
 import { join } from "path";
+import { ReportMetadata } from "./ReportMetadata";
 
-export class PDFReport implements Report {
+export class PDFReport extends ReportMetadata implements Report {
   private pdf: jsPDF;
   private position: number;
   private filename = "ghas-report.pdf";
