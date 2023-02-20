@@ -111,22 +111,14 @@ const run = async (): Promise<void> => {
     if (repository.features.length === 0) return;
 
     summaryReport.addHeader(
-      `Repository ${repository.owner}/${repository.name}`
+      summaryReport.addHeading(repository.owner, repository.name)
     );
 
     repository.features.forEach((feature) => {
-      const list = [
-        `Open Alerts: ${feature.metrics?.openVulnerabilities}`,
-        `Fixed in the past X days: ${feature.metrics?.fixedLastXDays}`,
-        `Opened in the past X days: ${feature.metrics?.openedLastXDays}`,
-        `Frequency: ${inputs.frequency}`,
-        "MTTR: " + secondsToReadable(feature.metrics?.mttr.mttr),
-        "MTTD: " + secondsToReadable(feature.metrics?.mttd?.mttd) || "N/A",
-      ];
       summaryReport.addSection(
         feature.prettyName,
         `${feature.prettyName} - top 10`,
-        list,
+        summaryReport.addList(feature, inputs.frequency),
         feature.attributes,
         feature.summaryTop10()
       );
@@ -134,7 +126,7 @@ const run = async (): Promise<void> => {
   });
 
   summaryReport.write();
-  core.info(`[✅] Actions Summary Report written`);
+  core.info(`[✅] Summary Report written`);
 
   const outputWithoutMetadata = {
     ...output,
@@ -155,30 +147,20 @@ const run = async (): Promise<void> => {
         );
         break;
       }
-      case "summary":
       case "pdf": {
-        const report = format === "pdf" ? new PDFReport() : new SummaryReport();
+        const report = new PDFReport();
         report.prepare();
 
         output.repositories.forEach((repository) => {
           if (repository.features.length === 0) return;
-
-          report.addHeader(`Repository ${repository.owner}/${repository.name}`);
-
+          report.addHeader(
+            report.addHeading(repository.owner, repository.name)
+          );
           repository.features.forEach((feature) => {
-            const list = [
-              `Open Alerts: ${feature.metrics?.openVulnerabilities}`,
-              `Fixed in the past X days: ${feature.metrics?.fixedLastXDays}`,
-              `Opened in the past X days: ${feature.metrics?.openedLastXDays}`,
-              `Frequency: ${inputs.frequency}`,
-              "MTTR: " + secondsToReadable(feature.metrics?.mttr.mttr),
-              "MTTD: " + secondsToReadable(feature.metrics?.mttd?.mttd) ||
-                "N/A",
-            ];
             report.addSection(
               feature.prettyName,
               `${feature.prettyName} - top 10`,
-              list,
+              report.addList(feature, inputs.frequency),
               feature.attributes,
               feature.summaryTop10()
             );
