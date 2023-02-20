@@ -2,10 +2,6 @@ name: "Github Advanced Sceurity Metrics Report"
 author: "theztefan"
 description: "A GitHub Action to generate a report of the Advanced Security Metrics for a given repository"
 inputs:
-  server-url:
-    description: "The URL of the GitHub Enterprise Server to connect to. If not provided, the action will connect to github.com."
-    required: false
-    default: "https://api.github.com"
   team:
     description: "The team to generate the report for. Provide it to run the action on all repositories the team is an admin of."
     required: false

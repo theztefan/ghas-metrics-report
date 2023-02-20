@@ -12,8 +12,7 @@ export const inputs = async (): Promise<inputsReturned> => {
   try {
     // get the inputs
     const baseUrl: string =
-      process.env.GITHUB_URL ||
-      core.getInput("server-url", { required: false });
+      process.env.GITHUB_URL as string || "https://api.github.com";
 
     const team: string =
       (process.env.TEAM as string) ||
