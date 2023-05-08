@@ -146,7 +146,6 @@ jobs:
 
 ⚠️ Important ⚠️: The dependabot REST API is not supported on GitHub Enterprise Server bellow version 3.8.0. If you are using a version of GitHub Enterprise Server bellow 3.8.0, you will need to remove `dependabot` from the `features` input.
 
-## Contrubting
-
+## Contributing
 - Create an issue to the repo with suggestions and bugs
 - Raise a pull request :)
