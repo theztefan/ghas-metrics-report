@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import { Octokit } from "@octokit/action";
+import { MyOctokit } from "./MyOctokit";
 
 export const GetCommitDate = async (
   owner: string,
@@ -41,7 +42,7 @@ export const GetCommitData = async (
   repository: string,
   commitSha: string
 ): Promise<{ commit: { author: { date: string } } }> => {
-  const octokit = new Octokit();
+  const octokit = new MyOctokit();
 
   const { data: commitData } = await octokit.request(
     "GET /repos/{owner}/{repo}/commits/{commitSha}",

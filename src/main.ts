@@ -1,6 +1,10 @@
 import * as core from "@actions/core";
-import { inputs as getInput, secondsToReadable } from "./utils";
-import { Alert, AlertsMetrics, ReportType } from "./types/common/main";
+import {
+  AlertsMetrics as AlertsMetricsUtils,
+  inputs as getInput,
+  secondsToReadable,
+} from "./utils";
+import { Alert, AlertsMetrics, Issue, ReportType } from "./types/common/main";
 import { randomUUID } from "crypto";
 import { Context } from "./context/Context";
 import {
@@ -11,6 +15,12 @@ import {
 import { JSONReport } from "./report/JSONReport";
 import { PDFReport } from "./report/PDFReport";
 import { SummaryReport } from "./report/SummaryReport";
+import { Issues } from "./github/Issues";
+import {
+  isCodeScanningAlert,
+  isDependancyAlert,
+  isSecretScanningAlert,
+} from "./utils/AlertMetrics";
 
 const run = async (): Promise<void> => {
   // get inputs
@@ -90,50 +100,67 @@ const run = async (): Promise<void> => {
   }
 
   if (process.env.RUN_USING_ACT !== "true") {
-    inputs.outputFormat.push("html", "github-output");
+    inputs.outputFormat.push("github-output");
   }
 
-  inputs.outputFormat.forEach((format) => {
-    const outputWithoutMetadata = {
-      ...output,
-      repositories: output.repositories.map((repository) => ({
-        ...repository,
-        features: repository.features.map((feature) =>
-          feature.printable(feature.prettyName, feature.metrics)
-        ),
-      })),
-    };
+  // Always write Summary Report
+  const summaryReport = new SummaryReport();
+  summaryReport.prepare();
 
+  output.repositories.forEach((repository) => {
+    if (repository.features.length === 0) return;
+
+    summaryReport.addHeader(
+      summaryReport.addHeading(repository.owner, repository.name)
+    );
+
+    repository.features.forEach((feature) => {
+      summaryReport.addSection(
+        feature.prettyName,
+        `${feature.prettyName} - top 10`,
+        summaryReport.addList(feature, inputs.frequency),
+        feature.attributes,
+        feature.summaryTop10()
+      );
+    });
+  });
+
+  summaryReport.write();
+  core.info(`[✅] Summary Report written`);
+
+  const outputWithoutMetadata = {
+    ...output,
+    repositories: output.repositories.map((repository) => ({
+      ...repository,
+      features: repository.features.map((feature) =>
+        feature.printable(feature.prettyName, feature.metrics)
+      ),
+    })),
+  };
+
+  inputs.outputFormat.forEach(async (format) => {
     switch (format) {
-      case "json":
+      case "json": {
         JSONReport.write(
           "ghas-report.json",
           JSON.stringify(outputWithoutMetadata, null, 2)
         );
         break;
-      case "pdf":
-      case "html": {
-        const report = format === "pdf" ? new PDFReport() : new SummaryReport();
+      }
+      case "pdf": {
+        const report = new PDFReport();
         report.prepare();
 
         output.repositories.forEach((repository) => {
           if (repository.features.length === 0) return;
-
-          report.addHeader(`Repository ${repository.owner}/${repository.name}`);
-
+          report.addHeader(
+            report.addHeading(repository.owner, repository.name)
+          );
           repository.features.forEach((feature) => {
-            const list = [
-              `Open Alerts: ${feature.metrics?.openVulnerabilities}`,
-              `Fixed in the past X days: ${feature.metrics?.fixedLastXDays}`,
-              `Frequency: ${inputs.frequency}`,
-              "MTTR: " + secondsToReadable(feature.metrics?.mttr.mttr),
-              "MTTD: " + secondsToReadable(feature.metrics?.mttd?.mttd) ||
-                "N/A",
-            ];
             report.addSection(
               feature.prettyName,
               `${feature.prettyName} - top 10`,
-              list,
+              report.addList(feature, inputs.frequency),
               feature.attributes,
               feature.summaryTop10()
             );
@@ -143,16 +170,71 @@ const run = async (): Promise<void> => {
         report.write();
         break;
       }
-      case "github-output":
+      case "github-output": {
         core.setOutput(
           "report-json",
           JSON.stringify(outputWithoutMetadata, null, 2)
         );
         core.info(`[✅] Report written output 'report-json' variable`);
         break;
-      default:
+      }
+      case "issues": {
+        const issues: Issue[] = [];
+        const github_issues = new Issues();
+        output.repositories.forEach((repository) => {
+          if (repository.features.length === 0) return;
+
+          // Create an issue for the Summary Report
+          const summaryReportIssue: Issue = {
+            owner: inputs.org,
+            repo: repository.name,
+            title:
+              "GHAS Summary Report" +
+              " - " +
+              new Date(Date.now()).toDateString(),
+            body: summaryReport.stringify(),
+            labels: ["GHAS", "Summary Report"],
+          };
+          issues.push(summaryReportIssue);
+
+          repository.features.forEach((feature) => {
+            feature.metrics.newOpenAlerts.forEach((alert) => {
+              let title = "";
+              if (isDependancyAlert(alert)) {
+                title = alert.security_advisory.summary;
+              } else if (isCodeScanningAlert(alert)) {
+                title = alert.rule.description;
+              } else if (isSecretScanningAlert(alert)) {
+                title = alert.secret_type_display_name;
+              }
+              const issue: Issue = {
+                owner: repository.owner,
+                repo: repository.name,
+                title: feature.prettyName + " - " + title,
+                body: "Tracking issue for:\n" + alert.html_url,
+                labels: ["GHAS", feature.prettyName],
+              };
+              issues.push(issue);
+            });
+          });
+        });
+        if (issues.length === 0) {
+          core.info(`[✅] No issues to create`);
+          break;
+        }
+        const issue_ids = await github_issues.createIssues(issues);
+
+        core.setOutput(
+          "created-issues-ids",
+          JSON.stringify(issue_ids, null, 2)
+        );
+        core.info(`[✅] Issues created: ${JSON.stringify(issue_ids, null, 2)}`);
+        break;
+      }
+      default: {
         core.warning(`[⚠️] Unknown output format ${format}`);
         break;
+      }
     }
     core.info(`[✅] ${format.toUpperCase()} Report written`);
   });

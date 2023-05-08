@@ -1,8 +1,10 @@
 import * as core from "@actions/core";
 import { SummaryTableRow } from "@actions/core/lib/summary";
+import { stringify } from "querystring";
 import { Report } from "./Report";
+import { ReportMetadata } from "./ReportMetadata";
 
-export class SummaryReport implements Report {
+export class SummaryReport extends ReportMetadata implements Report {
   prepare(): void {
     core.summary.addHeading("GHAS Metrics Summary");
     core.summary.addBreak();
@@ -34,5 +36,9 @@ export class SummaryReport implements Report {
 
   write(): void {
     core.summary.write();
+  }
+
+  stringify(): string {
+    return core.summary.stringify();
   }
 }

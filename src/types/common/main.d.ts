@@ -12,7 +12,7 @@ type inputsReturned = {
 
 type ghasFeatures = "secret-scanning" | "dependabot" | "code-scanning";
 type reportFrequency = "weekly" | "monthly" | "daily";
-type outputFormat = "json" | "pdf" | "html" | "github-output";
+type outputFormat = "json" | "pdf" | "github-output" | "issues" | "summary";
 
 interface MTTRMetrics {
   mttr: number;
@@ -24,8 +24,10 @@ interface MTTDMetrics {
 
 export interface AlertsMetrics {
   fixedLastXDays: number;
+  openedLastXDays: number;
   openVulnerabilities: number;
   top10: Alert[];
+  newOpenAlerts: Alert[];
   mttr: MTTRMetrics;
   mttd?: MTTDMetrics;
 }
@@ -235,4 +237,12 @@ export interface ReportType {
     owner: string;
     name: string;
   }[];
+}
+
+export interface Issue {
+  owner: string;
+  repo: string;
+  title: string;
+  body: string;
+  labels: string[];
 }
