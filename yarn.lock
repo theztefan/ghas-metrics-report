@@ -2582,10 +2582,10 @@ json5@^2.2.1:
   resolved "https://registry.npmjs.org/json5/-/json5-2.2.2.tgz"
   integrity sha512-46Tk9JiOL2z7ytNQWFLpj99RZkVgeHf87yGQKsIkaPz1qSH9UczKH1rO7K3wgRselo0tYMUNfecYpm/p1vC7tQ==
 
-jspdf-autotable@^3.5.28:
-  version "3.5.28"
-  resolved "https://registry.npmjs.org/jspdf-autotable/-/jspdf-autotable-3.5.28.tgz"
-  integrity sha512-eNYt5mUxCGa1Y0bmOhGXU+Va/P2jNkgOgUPGIpZp2rbZUauU34s0q3S59Jps5zi2u90nQy7DmD/D+sdesJLIEA==
+jspdf-autotable@^3.5.31:
+  version "3.5.31"
+  resolved "https://registry.yarnpkg.com/jspdf-autotable/-/jspdf-autotable-3.5.31.tgz#95f0d113639560ba27339e6eb9e2601881839bcc"
+  integrity sha512-Lc1KuLGDQWW/5t57Z/+c2E94XQV3jV2QVU3xMRiwvcm/nMx79aCkpPCsxLzJZVFneZvz4XoA8+egQR1QajYiWw==
 
 jspdf@^2.5.1:
   version "2.5.1"
