@@ -1,4 +1,4 @@
-name: "Github Advanced Sceurity Metrics Report"
+name: "GitHub Advanced Security Metrics Report"
 author: "theztefan"
 description: "A GitHub Action to generate a report of the Advanced Security Metrics for a given repository"
 inputs:
