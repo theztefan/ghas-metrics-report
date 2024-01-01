@@ -30,7 +30,7 @@ jobs:
           frequency: "daily"
           output-format: "json, pdf, issues"
       - name: upload GHAS metrics report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ghas-metrics-report
           path: ghas-metrics-report/dist/report.json
