@@ -30,7 +30,7 @@ export class Dependabot extends Printable implements Feature {
 
   async alertsMetrics(
     frequency: reportFrequency,
-    alerts: DependencyOrCodeAlert[]
+    alerts: DependencyOrCodeAlert[],
   ): Promise<AlertsMetricsType> {
     this.metrics = AlertsMetrics(alerts, frequency, "fixed_at", "fixed", false);
 

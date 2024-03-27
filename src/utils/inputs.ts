@@ -65,7 +65,7 @@ export const inputs = async (): Promise<inputsReturned> => {
     if (e instanceof Error) {
       core.debug(`${e}`);
       core.setFailed(
-        "Error: There was an error getting the inputs. Please check the logs."
+        "Error: There was an error getting the inputs. Please check the logs.",
       );
       throw new Error(e.message);
     }

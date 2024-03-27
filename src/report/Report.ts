@@ -6,7 +6,7 @@ export interface Report {
     heading: string,
     list: string[],
     tableHeaders: string[],
-    tableBody: unknown[]
+    tableBody: unknown[],
   ): void;
   write(): void;
 }

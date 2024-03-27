@@ -3,7 +3,7 @@ import { Endpoints } from "@octokit/types";
 import { MyOctokit } from "./MyOctokit";
 
 export const getRepositoriesForOrg = async (
-  org: string
+  org: string,
 ): Promise<Endpoints["GET /orgs/{org}/repos"]["response"]["data"]> => {
   const octokit = new MyOctokit();
 
@@ -17,7 +17,7 @@ export const getRepositoriesForOrg = async (
 
 export const getRepositoriesForTeamAsAdmin = async (
   org: string,
-  teamSlug: string
+  teamSlug: string,
 ): Promise<Endpoints["GET /teams/{team_id}/repos"]["response"]["data"]> => {
   const octokit = new MyOctokit();
 
@@ -38,7 +38,7 @@ export const getRepositoriesForTeamAsAdmin = async (
 
 export const getRepository = async (
   owner: string,
-  repo: string
+  repo: string,
 ): Promise<Endpoints["GET /repos/{owner}/{repo}"]["response"]["data"]> => {
   const octokit = new MyOctokit();
 

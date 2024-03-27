@@ -19,7 +19,7 @@ export class SummaryReport extends ReportMetadata implements Report {
     heading: string,
     list: string[],
     tableHeaders: string[],
-    tableBody: unknown[]
+    tableBody: unknown[],
   ): void {
     core.summary
       .addHeading(name)

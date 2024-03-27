@@ -5,7 +5,7 @@ import { MyOctokit } from "./MyOctokit";
 
 export const CodeScanningAlerts = async (
   owner: string,
-  repository: string
+  repository: string,
 ): Promise<CodeScanningAlert[]> => {
   let res: Array<CodeScanningAlert> = [];
   try {
@@ -19,7 +19,7 @@ export const CodeScanningAlerts = async (
       },
       (response) => {
         return response.data;
-      }
+      },
     );
     res = iterator as CodeScanningAlert[];
   } catch (error) {

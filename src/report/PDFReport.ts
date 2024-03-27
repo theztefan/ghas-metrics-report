@@ -18,7 +18,7 @@ export class PDFReport extends ReportMetadata implements Report {
     text: string,
     fontSize: number,
     xPosition,
-    yPosition = this.jumpAndUsePosition()
+    yPosition = this.jumpAndUsePosition(),
   ) {
     this.pdf.setFontSize(fontSize);
     this.pdf.text(text, xPosition, yPosition);
@@ -47,7 +47,7 @@ export class PDFReport extends ReportMetadata implements Report {
     heading: string,
     list: string[],
     tableHeaders: string[],
-    tableBody: unknown[]
+    tableBody: unknown[],
   ): void {
     if (this.pdf.getNumberOfPages() !== 1) this.position = 30;
 
@@ -58,8 +58,8 @@ export class PDFReport extends ReportMetadata implements Report {
       this.pdf.text(
         entry,
         index % 2 === 0 ? 10 : 80,
-        index % 2 === 0 ? this.jumpAndUsePosition() : this.position
-      )
+        index % 2 === 0 ? this.jumpAndUsePosition() : this.position,
+      ),
     );
 
     this.setFontAndWriteText(heading, 15, 10);
@@ -96,7 +96,7 @@ export class PDFReport extends ReportMetadata implements Report {
     this.pdf.deletePage(this.pdf.getNumberOfPages());
     const outputFilename = join(
       process.env.GITHUB_WORKSPACE as string,
-      this.filename
+      this.filename,
     );
     this.pdf.save(outputFilename);
     return;

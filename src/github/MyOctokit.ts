@@ -9,7 +9,7 @@ export class MyOctokit extends Octokit {
       throttle: {
         onRateLimit: (retryAfter, options, octokit) => {
           octokit.log.warn(
-            `Request quota exhausted for request ${options.method} ${options.url}`
+            `Request quota exhausted for request ${options.method} ${options.url}`,
           );
           if (options.request.retryCount <= 2) {
             console.log(`Retrying after ${retryAfter} seconds!`);
@@ -18,11 +18,11 @@ export class MyOctokit extends Octokit {
         },
         onSecondaryRateLimit: (retryAfter, options, octokit) => {
           octokit.log.warn(
-            `Secondary rate limit for request ${options.method} ${options.url}`
+            `Secondary rate limit for request ${options.method} ${options.url}`,
           );
           if (options.request.retryCount <= 2) {
             console.log(
-              `Secondary Limit - Retrying after ${retryAfter} seconds!`
+              `Secondary Limit - Retrying after ${retryAfter} seconds!`,
             );
             return true;
           }

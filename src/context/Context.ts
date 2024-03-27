@@ -44,7 +44,7 @@ export class Context {
     frequency: reportFrequency,
     alerts: Alert[],
     org?: string,
-    repo?: string
+    repo?: string,
   ): Promise<AlertsMetricsType> {
     return await this._feature.alertsMetrics(frequency, alerts, org, repo);
   }

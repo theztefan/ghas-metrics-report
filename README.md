@@ -75,7 +75,7 @@ jobs:
           frequency: "daily"
           output-format: "json, pdf, issues, github-output"
       - name: Upload GHAS metrics report as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ghas-metrics-report
           path: ${{ github.workspace }}/ghas-report.*
@@ -101,7 +101,7 @@ The action will output:
 - The report in PDF format will generate a PDF file.
 - THe `issues` output will create Issues for each new open alert in the given `frequency` to the repository.
 - Summarized report as an Action run Summary.
-- It is also generate the report in the defined `output-format` as an artifact. You can upload these using `actions/upload-artifact@v3` as shown in the example workflow.
+- It is also generate the report in the defined `output-format` as an artifact. You can upload these using `actions/upload-artifact@v4` as shown in the example workflow.
 
 ![Sample report output](ghas-metrics-report-sample-summary.png)
 
@@ -138,7 +138,7 @@ jobs:
           frequency: "daily"
           output-format: "json, pdf, issues, github-output"
       - name: Upload GHAS metrics report as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ghas-metrics-report
           path: ${{ github.workspace }}/ghas-report.*

@@ -16,11 +16,11 @@ export interface Feature {
     frequency: reportFrequency,
     alerts: Alert[],
     org?: string,
-    repo?: string
+    repo?: string,
   ): Promise<AlertsMetricsType>;
   summaryTop10(): string[][];
   printable(
     prettyName: string,
-    metrics: AlertsMetricsType
+    metrics: AlertsMetricsType,
   ): { prettyName: string; metrics: AlertsMetricsType };
 }

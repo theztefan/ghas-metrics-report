@@ -29,7 +29,7 @@ export class CodeScanning extends Printable implements Feature {
     frequency: reportFrequency,
     alerts: DependencyOrCodeAlert[],
     org: string,
-    repo: string
+    repo: string,
   ): Promise<AlertsMetricsType> {
     await GetCommitDate(org, repo, alerts, "most_recent_instance.commit_sha");
 
@@ -40,7 +40,7 @@ export class CodeScanning extends Printable implements Feature {
       "fixed",
       true,
       "commitDate",
-      "created_at"
+      "created_at",
     );
 
     return this.metrics;
