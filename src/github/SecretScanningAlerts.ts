@@ -8,7 +8,7 @@ import {
 
 export const SecretScanningAlerts = async (
   owner: string,
-  repository: string
+  repository: string,
 ): Promise<SecretScanningAlert[]> => {
   let res: Array<SecretScanningAlert> = [];
   try {
@@ -22,7 +22,7 @@ export const SecretScanningAlerts = async (
       },
       (response) => {
         return response.data;
-      }
+      },
     );
     res = iterator as SecretScanningAlert[];
 
@@ -33,10 +33,10 @@ export const SecretScanningAlerts = async (
           owner: owner,
           repo: repository,
           alert_number: alert.number,
-        }
+        },
       );
       alert["commitsSha"] = (locationData as SecretScanningLocation[]).map(
-        (location) => location.details.commit_sha
+        (location) => location.details.commit_sha,
       );
     }
   } catch (error) {

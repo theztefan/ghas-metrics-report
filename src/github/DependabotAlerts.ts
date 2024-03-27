@@ -5,7 +5,7 @@ import { MyOctokit } from "./MyOctokit";
 
 export const DependabotAlerts = async (
   owner: string,
-  repository: string
+  repository: string,
 ): Promise<DependancyAlert[]> => {
   let res: Array<DependancyAlert> = [];
   try {
@@ -19,7 +19,7 @@ export const DependabotAlerts = async (
       },
       (response) => {
         return response.data;
-      }
+      },
     );
     res = iterator as DependancyAlert[];
   } catch (error) {

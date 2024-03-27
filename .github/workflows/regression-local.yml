@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Git Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: ghas-metrics-report
       - name: Test Action
@@ -23,7 +23,7 @@ jobs:
           frequency: "daily"
           output-format: "json, pdf, issues"
       # - name: upload GHAS metrics report
-      #   uses: actions/upload-artifact@v3
+      #   uses: actions/upload-artifact@v4
       #   with:
       #     name: ghas-metrics-report
       #     path: ghas-metrics-report/dist/report.json

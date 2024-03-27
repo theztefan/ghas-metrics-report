@@ -5,7 +5,7 @@ export class JSONReport {
   static write(filename: string, data: string): void {
     const outputFilename = join(
       process.env.GITHUB_WORKSPACE as string,
-      filename
+      filename,
     );
     writeFileSync(outputFilename, data, {
       flag: "w",

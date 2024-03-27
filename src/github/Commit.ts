@@ -6,7 +6,7 @@ export const GetCommitDate = async (
   owner: string,
   repository: string,
   alerts: unknown[],
-  commitShaField: string
+  commitShaField: string,
 ): Promise<unknown[]> => {
   try {
     for (const alert of alerts) {
@@ -40,7 +40,7 @@ export const GetCommitDate = async (
 export const GetCommitData = async (
   owner: string,
   repository: string,
-  commitSha: string
+  commitSha: string,
 ): Promise<{ commit: { author: { date: string } } }> => {
   const octokit = new MyOctokit();
 
@@ -51,7 +51,7 @@ export const GetCommitData = async (
       repo: repository,
       commitSha: commitSha,
       per_page: 100,
-    }
+    },
   );
 
   return commitData;

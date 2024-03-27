@@ -28,7 +28,7 @@ export class SecretScanning extends Printable implements Feature {
     frequency: reportFrequency,
     alerts: SecretScanningAlert[],
     org: string,
-    repo: string
+    repo: string,
   ): Promise<AlertsMetricsType> {
     await GetCommitDate(org, repo, alerts, "commitsSha");
 
@@ -39,7 +39,7 @@ export class SecretScanning extends Printable implements Feature {
       "resolved",
       true,
       "commitDate",
-      "created_at"
+      "created_at",
     );
 
     return this.metrics;

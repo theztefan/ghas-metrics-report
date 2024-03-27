@@ -18,7 +18,7 @@ export const AlertsMetrics = (
   state: string,
   calculateMTTD: boolean,
   introducedDateField?: string,
-  detectedDateField?: string
+  detectedDateField?: string,
 ): AlertsMetricsType => {
   const todayDate: Date = new Date();
   todayDate.setHours(0, 0, 0, 0);
@@ -45,11 +45,11 @@ export const AlertsMetrics = (
         ? FilterBetweenDates(
             (a as DependencyOrCodeAlert).dismissed_at,
             pastDate,
-            todayDate
+            todayDate,
           )
         : (fixedLastXDays = fixedAlerts.filter((a) =>
-            FilterBetweenDates(a[fixedDateField], pastDate, todayDate)
-          ))
+            FilterBetweenDates(a[fixedDateField], pastDate, todayDate),
+          )),
   );
 
   //get Top 10 by criticality
@@ -59,7 +59,7 @@ export const AlertsMetrics = (
   openedLastXDays = openAlerts.filter(
     (a: CodeScanningAlert | DependencyOrCodeAlert | SecretScanningAlert) => {
       return FilterBetweenDates(a.created_at, pastDate, todayDate);
-    }
+    },
   );
 
   //get MTTR
@@ -70,7 +70,7 @@ export const AlertsMetrics = (
     mttd = CalculateMTTD(
       alerts as DependencyOrCodeAlert[],
       introducedDateField,
-      detectedDateField
+      detectedDateField,
     );
   }
 
@@ -90,7 +90,7 @@ export const AlertsMetrics = (
 export const CalculateMTTR = (
   alerts: Alert[],
   dateField: string,
-  state: string
+  state: string,
 ): MTTRMetrics => {
   let alert_count = 0;
   let total_time_to_remediate_seconds = 0;
@@ -115,7 +115,7 @@ export const CalculateMTTR = (
 export const CalculateMTTD = (
   alerts: DependencyOrCodeAlert[],
   introducedDateField: string,
-  detectedDateField: string
+  detectedDateField: string,
 ): MTTDMetrics => {
   let alert_count = 0;
   let total_time_to_detect_seconds = 0;
@@ -125,13 +125,13 @@ export const CalculateMTTD = (
       introducedDateField
         .split(".")
         .filter((s) => s)
-        .reduce((acc, val) => acc && acc[val], alert)
+        .reduce((acc, val) => acc && acc[val], alert),
     );
     const detectedDate: number = Date.parse(
       detectedDateField
         .split(".")
         .filter((s) => s)
-        .reduce((acc, val) => acc && acc[val], alert)
+        .reduce((acc, val) => acc && acc[val], alert),
     );
 
     const time_to_remediate = detectedDate - introducedDate;
@@ -150,7 +150,7 @@ export const CalculateMTTD = (
 const FilterBetweenDates = (
   stringDate: string,
   minDate: Date,
-  maxDate: Date
+  maxDate: Date,
 ): boolean => {
   const date: number = Date.parse(stringDate);
   return date >= minDate.getTime() && date < maxDate.getTime();
@@ -193,13 +193,13 @@ export function isDependancyAlert(alert: Alert): alert is DependancyAlert {
 }
 
 export function isCodeScanningAlert(
-  alert: CodeScanningAlert | DependencyOrCodeAlert | Alert
+  alert: CodeScanningAlert | DependencyOrCodeAlert | Alert,
 ): alert is CodeScanningAlert {
   return "rule" in alert && "severity" in alert.rule;
 }
 
 export function isSecretScanningAlert(
-  alert: SecretScanningAlert | Alert
+  alert: SecretScanningAlert | Alert,
 ): alert is SecretScanningAlert {
   return "secret_type_display_name" in alert;
 }

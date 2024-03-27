@@ -32,10 +32,10 @@ const run = async (): Promise<void> => {
   const repositories = [];
   if (inputs.team) {
     core.info(
-      `[🔎] Fetching repositories for team ${inputs.team} in org ${inputs.org}`
+      `[🔎] Fetching repositories for team ${inputs.team} in org ${inputs.org}`,
     );
     repositories.push(
-      ...(await getRepositoriesForTeamAsAdmin(inputs.org, inputs.team))
+      ...(await getRepositoriesForTeamAsAdmin(inputs.org, inputs.team)),
     );
   } else if (inputs.repo) {
     core.info(`[🔎] Fetching repository ${inputs.repo} in org ${inputs.org}`);
@@ -64,7 +64,7 @@ const run = async (): Promise<void> => {
 
       const alerts: Alert[] = await context.alerts(
         inputs.org as string,
-        repository.name
+        repository.name,
       );
 
       core.debug(`[🔎] ${context.prettyName} alerts: ` + alerts.length);
@@ -74,16 +74,16 @@ const run = async (): Promise<void> => {
         inputs.frequency,
         alerts,
         inputs.org as string,
-        repository.name
+        repository.name,
       );
 
       core.debug(
         `[🔎] ${context.prettyName} - MTTR: ` +
-          JSON.stringify(metrics.mttr.mttr)
+          JSON.stringify(metrics.mttr.mttr),
       );
       core.debug(
         `[🔎] ${context.prettyName} - MTTD: ` +
-          JSON.stringify(metrics.mttd?.mttd)
+          JSON.stringify(metrics.mttd?.mttd),
       );
 
       core.info(`[✅] ${context.prettyName} metrics calculated`);
@@ -111,7 +111,7 @@ const run = async (): Promise<void> => {
     if (repository.features.length === 0) return;
 
     summaryReport.addHeader(
-      summaryReport.addHeading(repository.owner, repository.name)
+      summaryReport.addHeading(repository.owner, repository.name),
     );
 
     repository.features.forEach((feature) => {
@@ -120,7 +120,7 @@ const run = async (): Promise<void> => {
         `${feature.prettyName} - top 10`,
         summaryReport.addList(feature, inputs.frequency),
         feature.attributes,
-        feature.summaryTop10()
+        feature.summaryTop10(),
       );
     });
   });
@@ -133,7 +133,7 @@ const run = async (): Promise<void> => {
     repositories: output.repositories.map((repository) => ({
       ...repository,
       features: repository.features.map((feature) =>
-        feature.printable(feature.prettyName, feature.metrics)
+        feature.printable(feature.prettyName, feature.metrics),
       ),
     })),
   };
@@ -143,7 +143,7 @@ const run = async (): Promise<void> => {
       case "json": {
         JSONReport.write(
           "ghas-report.json",
-          JSON.stringify(outputWithoutMetadata, null, 2)
+          JSON.stringify(outputWithoutMetadata, null, 2),
         );
         break;
       }
@@ -154,7 +154,7 @@ const run = async (): Promise<void> => {
         output.repositories.forEach((repository) => {
           if (repository.features.length === 0) return;
           report.addHeader(
-            report.addHeading(repository.owner, repository.name)
+            report.addHeading(repository.owner, repository.name),
           );
           repository.features.forEach((feature) => {
             report.addSection(
@@ -162,7 +162,7 @@ const run = async (): Promise<void> => {
               `${feature.prettyName} - top 10`,
               report.addList(feature, inputs.frequency),
               feature.attributes,
-              feature.summaryTop10()
+              feature.summaryTop10(),
             );
           });
         });
@@ -173,7 +173,7 @@ const run = async (): Promise<void> => {
       case "github-output": {
         core.setOutput(
           "report-json",
-          JSON.stringify(outputWithoutMetadata, null, 2)
+          JSON.stringify(outputWithoutMetadata, null, 2),
         );
         core.info(`[✅] Report written output 'report-json' variable`);
         break;
@@ -226,7 +226,7 @@ const run = async (): Promise<void> => {
 
         core.setOutput(
           "created-issues-ids",
-          JSON.stringify(issue_ids, null, 2)
+          JSON.stringify(issue_ids, null, 2),
         );
         core.info(`[✅] Issues created: ${JSON.stringify(issue_ids, null, 2)}`);
         break;

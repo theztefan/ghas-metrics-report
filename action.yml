@@ -30,7 +30,7 @@ outputs:
   created-issues-ids:
     description: "The IDs of the GitHub Issues created by the action"
 runs:
-  using: "node16"
+  using: "node20"
   main: "dist/index.js"
 branding:
   icon: "compass"
