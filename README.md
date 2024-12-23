@@ -1,5 +1,8 @@
 # GitHub Advanced Security - Metrics Report Action
 
+> [!NOTE]
+> This project was written as temporary solution and the functionality by now is superseded by the official [Security Overview](https://docs.github.com/en/enterprise-cloud@latest/code-security/security-overview/about-security-overview) dashboard that the GitHub Advanced Security now provides. The project is still maintained on best effort basis and PRs are welcome.
+
 ## Introduction
 
 A GitHub Action for generating scheduled reports for GitHub Advanced Security alerts.
@@ -27,9 +30,19 @@ This Action can be executed as a script with `npx`. In order to do that:
 
 ## Usage
 
-This action uses the GitHub API and requires a GitHub access token. The suggested way to do it is by using `peter-murray/workflow-application-token-action@v2`. Follow the [steps described](https://github.com/peter-murray/workflow-application-token-action#creating-a-github-application) in the README of the action to set up a GitHub App and use it with the Action.
+This action uses the GitHub API and requires a GitHub access token. The suggested way to do it is by using `actions/create-github-app-token@v1`.
 
-Official documentation on how to create a GitHub App can also be found on: [Creating a GitHub App](https://docs.github.com/en/developers/apps/creating-a-github-app)
+Official documentation on how to create a GitHub App can also be found on: [Creating a GitHub App](https://docs.github.com/en/developers/apps/creating-a-github-app). The Action requires the following minimum permissions:
+
+```
+Repository:
+  - Metadata: Read-only
+  - Contents: Read-only
+  - Code Scanning Alerts: Read-only
+  - Dependabot alerts: Read-only
+  - Secrets Scanning Alerts: Read-only
+  - Issues: Read & Write (only if you want to create issues with the report - output-format: issues)
+```
 
 Invoking GHAS Metrics Report action is as simple as:
 
@@ -60,10 +73,12 @@ jobs:
     steps:
       - name: Get Token
         id: get_workflow_token
-        uses: peter-murray/workflow-application-token-action@v2
+        uses: actions/create-github-app-token@v1
         with:
-          application_id: ${{ secrets.APPLICATION_ID }}
-          application_private_key: ${{ secrets.APPLICATION_PRIVATE_KEY }}
+          app-id: ${{ secrets.APPLICATION_ID }}
+          private-key: ${{ secrets.APPLICATION_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }} # or remove this line to generate toke to all repos in org
       - name: Generate GHAS Metrics Report
         uses: theztefan/ghas-metrics-report
         env:
@@ -122,10 +137,13 @@ jobs:
     steps:
       - name: Get Token
         id: get_workflow_token
-        uses: peter-murray/workflow-application-token-action@v2
+        uses: actions/create-github-app-token@v1
         with:
-          application_id: ${{ secrets.APPLICATION_ID }}
-          application_private_key: ${{ secrets.APPLICATION_PRIVATE_KEY }}
+          app-id: ${{ secrets.APPLICATION_ID }}
+          private-key: ${{ secrets.APPLICATION_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }} # or remove this line to generate toke to all repos in org
+          
       - name: Generate GHAS Metrics Report
         uses: theztefan/ghas-metrics-report
         env:
@@ -147,5 +165,6 @@ jobs:
 ⚠️ Important ⚠️: The dependabot REST API is not supported on GitHub Enterprise Server bellow version 3.8.0. If you are using a version of GitHub Enterprise Server bellow 3.8.0, you will need to remove `dependabot` from the `features` input.
 
 ## Contributing
+
 - Create an issue to the repo with suggestions and bugs
-- Raise a pull request :)
+- Raise a Pull Request 🙃
