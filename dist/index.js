@@ -64718,7 +64718,7 @@ class CodeScanning extends Printable {
     summaryTop10() {
         return this.metrics.top10.map((a) => [
             a.rule?.name || "",
-            a.rule?.severity || "",
+            a.rule?.security_severity_level || a.rule?.severity || "",
             a.tool?.name || "",
             a.most_recent_instance?.location.path || "",
             a.html_url,

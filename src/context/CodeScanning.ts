@@ -49,7 +49,7 @@ export class CodeScanning extends Printable implements Feature {
   summaryTop10(): string[][] {
     return this.metrics.top10.map((a: CodeScanningAlert) => [
       a.rule?.name || "",
-      a.rule?.severity || "",
+      a.rule?.security_severity_level || a.rule?.severity || "",
       a.tool?.name || "",
       a.most_recent_instance?.location.path || "",
       a.html_url,
