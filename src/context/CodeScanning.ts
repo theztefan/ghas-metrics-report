@@ -16,6 +16,7 @@ export class CodeScanning extends Printable implements Feature {
   attributes: string[] = [
     "Vulnerability",
     "Severity",
+    "Weakness",
     "Tool",
     "Vulnerable file",
     "Link",
@@ -46,10 +47,26 @@ export class CodeScanning extends Printable implements Feature {
     return this.metrics;
   }
 
+  //Extracts CWE-### from CodeScanningAlert.rule.tags[] from any format like  "external/cwe/cwe-247" or "CWE-352: Cross-Site Request Forgery (CSRF)"
+  cweFromTags(rule: CodeScanningAlert): string {
+    const cwe = rule.rule?.tags
+      .map((tag) => {
+        const cwe = tag.match(/cwe-(\d+)/i);
+        if (cwe) {
+          return `CWE-${cwe[1]}`;
+        }
+        return "";
+      })
+      .filter((cwe) => cwe !== "")
+      .join(", ");
+    return cwe;
+  }
+
   summaryTop10(): string[][] {
     return this.metrics.top10.map((a: CodeScanningAlert) => [
       a.rule?.name || "",
       a.rule?.security_severity_level || a.rule?.severity || "",
+      this.cweFromTags(a),
       a.tool?.name || "",
       a.most_recent_instance?.location.path || "",
       a.html_url,
