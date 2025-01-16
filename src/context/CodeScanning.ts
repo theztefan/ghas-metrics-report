@@ -68,7 +68,9 @@ export class CodeScanning extends Printable implements Feature {
       a.rule?.security_severity_level || a.rule?.severity || "",
       this.cweFromTags(a),
       a.tool?.name || "",
-      a.most_recent_instance?.location.path || "",
+      a.most_recent_instance?.location?.path
+        ? `${a.most_recent_instance.location.path}#L${a.most_recent_instance.location.start_line}`
+        : "",
       a.html_url,
     ]);
   }
