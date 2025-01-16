@@ -187,6 +187,7 @@ export interface Rule {
   description: string;
   name: string;
   tags: string[];
+  security_severity_level: string;
 }
 
 export interface Tool {
