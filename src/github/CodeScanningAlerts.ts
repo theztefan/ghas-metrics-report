@@ -1,5 +1,4 @@
 import * as core from "@actions/core";
-import { Octokit } from "@octokit/action";
 import { CodeScanningAlert } from "../types/common/main";
 import { MyOctokit } from "./MyOctokit";
 

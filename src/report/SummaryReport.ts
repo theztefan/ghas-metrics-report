@@ -1,6 +1,5 @@
 import * as core from "@actions/core";
 import { SummaryTableRow } from "@actions/core/lib/summary";
-import { stringify } from "querystring";
 import { Report } from "./Report";
 import { ReportMetadata } from "./ReportMetadata";
 
