@@ -64486,20 +64486,20 @@ function compareAlertSeverity(a, b) {
     const weight = {
         critical: 7,
         high: 6,
-        medium: 5,
-        low: 4,
+        error: 5,
+        medium: 4,
         warning: 3,
-        note: 2,
-        error: 1,
+        low: 2,
+        note: 1,
         none: 0,
     };
     const severity1 = getAlertSeverity(a);
     const severity2 = getAlertSeverity(b);
-    if (weight[severity1] < weight[severity2]) {
-        return 1;
-    }
-    else if (weight[severity1] > weight[severity2]) {
+    if (weight[severity1] > weight[severity2]) {
         return -1;
+    }
+    else if (weight[severity1] < weight[severity2]) {
+        return 1;
     }
     return 0;
 }
