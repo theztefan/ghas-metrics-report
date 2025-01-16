@@ -1,4 +1,3 @@
-import { Octokit } from "@octokit/action";
 import { Endpoints } from "@octokit/types";
 import { MyOctokit } from "./MyOctokit";
 

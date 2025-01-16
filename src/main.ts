@@ -1,9 +1,5 @@
 import * as core from "@actions/core";
-import {
-  AlertsMetrics as AlertsMetricsUtils,
-  inputs as getInput,
-  secondsToReadable,
-} from "./utils";
+import { inputs as getInput } from "./utils";
 import { Alert, AlertsMetrics, Issue, ReportType } from "./types/common/main";
 import { randomUUID } from "crypto";
 import { Context } from "./context/Context";

@@ -1,5 +1,4 @@
 import * as core from "@actions/core";
-import { Octokit } from "@octokit/action";
 import { DependancyAlert } from "../types/common/main";
 import { MyOctokit } from "./MyOctokit";
 
