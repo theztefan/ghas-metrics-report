@@ -156,36 +156,39 @@ const FilterBetweenDates = (
   return date >= minDate.getTime() && date < maxDate.getTime();
 };
 
+function getAlertSeverity(alert: Alert): string {
+  if (isDependancyAlert(alert)) {
+    return alert.security_advisory.severity.toLowerCase();
+  } else if (isCodeScanningAlert(alert)) {
+    const codeScanningAlert = alert as CodeScanningAlert;
+    return codeScanningAlert.rule?.security_severity_level
+      ? codeScanningAlert.rule?.security_severity_level.toLowerCase()
+      : codeScanningAlert.rule?.severity.toLowerCase() || "none";
+  }
+  return "none";
+}
+
 function compareAlertSeverity(a: Alert, b: Alert) {
-  //critical, high, medium, low, warning, note, error
   const weight: { [key: string]: number } = {
     critical: 7,
     high: 6,
-    medium: 5,
-    low: 4,
+    error: 5,
+    medium: 4,
     warning: 3,
-    note: 2,
-    error: 1,
+    low: 2,
+    note: 1,
     none: 0,
   };
-  let comparison = 0;
-  let severity1 = "none";
-  let severity2 = "none";
 
-  severity1 = isDependancyAlert(a)
-    ? a.security_advisory.severity.toLowerCase()
-    : (a as CodeScanningAlert).rule?.severity.toLowerCase();
-  severity2 = isDependancyAlert(b)
-    ? b.security_advisory.severity.toLowerCase()
-    : (b as CodeScanningAlert).rule?.severity.toLowerCase();
+  const severity1 = getAlertSeverity(a);
+  const severity2 = getAlertSeverity(b);
 
-  if (weight[severity1] < weight[severity2]) {
-    comparison = 1;
-  } else if (weight[severity1] > weight[severity2]) {
-    comparison = -1;
+  if (weight[severity1] > weight[severity2]) {
+    return -1;
+  } else if (weight[severity1] < weight[severity2]) {
+    return 1;
   }
-
-  return comparison;
+  return 0;
 }
 
 export function isDependancyAlert(alert: Alert): alert is DependancyAlert {

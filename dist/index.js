@@ -64470,34 +64470,38 @@ const FilterBetweenDates = (stringDate, minDate, maxDate) => {
     const date = Date.parse(stringDate);
     return date >= minDate.getTime() && date < maxDate.getTime();
 };
+function getAlertSeverity(alert) {
+    if (isDependancyAlert(alert)) {
+        return alert.security_advisory.severity.toLowerCase();
+    }
+    else if (isCodeScanningAlert(alert)) {
+        const codeScanningAlert = alert;
+        return codeScanningAlert.rule?.security_severity_level
+            ? codeScanningAlert.rule?.security_severity_level.toLowerCase()
+            : codeScanningAlert.rule?.severity.toLowerCase() || "none";
+    }
+    return "none";
+}
 function compareAlertSeverity(a, b) {
-    //critical, high, medium, low, warning, note, error
     const weight = {
         critical: 7,
         high: 6,
-        medium: 5,
-        low: 4,
+        error: 5,
+        medium: 4,
         warning: 3,
-        note: 2,
-        error: 1,
+        low: 2,
+        note: 1,
         none: 0,
     };
-    let comparison = 0;
-    let severity1 = "none";
-    let severity2 = "none";
-    severity1 = isDependancyAlert(a)
-        ? a.security_advisory.severity.toLowerCase()
-        : a.rule?.severity.toLowerCase();
-    severity2 = isDependancyAlert(b)
-        ? b.security_advisory.severity.toLowerCase()
-        : b.rule?.severity.toLowerCase();
-    if (weight[severity1] < weight[severity2]) {
-        comparison = 1;
+    const severity1 = getAlertSeverity(a);
+    const severity2 = getAlertSeverity(b);
+    if (weight[severity1] > weight[severity2]) {
+        return -1;
     }
-    else if (weight[severity1] > weight[severity2]) {
-        comparison = -1;
+    else if (weight[severity1] < weight[severity2]) {
+        return 1;
     }
-    return comparison;
+    return 0;
 }
 function isDependancyAlert(alert) {
     return "security_advisory" in alert;
@@ -64699,6 +64703,7 @@ class CodeScanning extends Printable {
     attributes = [
         "Vulnerability",
         "Severity",
+        "Weakness",
         "Tool",
         "Vulnerable file",
         "Link",
@@ -64711,12 +64716,29 @@ class CodeScanning extends Printable {
         this.metrics = AlertsMetrics(alerts, frequency, "fixed_at", "fixed", true, "commitDate", "created_at");
         return this.metrics;
     }
+    //Extracts CWE-### from CodeScanningAlert.rule.tags[] from any format like  "external/cwe/cwe-247" or "CWE-352: Cross-Site Request Forgery (CSRF)"
+    cweFromTags(rule) {
+        const cwe = rule.rule?.tags
+            .map((tag) => {
+            const cwe = tag.match(/cwe-(\d+)/i);
+            if (cwe) {
+                return `CWE-${cwe[1]}`;
+            }
+            return "";
+        })
+            .filter((cwe) => cwe !== "")
+            .join(", ");
+        return cwe;
+    }
     summaryTop10() {
         return this.metrics.top10.map((a) => [
             a.rule?.name || "",
-            a.rule?.severity || "",
+            a.rule?.security_severity_level || a.rule?.severity || "",
+            this.cweFromTags(a),
             a.tool?.name || "",
-            a.most_recent_instance?.location.path || "",
+            a.most_recent_instance?.location?.path
+                ? `${a.most_recent_instance.location.path}#L${a.most_recent_instance.location.start_line}`
+                : "",
             a.html_url,
         ]);
     }
