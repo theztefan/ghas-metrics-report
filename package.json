@@ -28,7 +28,7 @@
     "@vercel/ncc": "^0.36.1",
     "dotenv": "^16.0.3",
     "jspdf": "^2.5.1",
-    "jspdf-autotable": "^3.5.31"
+    "jspdf-autotable": "^3.8.4"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
